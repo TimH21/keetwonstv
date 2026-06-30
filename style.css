@@ -1908,3 +1908,52 @@ body.standby-mode .weather-row {
 .price-sidebar { display: flex; flex-direction: column; height: 100%; }
 .prices-stage { flex-grow: 1; display: flex; flex-direction: column; }
 .train-ticker-sub-container { height: 100% !important; max-height: 100% !important; flex-grow: 1; }
+
+/* =========================================
+   ✨ ANIMATIES & VERNIEUWDE LAYOUT
+   ========================================= */
+
+/* De kaarten zweven één voor één naar binnen als de slide actief wordt */
+.slide.active .modern-card {
+    opacity: 0;
+    transform: translateY(50px);
+    animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Stagger effect: elke kaart start net iets later */
+.slide.active .modern-card:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .modern-card:nth-child(2) { animation-delay: 0.3s; }
+.slide.active .modern-card:nth-child(3) { animation-delay: 0.5s; }
+.slide.active .modern-card:nth-child(4) { animation-delay: 0.7s; }
+
+@keyframes slideUpFade {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animatie voor de grote titels */
+.slide.active .slide-title {
+    animation: textFocus 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    letter-spacing: 2px;
+}
+@keyframes textFocus {
+    0% { filter: blur(10px); opacity: 0; transform: scale(1.05); }
+    100% { filter: blur(0); opacity: 1; transform: scale(1); }
+}
+
+/* De vernieuwde Snack Pills (Flexibel voor elk scherm) */
+.snack-container {
+    display: flex; flex-wrap: wrap; gap: 1.5vh 1vw; justify-content: center;
+    margin-bottom: 2vh; margin-top: 1vh;
+}
+.snack-pill {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1.2vh 1.5vw; border-radius: 8px; color: #fff;
+    font-size: 2.2vh; font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.3s, background 0.3s;
+}
+.snack-pill:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.2); }
+
+/* Accent kleur voor speciale items */
+.snack-pill.accent { border-color: var(--accent); color: var(--accent); }
