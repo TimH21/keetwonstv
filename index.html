@@ -42,8 +42,6 @@
             </div>
         </div>
     </div>
-
-    <div id="calamity-overlay" style="display:none;"></div>
     
     <div class="bg-layer"></div>
     <div id="weather-fx" class="weather-fx"></div>
@@ -241,6 +239,13 @@
         </div>
     </footer>
 
+    <div id="calamity-control-modal" class="modal-overlay" style="z-index: 100000; display: none;">
+        </div>
+
+    <div id="local-admin-btn" class="local-admin-btn" onclick="toggleAdminMenu()">
+        <i class="fa-solid fa-gear"></i>
+    </div>
+    
     <script src="script.js?v=99"></script>
     <video id="keepAwake" loop muted playsinline style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -100;">
         <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
