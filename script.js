@@ -11,7 +11,8 @@ let currentNextTitleStr = "...";
 function next() {
     if (!slides || slides.length === 0) return;
     
-    slides[idx].classList.remove('active');
+    // DE FIX: Haal eerst overal de 'active' class weg voordat we verder gaan!
+    slides.forEach(s => s.classList.remove('active'));
     
     // Blijf zoeken tot we een slide vinden die NIET overgeslagen mag worden
     let attempts = 0;
@@ -558,3 +559,93 @@ function preventSleepMode() {
 }
 preventSleepMode();
 document.addEventListener('click', preventSleepMode, { once: true });
+
+// ===============================================
+// 9. LOKALE ADMIN CONTROLLER (MUIS BEDIENING)
+// ===============================================
+let mouseTimer;
+let isAdminMenuOpen = false;
+let isPaused = false;
+
+// 1. Luister naar de muis
+document.addEventListener('mousemove', () => {
+    const btn = document.getElementById('local-admin-btn');
+    if (btn && !isAdminMenuOpen) {
+        btn.classList.add('visible'); // Laat knop zien
+        
+        clearTimeout(mouseTimer); // Reset de wekker
+        
+        // Verberg weer na 5 seconden
+        mouseTimer = setTimeout(() => {
+            btn.classList.remove('visible');
+        }, 5000);
+    }
+});
+
+// 2. Open / Sluit het menu
+function toggleAdminMenu() {
+    const modal = document.getElementById('local-admin-modal');
+    const btn = document.getElementById('local-admin-btn');
+    isAdminMenuOpen = !isAdminMenuOpen;
+
+    if (isAdminMenuOpen) {
+        modal.style.display = 'flex';
+        btn.classList.add('visible');
+        clearTimeout(mouseTimer); // Blijf permanent zichtbaar als menu open is
+    } else {
+        modal.style.display = 'none';
+        mouseTimer = setTimeout(() => { btn.classList.remove('visible'); }, 5000); // Start timer weer
+    }
+}
+
+// 3. Wijzigingen toepassen
+function updateLocalSettings() {
+    // Kleur aanpassen
+    const color = document.getElementById('admin-color').value;
+    document.querySelector('.bg-layer').style.backgroundColor = color;
+
+    // Sidebar aanpassen
+    const sidebar = document.getElementById('admin-sidebar').value;
+    const widget = document.getElementById('sidebar-widget');
+    const icon = document.getElementById('sw-icon');
+    const label = document.getElementById('sw-label');
+    const text = document.getElementById('sw-text');
+
+    widget.className = 'sidebar-widget'; // reset oude klasses
+
+    if (sidebar === 'status') {
+        widget.classList.add('sw-green');
+        icon.className = 'fa-solid fa-door-open';
+        label.textContent = 'STATUS';
+        text.textContent = 'OPEN';
+    } else if (sidebar === 'frituur') {
+        widget.classList.add('sw-orange');
+        icon.className = 'fa-solid fa-utensils';
+        label.textContent = 'FRITUUR';
+        text.textContent = 'AAN';
+    } else if (sidebar === 'knmi') {
+        widget.classList.add('sw-yellow');
+        icon.className = 'fa-solid fa-triangle-exclamation';
+        label.textContent = 'KNMI';
+        text.textContent = 'VEILIG'; 
+        checkKnmiAlarm(); // Roep functie aan voor live update
+    }
+}
+
+// 4. Pauzeknop logica
+function togglePause() {
+    const btn = document.getElementById('btn-pause');
+    isPaused = !isPaused;
+    
+    if (isPaused) {
+        clearInterval(slideTimer);
+        btn.innerHTML = "Hervat Rotatie ▶️";
+        btn.style.background = "#e74c3c";
+        document.getElementById('footer-next-title').textContent = "GEPAUZEERD";
+    } else {
+        slideTimer = setInterval(next, TIME);
+        btn.innerHTML = "Pauzeer Rotatie ⏸️";
+        btn.style.background = "#333";
+        document.getElementById('footer-next-title').textContent = currentNextTitleStr;
+    }
+}
