@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keet Wons TV - Noodomgeving</title>
+    <link rel="stylesheet" href="style.css?v=85">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="bg-layer"></div>
+    <div id="weather-fx" class="weather-fx"></div>
+    <div id="wind-fx" class="wind-fx"></div>
+
+    <div class="main-layout">
+        <!-- ZIJBALK -->
+        <aside class="sidebar">
+            <div class="logo-area">KEET<br><span style="color:#2ecc71">WONS.nl</span></div>
+
+            <div class="widget-box">
+                <div id="time">--:--</div>
+                <div id="date">Laden...</div>
+            </div>
+
+            <div class="widget-box weather-box" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="weather-left">
+                    <div class="weather-row">
+                        <i class="fa-solid fa-cloud" id="weather-icon"></i>
+                        <span id="temp">--°</span>
+                    </div>
+                    <div class="wind-row">
+                        <i class="fa-solid fa-wind"></i> <span id="wind-sidebar">-- km/u</span>
+                    </div>
+                    <div id="weather-desc">Wons</div>
+                </div>
+                <div class="no-smoking-sign">
+                    <i class="fa-solid fa-ban-smoking"></i>
+                </div>
+            </div>
+
+            <!-- Vaste 'OPEN' status in plaats van live -->
+            <div id="sidebar-widget" class="sidebar-widget sw-green">
+                <div class="widget-icon"><i id="sw-icon" class="fa-solid fa-door-open"></i></div>
+                <div class="widget-content">
+                    <span id="sw-label">STATUS</span>
+                    <strong id="sw-text">OPEN</strong>
+                </div>
+            </div>
+
+            <div class="price-sidebar">
+                <div class="price-header"><i class="fa-solid fa-tag"></i> PRIJZEN</div>
+                <div class="prices-stage" id="prices-stage">
+                    <div class="price-specific-list-box" id="sidebar-specific-box" style="display: none;">
+                        <div id="sidebar-cat-header" class="price-row cat-header"></div>
+                        <div class="train-ticker-sub-container">
+                            <div class="train-ticker-track-specific" id="sidebar-price-track-specific"></div>
+                        </div>
+                    </div>
+                    <div class="price-normal-list-box" id="sidebar-normal-box">
+                        <div class="train-ticker-sub-container">
+                            <div class="train-ticker-track-normal" id="sidebar-price-track-normal"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- HOOFDSCHERM -->
+        <main class="content-area">
+            
+            <div class="slide" id="slide-match" data-title="Voetbal">
+                <div class="slide-inner centered-layout">
+                    <div class="header-badge blue">EREDIVISIE</div>
+                    <h1 class="slide-title" style="margin-bottom: 4vh;">KOMENDE WEDSTRIJDEN</h1>
+                    <div id="eredivisie-list" class="eredivisie-grid">Laden...</div>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-weather" data-title="Weerbericht">
+                <div class="slide-inner centered-layout">
+                    <div class="weather-hero">
+                        <div class="weather-main-icon" id="hero-weather-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+                        <div class="weather-text">
+                            <h1 id="hero-temp">--°</h1>
+                            <div id="hero-feels-like" style="font-size: 3vh; color: #ccc; margin-bottom: 1vh; font-weight:bold;">Gevoel: --°</div>
+                            <div class="wind-badge">
+                                <i class="fa-solid fa-wind"></i> <span id="hero-wind">-- km/u</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="rain-alert-box" class="rain-alert safe">
+                        <span id="rain-text">Laden...</span>
+                    </div>
+                    <h2 class="sub-header">KOMENDE UREN</h2>
+                    <div class="forecast-container" id="forecast-grid"></div>
+                </div>
+            </div>
+
+            <!-- Nieuwe Vaste Menukaart met geüpdatete prijzen -->
+            <div class="slide active" id="slide-menu" data-title="Prijzenlijst">
+                <div class="slide-inner centered-layout">
+                    <h1 class="slide-title">PRIJZENLIJST</h1>
+                    <div style="font-size: 3vh; color: #2ecc71; font-weight: 800; margin-bottom: 3vh; letter-spacing: 2px;">1 MUNT = € 1,50</div>
+                    <div class="menu-grid-big">
+                        <div class="menu-block">
+                            <h2><i class="fa-solid fa-beer-mug-empty"></i> DRANKEN</h2>
+                            <div class="menu-row"><span>Bier / Wijn / 0.0</span> <b>1 Munt</b></div>
+                            <div class="menu-row"><span>Shotjes</span> <b>1 Munt</b></div>
+                            <div class="menu-row"><span>Mixdrank</span> <b>1,5 Munt</b></div>
+                            <div class="menu-row highlight"><span>Stelz</span> <b>2 Munten</b></div>
+                            <div class="menu-row" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;"><span>Fris (Cola, Ice Tea, etc.)</span> <b>0,5 Munt</b></div>
+                        </div>
+                        <div class="menu-block">
+                            <h2><i class="fa-solid fa-burger"></i> SNACKS (INCL. PATAT)</h2>
+                            <div class="menu-row"><span>Snack Zonder Saus</span> <b>1 Munt</b></div>
+                            <div class="menu-row highlight"><span>Snack Met Saus</span> <b>1,5 Munt</b></div>
+                            <div style="font-size: 2vh; color: #888; margin-top: 15px; font-style: italic;">Assortiment varieert: Frikandel, Kroket, Kipcorn, Kaassoufflé, Patat, etc.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-agenda" data-title="Agenda">
+                <div class="slide-inner centered-layout">
+                    <div class="header-badge blue"><i class="fa-regular fa-calendar"></i> AGENDA</div>
+                    <h1 class="slide-title">BINNENKORT IN DE KEET</h1>
+                    <div class="agenda-list">
+                        <div class="agenda-item">
+                            <div class="ag-day">VR</div>
+                            <div class="ag-info">
+                                <h3>Vrijdag Avond</h3>
+                                <p>20:30 • Start het weekend goed in de keet!</p>
+                            </div>
+                        </div>
+                        <div class="agenda-item">
+                            <div class="ag-day">ZA</div>
+                            <div class="ag-info">
+                                <h3>Zaterdag Avond</h3>
+                                <p>20:30 • Bier & Gezelligheid</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-smoke" data-title="Roken">
+                <div class="slide-inner centered-layout">
+                    <div class="smoke-icon"><i class="fa-solid fa-ban-smoking"></i></div>
+                    <h1 class="huge-text red-text">ROKEN? NAAR BUITEN!</h1>
+                    <h2>(Binnen Roken = Boete)</h2>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-socials" data-title="Socials">
+                <div class="slide-inner centered-layout">
+                    <h1 class="slide-title">VOLG ONS ONLINE</h1>
+                    <div class="social-grid">
+                        <div class="social-card insta"><i class="fa-brands fa-instagram"></i> @keetwons</div>
+                        <div class="social-card fb"><i class="fa-brands fa-facebook"></i> Keet Wons</div>
+                        <div class="social-card si"><i class="fa-brands fa-google"></i> Keetwons.nl</div>
+                    </div>
+                    <div class="qr-box">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://keetwons.nl" class="qr-img">
+                        <p>SCAN VOOR WEBSITE (TIJDELIJK OFFLINE)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GEBLOKKEERDE (SKIP) SLIDES -->
+            <!-- We geven alle slides die live Firebase-data nodig hebben de 'skip-slide' class -->
+            <div class="slide skip-slide" id="slide-history" data-title="Foto's"></div>
+            <div class="slide skip-slide" id="slide-music" data-title="Muziek"></div>
+            <div class="slide skip-slide" id="slide-top3" data-title="Sûplappen"></div>
+            <div class="slide skip-slide" id="slide-rich" data-title="Elite"></div>
+            <div class="slide skip-slide" id="slide-member" data-title="Spotlight"></div>
+            <div class="slide skip-slide" id="slide-poll" data-title="Poll"></div>
+            <div class="slide skip-slide" id="slide-aanwezigheid" data-title="Aanwezigheid"></div>
+            <div class="slide skip-slide" id="slide-orders" data-title="Snack"></div>
+            <div class="slide skip-slide" id="slide-birthday" data-title="Verjaardagen"></div>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="ticker-bar-new">
+        <div id="global-progress-bar" class="global-progress"></div>
+        <div class="ticker-left-next">
+            <span class="next-label">ZO METEEN:</span>
+            <span id="footer-next-title">...</span>
+        </div>
+        <div class="ticker-right-msg">
+            <span id="fade-ticker" class="ticker-text-anim">WELKOM BIJ KEET WONS</span>
+        </div>
+    </footer>
+
+    <script src="script.js?v=99"></script>
+    <video id="keepAwake" loop muted playsinline style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -100;">
+        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    </video>
+</body>
+</html>

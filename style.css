@@ -1,0 +1,1793 @@
+:root {
+    --primary: #2ecc71; --accent: #f1c40f;
+    --bg-dark: #050505; --sidebar-bg: #0f0f0f;
+    --text-main: #ffffff;
+    --font-head: 'Bebas Neue', sans-serif;
+    --font-body: 'Montserrat', sans-serif;
+}
+
+html, body { margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); height: 100vh; width: 100vw; overflow: hidden; }
+
+/* === BASIS LAGEN (PREMIUM CINEMATIC FILM GRAIN) === */
+.bg-layer { 
+    position: fixed; inset: 0; z-index: 0; 
+    background-color: #060606; /* Iets zachter dan puur zwart voor de film-look */
+}
+.bg-layer::after {
+    content: ""; position: absolute; inset: 0;
+    opacity: 0.12; /* Een haast onzichtbaar laagje textuur */
+    pointer-events: none;
+}
+
+/* Overlay is niet meer nodig op zwart, dus die verbergen we */
+.bg-overlay { display: none; }
+
+/* === WEER EFFECTEN LAAG === */
+.weather-fx {
+    position: fixed; inset: 0; z-index: 2; 
+    pointer-events: none;
+    opacity: 0; /* STANDAARD UIT */
+    transition: opacity 1.5s ease-in-out; 
+}
+/* Extra laag voor windvlagen (kan tegelijk met regen) */
+.wind-fx {
+    position: fixed; inset: 0; z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s;
+    background-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    animation: windRush 2s linear infinite;
+}
+@keyframes windRush { from {background-position: 200% 0;} to {background-position: -200% 0;} }
+
+/* === MAIN LAYOUT (Bovenop alles) === */
+.main-layout { 
+    display: grid; 
+    grid-template-columns: 30vw 70vw; 
+    height: 90vh; width: 100vw; 
+    /* DE FIX: Vloeiende overgang van de grid kolommen! */
+    transition: grid-template-columns 1.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+}
+
+/* SIDEBAR */
+.sidebar { background: var(--sidebar-bg); border-right: 2px solid #222; display: flex; flex-direction: column; padding: 3vh 2vw; box-shadow: 10px 0 30px rgba(0,0,0,0.5); z-index: 10; }
+.logo-area { font-family: var(--font-head); font-size: 6vh; line-height: 0.8; border-left: 6px solid var(--primary); padding-left: 15px; margin-bottom: 3vh; }
+.logo-area span { color: var(--primary); }
+.widget-box { margin-bottom: 2vh; }
+#time { font-family: var(--font-head); font-size: 5vh; line-height: 1; margin-bottom: 0; }
+#date { font-size: 1.5vh; color: #888; text-transform: uppercase; font-weight: 600; }
+.weather-row { display: flex; align-items: center; gap: 15px; }
+#weather-icon { font-size: 3vh; color: var(--accent); }
+#temp { font-family: var(--font-head); font-size: 4vh; }
+.wind-row { font-size: 1.5vh; color: #aaa; margin-top: 0.5vh; font-weight: bold; display: flex; align-items: center; gap: 0.5vw; }
+#weather-desc { margin-top: 5px; color: #666; font-weight: 600; font-size: 1.5vh; }
+.price-sidebar { background: #1a1a1a; border-radius: 12px; padding: 2vh 1.5vw; border: 1px solid #333; margin-top: 1vh; margin-bottom: auto; }
+.price-header { font-family: var(--font-head); font-size: 2.5vh; color: var(--primary); margin-bottom: 1vh; border-bottom: 1px solid #333; }
+.price-row { display: flex; justify-content: space-between; font-size: 1.8vh; margin-bottom: 0.5vh; border-bottom: 1px solid #222; padding-bottom: 0.5vh; }
+.price-row strong { color: var(--accent); }
+.status-badge { background: #222; padding: 1.5vh; border-radius: 50px; border: 1px solid #333; margin-top: 2vh; display: flex; align-items: center; gap: 1vw; }
+.status-dot { width: 1.5vh; height: 1.5vh; border-radius: 50%; background: red; box-shadow: 0 0 10px red; }
+#status-text { font-weight: 800; font-size: 2vh; }
+/* === FOOTER (MET GLOBALE BALK) === */
+.ticker-bar-new { 
+    position: fixed; bottom: 0; left: 0; width: 100%; height: 10vh; 
+    background: #000; 
+    /* border-top: 5px solid var(--primary);  <-- DEZE IS WEGGEHAALD! */
+    display: flex; justify-content: space-between; align-items: center; 
+    z-index: 1000; padding: 0 3vw; box-sizing: border-box;
+    gap: 3vw;
+}
+
+/* DE NIEUWE BALK (Bovenop de footer) */
+.global-progress {
+    position: absolute;
+    top: 0; left: 0;
+    height: 6px; /* Dikte van de balk */
+    background: var(--primary); /* Groen */
+    width: 0%; 
+    transition: width 0.1s linear;
+    z-index: 1001;
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* LINKS: ZO METEEN */
+.ticker-left-next { 
+    font-family: var(--font-head); font-size: 4vh; color: white; 
+    display: flex; align-items: center; gap: 15px; position: relative;
+    flex-shrink: 0;
+}
+.next-label { color: #888; font-weight: 600; }
+#footer-next-title { color: var(--primary); font-weight: 800; white-space: nowrap; }
+
+.footer-progress-bar { width: 100%; height: 6px; background: #333; position: absolute; bottom: -10px; left: 0; }
+#footer-progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
+
+/* RECHTS: DE MELDINGEN (MET FADE) */
+.ticker-right-msg { 
+    font-family: var(--font-head); font-size: 5vh; color: white; 
+    text-transform: uppercase; letter-spacing: 2px;
+    flex: 1; /* Neemt de rest van de ruimte in */
+    text-align: right; /* Tekst aan de rechterkant */
+    overflow: hidden; 
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* De animatie klasse */
+.ticker-text-anim {
+    opacity: 1;
+    transition: opacity 0.6s ease-in-out; /* Dit zorgt voor de fade! */
+}
+
+/* =========================================
+   📺 CONTENT (ULTRA-MODERN FESTIVAL REVEAL)
+   ========================================= */
+.content-area { position: relative; width: 100%; height: 100%; overflow: hidden; }
+
+.slide { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    opacity: 0; visibility: hidden; z-index: 0; 
+    /* Geen gezoom meer! Begint een stukje lager voor een strakke 'lift' */
+    transform: translateY(12vh); 
+    /* Een 'snappy' curve: schiet razendsnel omhoog en remt superstrak af */
+    transition: opacity 0.5s ease-out, 
+                transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                visibility 0.8s; 
+}
+
+.slide.active { 
+    opacity: 1 !important; visibility: visible !important; z-index: 10; 
+    /* Klapt direct en haarscherp op zijn plek */
+    transform: translateY(0); 
+}
+
+.slide-inner { width: 90%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin: 0 auto; }
+.header-badge { display: inline-block; padding: 1vh 3vw; border-radius: 30px; font-weight: 800; margin-bottom: 2vh; font-size: 2vh; }
+.header-badge.gold { background: var(--accent); color: black; }
+.header-badge.blue { background: #3498db; color: white; }
+.slide-title { font-family: var(--font-head); font-size: 8vh; margin: 0 0 4vh 0; text-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 0.9; }
+
+/* MATCHDAY */
+.match-card-big { display: flex; justify-content: center; align-items: center; gap: 4vw; background: linear-gradient(135deg, rgba(30,60,114,0.8), rgba(42,82,152,0.8)); padding: 5vh; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 4vh; }
+.team-block h1 { font-family: var(--font-head); font-size: 8vh; margin: 0; text-transform: uppercase; }
+.team-logo-big { width: 12vw; height: 12vw; object-fit: contain; background: white; border-radius: 50%; padding: 2vh; margin-bottom: 2vh; }
+.vs-block { font-family: var(--font-head); font-size: 5vh; opacity: 0.6; }
+.match-time-big { font-size: 4vh; font-weight: 800; background: #fff; color: #000; display: inline-block; padding: 1vh 4vw; border-radius: 50px; }
+
+/* AGENDA */
+.agenda-list { display: flex; gap: 2vw; width: 100%; justify-content: center; margin-top: 2vh; }
+.agenda-item { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 3vh; border-radius: 15px; width: 25%; text-align: left; position: relative; overflow: hidden; }
+.agenda-item::before { content: ''; position: absolute; left: 0; top: 0; width: 5px; height: 100%; background: var(--primary); }
+.ag-day { font-family: var(--font-head); font-size: 5vh; color: var(--primary); margin-bottom: 1vh; }
+.ag-info h3 { margin: 0; font-size: 2.5vh; color: white; }
+.ag-info p { color: #aaa; margin: 0.5vh 0 0 0; font-size: 1.8vh; }
+
+/* MUSIC */
+.music-layout { flex-direction: row; gap: 5vw; }
+.vinyl-container { width: 35vh; height: 35vh; position: relative; }
+.vinyl-record { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(#111 50%, #000 70%); border: 3px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: spin 8s linear infinite; display: flex; align-items: center; justify-content: center; }
+.vinyl-record img { width: 45%; height: 45%; border-radius: 50%; object-fit: cover; }
+.vinyl-hole { position: absolute; width: 15px; height: 15px; background: #000; border-radius: 50%; border: 2px solid #555; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.music-info { text-align: left; max-width: 40vw; }
+.music-tag { background: #1DB954; color: black; display: inline-block; padding: 0.8vh 2vw; font-weight: 800; border-radius: 20px; margin-bottom: 2vh; font-size: 1.5vh; }
+.music-info h1 { font-family: var(--font-head); font-size: 8vh; margin: 0; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.music-info h2 { font-size: 4vh; color: var(--primary); margin: 1vh 0 3vh 0; }
+.prev-song { color: #666; font-size: 2vh; border-top: 1px solid #333; padding-top: 1vh; display: inline-block; }
+.visualizer { display: flex; gap: 10px; height: 50px; align-items: flex-end; margin-top: 2vh; }
+.bar { width: 10px; background: var(--primary); animation: jump 0.5s infinite alternate; }
+.bar:nth-child(2) { animation-delay: 0.1s; } .bar:nth-child(3) { animation-delay: 0.3s; }
+@keyframes jump { from { height: 10px; } to { height: 40px; } }
+
+/* MENU */
+.menu-grid-big { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; width: 100%; text-align: left; }
+.menu-block h2 { color: var(--primary); border-bottom: 2px solid #333; padding-bottom: 15px; font-size: 4vh; margin-top: 0; font-family: var(--font-head); }
+.menu-row { display: flex; justify-content: space-between; font-size: 2.5vh; padding: 1.5vh 0; border-bottom: 1px solid #222; }
+.menu-row.highlight { color: var(--accent); }
+
+/* SOCIALS */
+.social-grid { display: flex; gap: 1vw; justify-content: center; margin-bottom: 2vh; }
+.social-card { background: rgba(255,255,255,0.1); padding: 2vh 3vw; border-radius: 15px; border: 1px solid #444; font-size: 2.5vh; font-weight: bold; display: flex; align-items: center; gap: 1vw; }
+.insta i { color: #E1306C; } .fb i { color: #1877F2; } .sp i { color: #1DB954; } .si i { color: #b9491d; }
+.qr-box { background: white; padding: 10px; border-radius: 15px; display: inline-block; color: black; }
+.qr-img { width: 25vh; height: 25vh; }
+.qr-box p { margin: 5px 0 0 0; font-weight: bold; font-size: 1.5vh; }
+
+/* LEADERBOARD & SPOTLIGHT */
+.podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 2vw; margin-top: 5vh; }
+.podium-card { background: rgba(30,30,30,0.9); padding: 3vh 2vw; border-radius: 20px; width: 15vw; text-align: center; border: 1px solid #333; position: relative; }
+.rank-1 { transform: scale(1.15); border: 2px solid var(--accent); z-index: 5; background: rgba(40,40,40,0.95); }
+.p-img { width: 8vw; height: 8vw; border-radius: 50%; object-fit: cover; margin: 2vh 0; border: 4px solid #444; }
+.p-name { font-weight: 800; font-size: 3vh; margin-bottom: 1vh; }
+.p-score { color: var(--primary); font-size: 2.5vh; font-weight: 600; }
+.spotlight-card { background: rgba(30,30,30,0.9); padding: 5vh; border-radius: 20px; border: 1px solid #444; }
+.spotlight-img-box img { width: 18vw; height: 18vw; border-radius: 50%; object-fit: cover; border: 5px solid var(--primary); margin-bottom: 2vh; }
+#spotlight-name { font-family: var(--font-head); font-size: 6vh; margin: 0; }
+.quote { font-style: italic; color: #aaa; font-size: 2.5vh; margin-top: 1vh; }
+
+/* WEER SLIDE */
+.weather-hero {
+    display: flex; align-items: center; justify-content: center; gap: 5vw;
+    margin-bottom: 1.5vh !important; /* Strakker op de rest */
+    padding: 2vh 5vw !important; /* Minder padding */
+    background: rgba(0, 0, 0, 0.6); 
+    border-radius: 40px; border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+.weather-main-icon { font-size: 13vh !important; color: #fff; filter: drop-shadow(0 0 30px rgba(255,255,255,0.4)); animation: float 6s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.weather-text h1 { font-family: var(--font-head); font-size: 15vh !important; margin: 0; line-height: 0.85; color: white; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+.wind-badge { margin-top: 1vh !important; background: rgba(0,0,0,0.5); border: 1px solid rgba(52, 152, 219, 0.6); color: #63b3ed; padding: 1vh 2vw !important; border-radius: 50px; font-size: 2.5vh !important; font-weight: 700; display: flex; align-items: center; gap: 1vw; justify-content: center; }
+
+/* Regen Alarm */
+.rain-alert { width: 90%; margin: 1.5vh auto !important; padding: 1.5vh !important; border-radius: 15px; font-size: 3vh !important; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 1.5vw; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+.rain-alert.safe { background: #27ae60; color: white; border: 2px solid #2ecc71; }
+.rain-alert.danger { background: #2980b9; color: white; border: 2px solid #3498db; }
+.sub-header { font-size: 2.5vh !important; color: #ccc; font-weight: 800; letter-spacing: 3px; margin-bottom: 1.5vh !important; opacity: 0.8; text-transform: uppercase; }
+
+/* ROOSTER GRID */
+.forecast-container { 
+    display: grid; grid-template-columns: repeat(5, 1fr); 
+    gap: 15px; width: 100%; margin-top: 0vh; padding: 0 10px; 
+}
+.f-card { 
+    background: rgba(20, 20, 20, 0.9); border: 1px solid rgba(255,255,255,0.15); 
+    padding: 1vh 0 !important; border-radius: 15px; text-align: center; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6); 
+    position: relative; overflow: hidden;
+}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.f-time { font-family: 'Montserrat', sans-serif; color: #fff; opacity: 0.9; font-size: 2.2vh !important; font-weight: 700; margin-bottom: 1vh !important; }
+.f-temp { font-family: var(--font-head); font-size: 5vh !important; color: #fff; margin: 0.5vh 0 !important; text-shadow: 0 3px 8px black; }
+.f-icon { font-size: 3.5vh !important; margin: 0.5vh 0 !important; color:white; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+.f-rain { font-weight: 800; font-size: 1.8vh !important; margin-top: 3px !important; color: #ccc; }
+.f-rain-mm { font-size: 0.8em; color: #3498db; display: block; margin-top: 2px; }
+.f-wind { color: #888; font-size: 1.5vh !important; margin-top: 1vh !important; font-weight: 600; display:flex; justify-content:center; gap:0.5vw; align-items: center; }
+
+
+/* =========================================
+   🌍 WEER EFFECTEN (DE "PERFECTE" STIJL)
+   ========================================= */
+
+/* 1. ☀️ ZONNIG (Statische gloed om flikkeren te voorkomen) */
+.fx-sunny::before {
+    content: ""; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255, 220, 100, 0.25) 0%, transparent 70%);
+    mix-blend-mode: screen; 
+    animation: sunPulse 10s infinite alternate;
+}
+@keyframes sunPulse { from { opacity: 0.6; } to { opacity: 0.9; } }
+
+/* ALGEMENE VAL ANIMATIE VOOR ALLE REGEN */
+@keyframes rainFall {
+    from { background-position: 0 0; }
+    to { background-position: 0 100vh; } 
+}
+
+/* 2a. 💧 MIEZER / DRIZZLE (Kleinere druppels, langzamer, lichter) */
+.fx-drizzle { 
+    background-color: rgba(0, 0, 20, 0.2); 
+}
+/* Laag 1: Fijne druppeltjes */
+.fx-drizzle::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: 
+        radial-gradient(1px 6px at 10% 10%, rgba(255, 255, 255, 0.6), transparent),
+        radial-gradient(1px 6px at 30% 40%, rgba(255, 255, 255, 0.6), transparent),
+        radial-gradient(1px 6px at 70% 20%, rgba(255, 255, 255, 0.6), transparent),
+        radial-gradient(1px 6px at 90% 60%, rgba(255, 255, 255, 0.6), transparent);
+    background-size: 20vw 30vh; 
+    animation: rainFall 1.5s linear infinite; /* Langzaam vallen */
+    opacity: 0.6;
+    z-index: 2;
+}
+/* Laag 2: Achtergrond waas */
+.fx-drizzle::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: 
+        radial-gradient(1px 4px at 20% 30%, rgba(255, 255, 255, 0.3), transparent),
+        radial-gradient(1px 4px at 60% 70%, rgba(255, 255, 255, 0.3), transparent);
+    background-size: 30vw 40vh; 
+    animation: rainFall 2.5s linear infinite; /* Heel traag */
+    opacity: 0.3;
+    z-index: 1;
+}
+
+/* 2b. 🌧️ NORMALE REGEN (Jouw 'Perfecte' Code) */
+.fx-rain {
+    background-color: rgba(0, 0, 25, 0.5); 
+}
+.fx-rain::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: 
+        radial-gradient(1.5px 15px at 10% 10%, rgba(220, 240, 255, 0.9), transparent),
+        radial-gradient(1.5px 15px at 30% 40%, rgba(220, 240, 255, 0.9), transparent),
+        radial-gradient(1.5px 15px at 50% 80%, rgba(220, 240, 255, 0.9), transparent),
+        radial-gradient(1.5px 15px at 70% 20%, rgba(220, 240, 255, 0.9), transparent),
+        radial-gradient(1.5px 15px at 90% 60%, rgba(220, 240, 255, 0.9), transparent);
+    background-size: 30vw 40vh; 
+    animation: rainFall 0.6s linear infinite; 
+    opacity: 0.8;
+    z-index: 2;
+}
+.fx-rain::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: 
+        radial-gradient(2px 10px at 20% 30%, rgba(200, 230, 255, 0.5), transparent),
+        radial-gradient(2px 10px at 60% 70%, rgba(200, 230, 255, 0.5), transparent),
+        radial-gradient(2px 10px at 80% 10%, rgba(200, 230, 255, 0.5), transparent);
+    background-size: 40vw 50vh; 
+    animation: rainFall 1.2s linear infinite; 
+    opacity: 0.4; 
+    z-index: 1;
+}
+
+/* 2c. ⛈️ ZWARE REGEN (Dikkere druppels, veel sneller, donkerder) */
+.fx-heavy {
+    background-color: rgba(0, 0, 20, 0.7); /* Donkerdere lucht */
+}
+/* Laag 1: Dikke, snelle druppels */
+.fx-heavy::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: 
+        radial-gradient(2.5px 30px at 15% 15%, rgba(200, 230, 255, 0.9), transparent),
+        radial-gradient(2.5px 30px at 35% 45%, rgba(200, 230, 255, 0.9), transparent),
+        radial-gradient(2.5px 30px at 55% 85%, rgba(200, 230, 255, 0.9), transparent),
+        radial-gradient(2.5px 30px at 75% 25%, rgba(200, 230, 255, 0.9), transparent),
+        radial-gradient(2.5px 30px at 95% 65%, rgba(200, 230, 255, 0.9), transparent);
+    background-size: 25vw 35vh; /* Dichter op elkaar */
+    animation: rainFall 0.35s linear infinite; /* Snel! */
+    opacity: 0.9;
+    z-index: 2;
+}
+/* Laag 2: Opvulling */
+.fx-heavy::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: 
+        radial-gradient(2px 20px at 25% 35%, rgba(200, 230, 255, 0.5), transparent),
+        radial-gradient(2px 20px at 65% 75%, rgba(200, 230, 255, 0.5), transparent),
+        radial-gradient(2px 20px at 85% 15%, rgba(200, 230, 255, 0.5), transparent);
+    background-size: 30vw 40vh; 
+    animation: rainFall 0.6s linear infinite; 
+    opacity: 0.6;
+    z-index: 1;
+}
+
+/* 3. ❄️ IJZEL (Blauwe rand) */
+.fx-ice {
+    box-shadow: inset 0 0 200px rgba(150, 200, 255, 0.3);
+    background-color: rgba(5, 20, 40, 0.4);
+}
+
+/* 4. 🌩️ ONWEER (Rustige flitsen) */
+.fx-storm {
+    background-color: rgba(10, 0, 20, 0.6);
+    animation: thunderFlash 8s infinite;
+}
+/* Onweer krijgt ook zware regen erbij */
+.fx-storm::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(2.5px 30px at 50% 50%, rgba(200, 230, 255, 0.8), transparent);
+    background-size: 20vw 30vh;
+    animation: rainFall 0.4s linear infinite;
+    opacity: 0.7;
+}
+@keyframes thunderFlash {
+    0%, 92%, 100% { background-color: rgba(10, 0, 20, 0.6); }
+    93% { background-color: rgba(50, 60, 90, 0.8); } /* Blauwe flits */
+    96% { background-color: rgba(10, 0, 20, 0.6); }
+}
+
+/* 5. ☁️ BEWOLKT */
+.fx-cloudy {
+    background: radial-gradient(circle at 50% -50%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.5) 100%);
+}
+
+/* 6. 🌫️ MIST */
+.fx-fog {
+    background-color: rgba(200, 200, 200, 0.15);
+    backdrop-filter: blur(4px);
+}
+
+/* 7. ❄️ SNEEUW (Ronde vlokken) */
+.fx-snow {
+    background-image: radial-gradient(white 3px, transparent 4px);
+    background-size: 300px 300px;
+    animation: snowFall 10s linear infinite;
+}
+@keyframes snowFall { 
+    0% { background-position: 0 0; } 
+    100% { background-position: 50px 300px; } 
+}
+
+
+/* === ROKEN FIX (Verkeersbord Stijl) === */
+.smoking-layout { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.smoke-icon {
+    width: 25vh; height: 25vh; border: 2.5vh solid #e74c3c; /* DIKKE RODE RAND */
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12vh; color: #e74c3c; background: white; /* Wit bord */
+    box-shadow: 0 0 50px rgba(231, 76, 60, 0.3); margin-bottom: 4vh;
+}
+
+.huge-text { font-family: var(--font-head); font-size: 12vh; color: #e74c3c; margin: 0; line-height: 0.9; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
+.smoking-layout h2 { font-size: 4vh; color: #ccc; margin-top: 1vh; }
+
+/* TICKER */
+.ticker-bar-new { position: fixed; bottom: 0; left: 0; width: 100%; height: 8vh; background: #000; border-top: 4px solid var(--primary); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.ticker-text { font-family: var(--font-head); font-size: 4vh; color: white; text-transform: uppercase; letter-spacing: 2px; opacity: 1; transition: opacity 0.5s ease-in-out; }
+
+/* =========================================
+   🎱 BINGO MODUS
+   ========================================= */
+.bingo-overlay {
+    position: fixed; inset: 0; z-index: 200; 
+    background: rgba(0, 0, 0, 0.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; 
+    transition: opacity 0.5s ease-in-out;
+    backdrop-filter: blur(10px);
+
+    /* === NIEUWE REGELS HIERONDER === */
+    padding-bottom: 15vh; /* Duwt alles omhoog, weg achter de balk vandaan */
+    box-sizing: border-box; /* Zorgt dat de padding niet buiten beeld valt */
+}
+.bingo-overlay.active { opacity: 1; pointer-events: all; }
+
+.bingo-header {
+    font-family: var(--font-head); font-size: 10vh; color: var(--accent);
+    margin-bottom: 5vh; text-shadow: 0 0 30px rgba(241, 196, 15, 0.5);
+    letter-spacing: 5px; animation: pulse 2s infinite;
+}
+
+/* De Grote Bal */
+.bingo-main-ball {
+    width: 40vh; height: 40vh;
+    background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset -10px -10px 30px rgba(0,0,0,0.2);
+    border: 10px solid var(--primary);
+    margin-bottom: 5vh;
+    transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bingo-main-ball.pop { transform: scale(1.1); } /* Pop effect bij nieuw nummer */
+
+.ball-inner {
+    font-family: var(--font-head); font-size: 20vh; color: #333;
+    background: white; width: 70%; height: 70%; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px dashed #ccc;
+}
+
+/* Historie balk */
+.bingo-history {
+    display: flex; align-items: center; gap: 2vw;
+    background: rgba(255,255,255,0.1); padding: 2vh 4vw; border-radius: 50px;
+}
+.bingo-history span { font-weight: bold; color: #888; font-size: 2vh; }
+.history-list { display: flex; gap: 1vw; }
+.small-ball {
+    width: 6vh; height: 6vh; background: #fff; color: #333;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 2.5vh;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+/* ... (je andere bingo CSS hierboven laten staan) ... */
+
+/* Status Meldingen (Valse Bingo! / Winnaar!) */
+.bingo-msg {
+    /* Geen absolute positie meer, het wordt nu een hoofdelement */
+    font-family: var(--font-head); 
+    font-size: 12vh; /* Flink groter! */
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 5vw;
+    line-height: 1.2;
+    /* Standaard verborgen via JS display:none */
+}
+
+/* NIEUW: Een speciale 'modus' voor de overlay als er een bericht is */
+.bingo-overlay.showing-message {
+    justify-content: center; /* Centreer de tekst verticaal */
+}
+
+/* Als deze modus aan staat, VERBERG dan de ballen en historie */
+.bingo-overlay.showing-message .bingo-main-ball,
+.bingo-overlay.showing-message .bingo-history,
+.bingo-overlay.showing-message .bingo-header {
+    display: none;
+}
+
+/* Animaties voor de berichten */
+.bingo-msg.winner {
+    color: #2ecc71;
+    animation: winnerPulse 0.8s infinite alternate;
+}
+.bingo-msg.false {
+    color: #e74c3c;
+    animation: shake 0.5s infinite;
+}
+
+@keyframes shake { 0% {transform: translateX(0);} 25% {transform: translateX(-15px);} 75% {transform: translateX(15px);} 100% {transform: translateX(0);} }
+@keyframes winnerPulse { 
+    0% { transform: scale(1); text-shadow: 0 0 20px currentColor; } 
+    100% { transform: scale(1.1); text-shadow: 0 0 60px currentColor, 0 0 100px currentColor; } 
+}
+
+/* =========================================
+   🔔 NOTIFICATIE POPUP (NEEMT DE HELE SLIDE OVER!)
+   ========================================= */
+.notification-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; /* Neemt de hele hoogte in */
+    width: 70vw !important; /* Neemt de exact de hele breedte van de dia in */
+    transform: translateX(-100%); /* Verbergt hem links achter de sidebar */
+    background: rgba(15, 15, 15, 0.95); /* Luxe donkere transparante achtergrond */
+    border-radius: 0; 
+    padding: 5vh 5vw !important;
+    display: flex;
+    flex-direction: column; /* Zet icoon, titel en tekst strak onder elkaar */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 20px 0 50px rgba(0,0,0,0.8);
+    z-index: 1000; /* Bovenop alles! */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    backdrop-filter: blur(15px);
+}
+
+.notification-popup.active {
+    transform: translateX(30vw); /* Schuift exact naast de 30vw sidebar het scherm op */
+}
+
+/* Icoon gigantisch maken */
+.notif-icon-box {
+    width: 25vh !important;
+    height: 25vh !important;
+    font-size: 12vh !important;
+    margin-bottom: 5vh;
+    background: var(--primary);
+    color: #000;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 40px var(--primary);
+    flex-shrink: 0;
+}
+
+/* Tekst gigantisch en gecentreerd maken */
+.notif-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.notif-content h1 {
+    font-family: var(--font-head);
+    font-size: 13vh !important;
+    margin: 0 0 2vh 0;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.notif-content p {
+    font-size: 5vh !important;
+    margin: 0;
+    color: #e2e8f0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.notification-popup.alert { border-bottom: 15px solid #e74c3c; border-top: 15px solid #e74c3c; }
+.notification-popup.alert .notif-icon-box { background: #e74c3c; box-shadow: 0 0 50px #e74c3c; }
+
+/* ======================================================
+   📺 TV BOOSTER MODUS (LEESBAARHEID FIX)
+   Plak dit helemaal onderaan je CSS bestand!
+   ====================================================== */
+
+/* 1. SIDEBAR: Alles groter & dikker */
+.logo-area { font-size: 8vh !important; margin-bottom: 4vh; } /* Logo Reusachtig */
+
+#time { 
+    font-size: 14vh !important; /* Klok GIGANTISCH */
+    font-weight: 900; 
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+#date { font-size: 2.5vh !important; font-weight: 800; color: #ccc; }
+
+#weather-icon { font-size: 5vh !important; }
+#temp { font-size: 7vh !important; font-weight: bold; }
+.wind-row { font-size: 2.2vh !important; font-weight: 800; color: white !important; }
+#weather-desc { font-size: 2vh !important; color: #aaa; }
+
+.price-header { font-size: 3.5vh !important; margin-bottom: 2vh; }
+.price-row { font-size: 2.8vh !important; padding-bottom: 1vh; font-weight: 600; }
+
+.status-badge { padding: 1.5vh !important; }
+#status-text { font-size: 2vh !important; text-transform: uppercase; }
+
+.next-up-box small { font-size: 1.8vh !important; color: #888; }
+#next-slide-title { font-size: 3.5vh !important; line-height: 1.1; margin-bottom: 1.5vh; }
+
+/* 2. HOOFD SCHERM: Titels en Tekst */
+.slide-title { 
+    font-size: 12vh !important; /* Koppen enorm */
+    text-shadow: 4px 4px 0px #000; /* Harde schaduw voor leesbaarheid */
+    margin-bottom: 5vh;
+}
+
+/* Agenda */
+.ag-day { font-size: 7vh !important; font-weight: 900; }
+.ag-info h3 { font-size: 3.5vh !important; font-weight: 800; }
+.ag-info p { font-size: 2.5vh !important; color: #ddd; font-weight: 600; }
+
+/* Menu */
+.menu-block h2 { font-size: 5vh !important; border-bottom-width: 4px; }
+.menu-row { font-size: 3.5vh !important; font-weight: 700; padding: 2vh 0; }
+
+/* Voetbal */
+.team-block h1 { font-size: 9vh !important; font-weight: 900; }
+.match-time-big { font-size: 5vh !important; padding: 2vh 5vw; }
+.vs-block { font-size: 6vh !important; font-weight: bold; }
+
+/* Muziek */
+.music-info h1 { font-size: 10vh !important; }
+.music-info h2 { font-size: 5vh !important; font-weight: bold; }
+.prev-song { font-size: 3vh !important; }
+
+/* Weer Slide */
+.weather-text h1 { font-size: 22vh !important; font-weight: 900; } /* Temperatuur ENORM */
+#hero-feels-like { font-size: 5vh !important; }
+.wind-badge { font-size: 4vh !important; padding: 1.5vh 3vw; }
+.rain-alert { font-size: 3.5vh !important; padding: 2vh; margin-bottom: 4vh; }
+.f-temp { font-size: 6vh !important; font-weight: 800; }
+.f-time { font-size: 3vh !important; font-weight: 700; }
+
+/* 3. BINGO: Moet van het scherm knallen */
+.bingo-header { font-size: 15vh !important; letter-spacing: 10px; }
+.bingo-main-ball { 
+    width: 55vh !important; height: 55vh !important; /* Bal nog groter */
+    border-width: 15px !important;
+}
+.ball-inner { font-size: 30vh !important; font-weight: 900; }
+.bingo-history span { font-size: 3vh !important; }
+.small-ball { width: 8vh !important; height: 8vh !important; font-size: 4vh !important; }
+
+/* Winnaar tekst (die was al groot, maar nu nog dikker) */
+.bingo-msg { 
+    font-size: 14vh !important; 
+    font-weight: 900 !important;
+    text-shadow: 5px 5px 0 #000;
+}
+
+/* 4. MELDINGEN POPUP */
+.notification-popup {
+    width: 80vw !important; /* Breder */
+    padding: 4vh 4vw !important;
+    border-width: 4px !important;
+}
+.notif-icon-box { 
+    width: 14vh !important; height: 14vh !important; 
+    font-size: 7vh !important; 
+}
+.notif-content h1 { font-size: 7vh !important; font-weight: 900; }
+.notif-content p { font-size: 4vh !important; font-weight: 600; line-height: 1.2; }
+
+/* 5. TICKER (Onderaan) */
+.ticker-bar-new { height: 10vh !important; border-top-width: 6px; }
+.ticker-text { font-size: 5.5vh !important; font-weight: 900; letter-spacing: 3px; }
+
+/* ========================
+   ⚠️ ALARM MODUS FOOTER (GROTER & DUIDELIJKER)
+   ======================== */
+/* ALARM MODUS (Aangepast: Balk blijft, tekst verandert) */
+.ticker-left-next.alarm-active {
+    height: 100%; min-width: 45vw; padding: 0 3vw; 
+    display: flex; align-items: center; justify-content: flex-start;
+    animation: none; z-index: 20;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+    /* Let op: Geen border-top meer nodig, de balk zit er al boven! */
+}
+.alarm-geel { background-color: #f1c40f !important; color: black !important; }
+.alarm-oranje { background-color: #e67e22 !important; color: white !important; }
+.alarm-rood { background-color: #c0392b !important; color: white !important; animation: pulse-alert 2s infinite; }
+
+@keyframes pulse-alert {
+    0% { background-color: #c0392b; }
+    50% { background-color: #a93226; }
+    100% { background-color: #c0392b; }
+}
+
+.alarm-content {
+    display: flex; align-items: center; gap: 20px;
+    font-family: var(--font-head);
+    font-weight: 400; /* Bebas Neue is van zichzelf al dik */
+    font-size: 5vh; /* VEEL GROTERE TEKST */
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.alarm-content i { font-size: 5vh; margin-top: -0.5vh; }
+
+/* ========================
+   📸 HISTORIE / FOTO SLIDE (FIX)
+   ======================== */
+.photo-polaroid {
+    background: #fff;
+    padding: 2vh 2vh 8vh 2vh; /* Witte rand, extra ruimte onderin voor tekst */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    transform: rotate(-3deg); /* Speelse draai */
+    
+    /* HIER ZIT DE TRUC: Vaste breedte instellen */
+    width: 60vh !important; 
+    max-width: 80vw;
+    margin: 0 auto; /* Centreren */
+    
+    display: flex;
+    flex-direction: column;
+}
+
+.photo-clip {
+    width: 100%;
+    height: 50vh !important; /* Vaste hoogte voor het plaatje */
+    overflow: hidden; /* Zorgt dat de zoom NIET buiten het kader gaat */
+    background: #000;
+    position: relative;
+    border: 1px solid #ddd;
+}
+
+/* De Foto Zelf */
+.ken-burns {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Zorgt dat de foto het vak vult zonder uitrekken */
+    filter: sepia(0.3) contrast(1.1); /* Oud effectje */
+    transform-origin: center;
+}
+
+/* De Animatie: Langzaam inzoomen */
+.slide.active .ken-burns {
+    animation: zoomSlow 20s infinite alternate;
+}
+
+@keyframes zoomSlow {
+    from { transform: scale(1); }
+    to { transform: scale(1.3); }
+}
+
+/* De Tekst onder de foto */
+#history-caption {
+    font-family: 'Courier New', Courier, monospace; /* Typemachine lettertype */
+    color: #333;
+    margin-top: 3vh !important;
+    font-size: 4vh !important;
+    text-align: center;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ========================
+   🎵 SPOTIFY: VIERKANT & STRAK
+   ======================== */
+
+/* De container aanpassen */
+.vinyl-container {
+    width: 40vh !important; 
+    height: 40vh !important;
+    /* Zorgt dat hij nooit ovaal wordt, zelfs niet op rare TV's */
+    aspect-ratio: 1 / 1; 
+}
+
+/* De Album Art zelf */
+.vinyl-record {
+    border-radius: 25px !important; /* Licht afgeronde hoeken */
+    background: none !important; /* Geen zwart vinyl meer */
+    border: none !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; /* Mooie diepe schaduw */
+    animation: albumPulse 4s ease-in-out infinite !important; /* Rustig ademen */
+}
+
+/* Het plaatje (de cover) */
+.vinyl-record img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 25px !important;
+    border: 2px solid rgba(255,255,255,0.1) !important; /* Subtiel randje */
+    object-fit: cover !important;
+}
+
+/* Het gat in het midden weghalen */
+.vinyl-hole { display: none !important; }
+
+/* Nieuwe rustige animatie (beter voor Firestick) */
+@keyframes albumPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); } /* Heel klein beetje groter */
+    100% { transform: scale(1); }
+}
+
+/* ========================
+   🚀 PERFORMANCE BOOSTER (ANTI-LAG)
+   ======================== */
+
+/* 1. Stop de zware achtergrond zoom-animatie */
+.bg-layer { animation: none !important; }
+
+/* 2. VERWIJDER BLUR (De grootste boosdoener voor lag!) */
+.weather-hero, 
+.bingo-overlay, 
+.notification-popup,
+.weather-fx,
+.fx-fog {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Maak de achtergronden iets donkerder ter compensatie van het gemis aan blur */
+.weather-hero { background: rgba(0, 0, 0, 0.85) !important; }
+.notification-popup { background: rgba(10, 10, 10, 0.95) !important; }
+.bingo-overlay { background: rgba(0,0,0,0.95) !important; }
+
+/* 3. Versimpel schaduwen (kost veel rekenkracht) */
+.slide-title, .huge-text, .bingo-header {
+    text-shadow: 2px 2px 0 #000 !important; /* Simpele harde schaduw */
+}
+
+/* 4. Zet zware weer-effecten uit op de achtergrond als het niet nodig is */
+/* Als je echt maximale snelheid wilt, haal de // hieronder weg: */
+/* .weather-fx { display: none !important; } */
+
+/* 2. FOTO SLIDE: IETS KLEINER & BETER GEPLAATST */
+.photo-polaroid {
+    /* Hij was 60vh, we maken hem 50vh zodat hij vrij staat */
+    width: 50vh !important; 
+    
+    /* Zorgt voor witruimte boven de foto */
+    margin-top: 5vh !important; 
+    margin-bottom: 5vh !important;
+    
+    padding: 1.5vh 1.5vh 6vh 1.5vh !important;
+}
+
+.photo-clip {
+    /* Hoogte aanpassen aan de nieuwe breedte */
+    height: 40vh !important; 
+}
+
+#history-caption {
+    font-size: 3.5vh !important;
+    margin-top: 2vh !important;
+}
+
+/* ========================
+   ⚽ EREDIVISIE: DIKKE BLOKKEN (ONDER ELKAAR)
+   ======================== */
+
+/* De Container: Nu onder elkaar (Column) */
+.eredivisie-grid {
+    display: flex;
+    flex-direction: column; /* Onder elkaar */
+    justify-content: flex-start;
+    gap: 2.5vh; /* Ruimte tussen de balken */
+    width: 100%; /* Vult de beschikbare ruimte */
+    padding: 0 2vw; /* Beetje ruimte aan de zijkanten */
+    box-sizing: border-box;
+}
+
+/* Het Blok zelf */
+.match-fat-row {
+    background: linear-gradient(90deg, rgba(30,60,114,0.9), rgba(42,82,152,0.9));
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 1.5vh 2vw; /* Ruimte binnenin */
+    
+    display: flex;
+    align-items: center; /* Verticaal centreren */
+    justify-content: space-between; /* Links de teams, rechts de tijd */
+    
+    height: 14vh; /* Vaste hoogte per blok (groot!) */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden; /* Zorgt dat niks uitsteekt */
+}
+
+/* Linkerkant: Logo's en Namen */
+.mf-teams {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+    flex: 1; /* Neemt alle ruimte links in */
+}
+
+.mf-logo {
+    width: 9vh; height: 9vh; /* Flinke logo's */
+    background: #fff; border-radius: 50%; padding: 0.5vh; object-fit: contain;
+    flex-shrink: 0; /* Logo mag niet krimpen */
+}
+
+.mf-names-box {
+    display: flex; flex-direction: column; justify-content: center;
+    font-family: var(--font-head);
+    line-height: 0.9;
+}
+
+.mf-name {
+    font-size: 5vh; /* Grote teamnamen */
+    text-transform: uppercase;
+    color: white;
+}
+.mf-vs {
+    font-size: 2.5vh; color: #aaa; font-weight: bold; margin: 0.2vh 0;
+}
+
+/* Rechterkant: Tijd */
+.mf-time {
+    background: white; color: #1e3c72;
+    padding: 1.5vh 2vw;
+    border-radius: 15px;
+    font-size: 3vh; font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 15vw;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Highlight VANDAAG */
+.match-fat-row.today {
+    border: 3px solid #2ecc71;
+    transform: scale(1.02); /* Springt er iets uit */
+}
+.match-fat-row.today .mf-time {
+    background: #2ecc71; color: black;
+}
+
+/* ========================
+   🛠️ NIEUWE TV CONTROLS
+   ======================== */
+
+/* 1. SIDEBAR WIDGET (Dynamisch) */
+.sidebar-widget {
+    background: #222; border: 1px solid #444;
+    border-radius: 15px; padding: 1.5vh;
+    margin-top: 0vh;
+    display: flex; align-items: center; gap: 0.5vw;
+    transition: all 0.5s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.widget-icon {
+    width: 6vh; height: 6vh;
+    background: #333; color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3vh;
+}
+.widget-content { display: flex; flex-direction: column; line-height: 1.1; }
+#sw-label { font-size: 1.5vh; color: #aaa; font-weight: bold; text-transform: uppercase; }
+#sw-text { font-size: 2.2vh; color: white; font-weight: 800; }
+
+/* Widget Kleuren (Worden via JS gezet) */
+.sw-red .widget-icon { background: #e74c3c; color: white; }
+.sw-green .widget-icon { background: #2ecc71; color: black; }
+.sw-blue .widget-icon { background: #3498db; color: white; }
+.sw-orange .widget-icon { background: #e67e22; color: white; }
+/* Widget Kleur Geel */
+.sw-yellow .widget-icon { background: #f1c40f; color: black; }
+
+/* =========================================
+   2. STAND-BY MODUS (Fullscreen Screensaver)
+   ========================================= */
+body.standby-mode .content-area,
+body.standby-mode .ticker-bar-new,
+body.standby-mode .bg-layer,
+body.standby-mode .weather-fx {
+    opacity: 0 !important;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+body.standby-mode { background: #000 !important; }
+
+/* Rek de main-layout uit over het héle scherm (ook over de ticker-bar heen!) */
+body.standby-mode .main-layout {
+    grid-template-columns: 100vw 0vw;
+    height: 100vh !important; /* Pak de volle 100% hoogte */
+}
+
+body.standby-mode .sidebar {
+    align-items: center;
+    justify-content: center;
+    border-right: none;
+    background: radial-gradient(circle at center, #111 0%, #000 100%);
+    padding: 5vh;
+}
+
+/* Verberg de lijstjes en infoblokjes voor een strakke look */
+body.standby-mode .price-sidebar,
+body.standby-mode .sidebar-widget {
+    display: none !important;
+}
+
+/* Maak het Logo GIGANTISCH */
+body.standby-mode .logo-area {
+    font-size: 25vh !important;
+    border: none;
+    text-align: center;
+    margin-bottom: 6vh;
+    padding: 0;
+    text-shadow: 0 10px 40px rgba(46, 204, 113, 0.4);
+}
+
+/* Maak de Klok en het Weer extreem groot */
+body.standby-mode .widget-box {
+    transform: scale(2.5); /* 2.5x zo groot */
+    transform-origin: center top;
+    margin: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+body.standby-mode .weather-row {
+    justify-content: center;
+}
+
+/* 3. FULL SCREEN POSTER */
+.fs-overlay {
+    position: fixed; inset: 0; z-index: 5000;
+    background: black;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s;
+}
+.fs-overlay.active { opacity: 1; pointer-events: all; }
+#fs-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+/* 4. GROTE MEDEDELING */
+.bm-overlay {
+    position: fixed; inset: 0; z-index: 6000;
+    background: rgba(0,0,0,0.95);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s;
+    backdrop-filter: blur(10px);
+}
+.bm-overlay.active { opacity: 1; pointer-events: all; }
+#bm-text {
+    font-family: var(--font-head); font-size: 15vh; color: white;
+    text-align: center; text-transform: uppercase;
+    animation: pulse 2s infinite;
+}
+
+/* === PODIUM RANKING BADGES === */
+.podium-card {
+    position: relative; /* Nodig om de badge te positioneren */
+    overflow: visible !important; /* Zorg dat de badge buiten de kaart mag steken */
+    margin-top: 3vh; /* Ruimte maken voor de badge bovenop */
+}
+
+.p-rank {
+    position: absolute;
+    top: -2.5vh; /* Zweeft boven de kaart */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6vh;
+    height: 6vh;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-head);
+    font-size: 3.5vh;
+    font-weight: 900;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    background: #333; /* Fallback kleur */
+    color: white;
+    border: 3px solid #555;
+}
+
+/* GOUD (Nummer 1) */
+.rank-1 .p-rank {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    color: #000;
+    border-color: #fff;
+    width: 8vh; height: 8vh; /* Iets groter */
+    top: -4vh;
+    font-size: 5vh;
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+}
+
+/* ZILVER (Nummer 2) */
+.rank-2 .p-rank {
+    background: linear-gradient(135deg, #bdc3c7, #95a5a6);
+    color: #000;
+    border-color: #fff;
+}
+
+/* BRONS (Nummer 3) */
+.rank-3 .p-rank {
+    background: linear-gradient(135deg, #e67e22, #d35400); /* Of een koper tint */
+    color: #fff;
+    border-color: #fff;
+}
+
+/* ========================
+   🎂 VERJAARDAG SLIDE
+   ======================== */
+
+.bday-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3vw;
+    width: 100%;
+    height: 60vh;
+    perspective: 1000px;
+}
+
+/* De kaart van één jarige */
+.bday-card {
+    background: #fff;
+    padding: 1.5vh;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    transition: all 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+    opacity: 0.5; /* Standaard iets doorzichtig */
+    transform: scale(0.8); /* Standaard klein */
+    text-align: center;
+    width: 25vw; /* Breedte aanpassen o.b.v. aantal */
+}
+
+/* De "Actieve" jarige (Ingezoomd) */
+.bday-card.active {
+    opacity: 1;
+    transform: scale(1.1) rotate(0deg) !important;
+    z-index: 100;
+    box-shadow: 0 30px 80px rgba(241, 196, 15, 0.6); /* Gouden gloed */
+    border: 5px solid #f1c40f;
+}
+
+.bday-img-box {
+    width: 100%;
+    height: 35vh;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #000;
+}
+
+.bday-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bday-name {
+    font-family: var(--font-head);
+    font-size: 6vh;
+    color: #333;
+    margin: 1vh 0 0 0;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.bday-age {
+    font-size: 3vh;
+    color: #e74c3c;
+    font-weight: 800;
+    font-family: var(--font-body);
+}
+
+/* Confetti Effect (Simpel & Snel) */
+.confetti {
+    position: absolute;
+    width: 1.5vh; height: 1.5vh;
+    background-color: #f1c40f;
+    animation: confettiFall 4s linear infinite;
+    z-index: 1;
+}
+@keyframes confettiFall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ========================
+   ⏰ HET UURTJE (COUNTDOWN)
+   ======================== */
+
+.hourly-overlay {
+    position: fixed; inset: 0; z-index: 3000; /* Boven alles */
+    background: black;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transform: scale(1.1);
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.hourly-overlay.active {
+    opacity: 1; transform: scale(1);
+    pointer-events: all;
+}
+
+.hourly-content { text-align: center; }
+
+#hourly-label {
+    font-family: var(--font-body);
+    font-size: 5vh; color: #aaa; letter-spacing: 5px; margin: 0;
+    text-transform: uppercase;
+}
+
+#hourly-clock {
+    font-family: var(--font-head);
+    font-size: 35vh; line-height: 1;
+    color: white;
+    font-variant-numeric: tabular-nums; /* Zorgt dat cijfers niet verspringen */
+    text-shadow: 0 10px 30px rgba(255,255,255,0.2);
+}
+
+/* === MIDDENNACHT SPECIAAL (00:00) === */
+.hourly-overlay.midnight {
+    background: radial-gradient(circle, #222 0%, #000 100%);
+}
+
+.hourly-overlay.midnight #hourly-clock {
+    color: #f1c40f; /* Goud */
+    text-shadow: 0 0 50px rgba(241, 196, 15, 0.8);
+    animation: pulseMidnight 0.8s infinite;
+}
+
+.hourly-overlay.midnight #hourly-label {
+    color: #f1c40f;
+    font-weight: 900; font-size: 8vh;
+    animation: shake 0.5s infinite;
+}
+
+@keyframes pulseMidnight {
+    0% { transform: scale(1); text-shadow: 0 0 30px rgba(241, 196, 15, 0.5); }
+    50% { transform: scale(1.05); text-shadow: 0 0 80px rgba(241, 196, 15, 1); }
+    100% { transform: scale(1); text-shadow: 0 0 30px rgba(241, 196, 15, 0.5); }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px) rotate(-2deg); }
+    75% { transform: translateX(5px) rotate(2deg); }
+    100% { transform: translateX(0); }
+}
+
+/* =========================================
+   🛑 SLUITINGSPROCEDURE (Nachtvriendelijk)
+   ========================================= */
+#closing-overlay {
+    position: fixed; inset: 0; z-index: 9000;
+    pointer-events: none; /* Zorgt dat je er doorheen kan klikken */
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    transition: all 1s ease;
+}
+#closing-overlay.active { display: flex; }
+
+/* De 3 Waarschuwingsfases (Gloeiende randen) */
+.close-phase-1 { animation: pulseYellow 4s infinite; }
+.close-phase-2 { animation: pulseOrange 2s infinite; }
+.close-phase-3 { animation: pulseRed 1s infinite; }
+/* De Eindfase (Volledig scherm) */
+.close-phase-final { animation: flashDarkRed 1.5s infinite; }
+
+/* Animatie Keyframes (Binnenkant gloed) */
+@keyframes pulseYellow {
+    0%, 100% { box-shadow: inset 0 0 0px rgba(180, 150, 0, 0); }
+    50% { box-shadow: inset 0 0 150px rgba(180, 150, 0, 0.4); } /* Dof geel */
+}
+@keyframes pulseOrange {
+    0%, 100% { box-shadow: inset 0 0 50px rgba(200, 80, 0, 0.1); }
+    50% { box-shadow: inset 0 0 250px rgba(200, 80, 0, 0.6); } /* Oranje */
+}
+@keyframes pulseRed {
+    0%, 100% { box-shadow: inset 0 0 100px rgba(200, 0, 0, 0.2); }
+    50% { box-shadow: inset 0 0 350px rgba(200, 0, 0, 0.8); } /* Rood */
+}
+/* De Zwart/Rood knipper (Niet te fel rood, maar donker bloedrood) */
+@keyframes flashDarkRed {
+    0%, 49% { background-color: rgba(5, 5, 5, 0.95); } /* Zwart */
+    50%, 100% { background-color: rgba(90, 0, 0, 0.95); } /* Donkerrood */
+}
+
+/* De Tekst in het midden */
+#closing-text {
+    font-family: var(--font-head); font-size: 15vh; color: white;
+    text-shadow: 0 5px 20px black; letter-spacing: 5px; opacity: 0; transition: opacity 0.5s;
+}
+#closing-subtext {
+    font-family: var(--font-body); font-size: 4vh; color: #ccc;
+    font-weight: bold; opacity: 0; transition: opacity 0.5s;
+}
+
+/* Laat de tekst alleen zien in fase 3 en de eindfase */
+.close-phase-3 #closing-text, .close-phase-3 #closing-subtext { opacity: 0.9; }
+.close-phase-final #closing-text, .close-phase-final #closing-subtext { opacity: 1; }
+
+
+
+/* =========================================
+   🕵️‍♀️ VERTICALE SWIPE-REVEAL TICKER (GEFIXT)
+   ========================================= */
+#prices-stage {
+    position: relative;
+    height: 16vh; 
+    width: 85%;   
+    margin: 0 auto;
+    overflow: hidden; /* BELANGRIJK: Zorgt dat de swipe strak binnen het kader blijft! */
+}
+
+/* DE NIEUWE SOEPELE SWIPE TRANSITIE KLASSEN */
+.c-panel-reveal-out {
+    /* Lijst schuift soepel omhoog het beeld uit */
+    animation: swipeOutUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.c-panel-reveal-in {
+    /* Nieuwe lijst komt soepel van onderen het beeld in */
+    animation: swipeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+/* Algemene panel styling (beide lijsten) */
+.price-specific-list-box, .price-normal-list-box {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+}
+
+/* Container voor het scrollen (Schaduw/Fade is verwijderd!) */
+.train-ticker-sub-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    /* De mask-image regels zijn hier verwijderd voor keiharde, scherpe tekst */
+}
+
+#sidebar-normal-box .train-ticker-sub-container {
+    height: 16vh; 
+}
+
+#sidebar-specific-box .train-ticker-sub-container {
+    /* FIX 1: Iets groter gemaakt (was 11) zodat lange woorden zoals 'Jagermeister' de rest niet buiten beeld duwen! */
+    height: 12.5vh; 
+}
+
+.train-ticker-track-specific, .train-ticker-track-normal {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* De vaste titel */
+.price-row.cat-header {
+    /* FIX 2: Exact dezelfde kleur als de sidebar (#1a1a1a) in plaats van hard zwart! */
+    background: #1a1a1a; 
+    position: relative;
+    z-index: 10;
+    color: #f1c40f !important;
+    border-bottom: 2px dashed #f1c40f !important;
+    font-weight: 900 !important;
+    font-style: italic;
+    font-size: 2.2vh !important;
+    justify-content: center;
+    margin-bottom: 1vh;
+    flex-shrink: 0; 
+}
+
+/* --- ANIMATIE DEFINITIES (Keyframes voor de Swipe) --- */
+@keyframes swipeOutUp {
+    0%   { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-100%); opacity: 0; visibility: hidden; }
+}
+
+@keyframes swipeInUp {
+    0%   { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; visibility: visible; }
+}
+
+/* =========================================
+   🚭 HUISREGELS (HET VERKEERSBORDJE - STRAK UITGELIJND & GEANIMEERD)
+   ========================================= */
+
+.no-smoking-sign {
+    width: 10vh;        
+    height: 10vh;
+    background: #ffffff; 
+    border: 0.6vh solid #e74c3c; 
+    border-radius: 50%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e74c3c; 
+    font-size: 5vh;     
+    flex-shrink: 0;     
+    /* NIEUW: De professionele 'Adem' animatie */
+    animation: signBreathing 3s infinite ease-in-out;
+}
+
+/* De Ademhaling: Subtiel schalen en een zachte rode gloed uitstralen */
+@keyframes signBreathing {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(231, 76, 60, 0.1); 
+    }
+    50% { 
+        transform: scale(1.05); /* Wordt 5% groter */
+        box-shadow: 0 8px 25px rgba(231, 76, 60, 0.7), inset 0 0 15px rgba(231, 76, 60, 0.4); /* Rode gloed */
+    }
+}
+
+/* =========================================
+   🚭 TICKER ACHTERGROND WAVE (ROKEN)
+   ========================================= */
+
+/* Deze klasse zetten we op de hele zwarte footer-balk */
+.ticker-bar-new.footer-red-wave {
+    /* Een verloop van zwart, naar donkerrood, naar bloedrood in het midden, en weer terug */
+    background: linear-gradient(90deg, #000000 0%, #3a0000 25%, #8b0000 50%, #3a0000 75%, #000000 100%) !important;
+    background-size: 200% 100% !important;
+    animation: waveBackground 2.5s linear infinite !important; /* Roteert constant door */
+}
+
+/* Laat de achtergrond van links naar rechts schuiven als een golf */
+@keyframes waveBackground {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* =========================================
+   ✨ PREMIUM DETAILS (KLOK & MUZIEK GLOW)
+   ========================================= */
+
+/* De Ultra-Relaxte Fade van de Klok (2 seconden ademhaling) */
+@keyframes fadeColon { 
+    0%, 100% { opacity: 1; transform: scale(1); } 
+    50% { opacity: 0.15; transform: scale(0.98); } /* Krimpt een héél klein beetje in en fadet zacht weg */
+}
+.blink-colon { 
+    display: inline-block; 
+    /* Loopt nu over 2 volle seconden met een vloeiende in- en uitademing (ease-in-out) */
+    animation: fadeColon 2s ease-in-out infinite; 
+}
+
+/* Apple Music Gloed op de Muziek Slide */
+#slide-music {
+    background-size: cover;
+    background-position: center;
+}
+
+/* De wazige, ademende en kleurrijke gloed */
+#slide-music::before {
+    content: ""; position: absolute; inset: 0;
+    background: inherit; /* Kopieert de foto van de achtergrond */
+    filter: blur(80px) saturate(1.5); /* Extreem wazig en extra kleur! */
+    opacity: 0.45; /* De intensiteit van de gloed */
+    transform: scale(1.2); /* Voorkomt witte randen door de blur */
+    z-index: -2;
+    animation: ambientBreathe 8s ease-in-out infinite alternate; /* Adem effect */
+}
+
+/* Een donkere folie eroverheen zodat je witte tekst perfect leesbaar blijft */
+#slide-music::after {
+    content: ""; position: absolute; inset: 0;
+    background: rgba(0, 0, 0, 0.7); 
+    z-index: -1;
+}
+
+@keyframes ambientBreathe {
+    0% { opacity: 0.35; transform: scale(1.15); }
+    100% { opacity: 0.55; transform: scale(1.25); }
+}
+
+/* =========================================
+   🍟 MCDONALDS SNACK BORD
+   ========================================= */
+.mc-order-board {
+    display: flex;
+    width: 100%;
+    height: 55vh;
+    gap: 2vw;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 30px;
+    border: 2px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+
+.mc-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.mc-column h2 {
+    margin: 0; 
+    padding: 2vh; 
+    font-family: var(--font-head); 
+    font-size: 6vh !important; 
+    text-align: center;
+}
+
+.mc-column.preparing h2 { background: #d69e2e; color: black; }
+.mc-column.ready h2 { background: #38a169; color: white; animation: pulseReady 1.5s infinite alternate; }
+
+.mc-list {
+    padding: 2vh; 
+    overflow-y: auto; /* Zorgt dat de browser kán scrollen */
+    overflow-x: hidden;
+    display: flex; 
+    flex-direction: column; 
+    gap: 1.5vh;
+    scrollbar-width: none; /* Verbergt de scrollbalk in Firefox */
+    -ms-overflow-style: none; /* Verbergt de scrollbalk in Edge */
+}
+
+/* Verbergt de scrollbalk in Chrome / Safari / TV's */
+.mc-list::-webkit-scrollbar { 
+    display: none; 
+}
+
+.mc-item {
+    background: rgba(255,255,255,0.1); 
+    padding: 1.5vh 2vw; 
+    border-radius: 15px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    font-size: 4vh; 
+    font-weight: 900; 
+    border-left: 8px solid transparent;
+}
+
+.mc-item.prep { border-left-color: #d69e2e; }
+.mc-item.done { 
+    border-left-color: #38a169; 
+    background: rgba(56, 161, 105, 0.2); 
+    font-size: 5vh; /* De naam van degene die mag eten is NOG groter! */
+}
+
+/* De kleine tekst met wat ze hebben besteld */
+.mc-item-items { 
+    font-size: 2.2vh; 
+    color: #ccc; 
+    font-weight: 600; 
+    max-width: 60%; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+@keyframes pulseReady {
+    0% { box-shadow: inset 0 0 0px rgba(56, 161, 105, 0); }
+    100% { box-shadow: inset 0 0 50px rgba(56, 161, 105, 0.8); }
+}
+
+/* === PROMO TV STYLES === */
+        .promo-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 19, 43, 0.90) !important;
+            backdrop-filter: blur(20px);
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .promo-box {
+            background: radial-gradient(circle at top, #2d3748 0%, #1a202c 100%);
+            border: 4px solid #276749;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 0 80px #37a169;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .promo-tv-box {
+            width: 85%;
+            max-width: 1400px;
+            padding: 80px;
+        }
+        .promo-title {
+            color: #FFD700;
+            font-size: 6.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0 0 20px 0;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            line-height: 1.1;
+        }
+        .promo-desc {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 50px;
+        }
+        .promo-timer {
+            background: #000;
+            color: #ff1100;
+            border-radius: 20px;
+            font-family: monospace;
+            font-weight: 900;
+        }
+
+/* ==========================================
+   👁️ PROFESSIONAL SIDEBAR COUNTER
+   ========================================== */
+
+/* 🟢 TICKER LIVE-COUNT ALERT */
+.ticker-alert-green {
+    animation: ticker-pulse-green 3s ease-in-out forwards;
+}
+
+@keyframes ticker-pulse-green {
+    0% { background: rgba(0, 0, 0, 0.9); }
+    15% { background: rgba(39, 174, 96, 0.9); box-shadow: 0 0 30px rgba(39, 174, 96, 0.6); }
+    85% { background: rgba(39, 174, 96, 0.9); box-shadow: 0 0 30px rgba(39, 174, 96, 0.6); }
+    100% { background: rgba(0, 0, 0, 0.9); }
+}
+
+/* Zorg dat de tekst ook even extra wit/dik wordt tijdens het alarm */
+.ticker-alert-green #fade-ticker {
+    color: #ffffff !important;
+    font-weight: 900;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* ==========================================
+   🚨 CALAMITEITEN SCHERM (PREMIUM NS/AVIATION STYLE)
+   ========================================== */
+#calamity-overlay {
+    position: fixed; inset: 0; z-index: 999999;
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+    color: white; 
+    transition: background-color 0.5s ease;
+    overflow: hidden;
+}
+
+/* De diagonaal bewegende gevarenstrepen (boven en onder) */
+.hazard-border {
+    position: absolute; left: 0; right: 0; height: 4vh;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(0, 0, 0, 0.5),
+        rgba(0, 0, 0, 0.5) 40px,
+        transparent 40px,
+        transparent 80px
+    );
+    z-index: 10;
+    animation: hazardMove 2s linear infinite;
+}
+.hazard-border.top { top: 0; }
+.hazard-border.bottom { bottom: 0; }
+
+@keyframes hazardMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 113px 0; } /* 113px is de wiskundige diagonaal van 80px */
+}
+
+/* Het content vlak in het midden */
+.calamity-content-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6vw;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 6vh 5vw;
+    border-radius: 20px;
+    border: 3px solid rgba(255, 255, 255);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    max-width: 90vw;
+    z-index: 5;
+}
+
+/* Het gigantische icoon links */
+.calamity-icon-huge {
+    font-size: 26vh;
+    color: white;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    animation: alertPulse 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes alertPulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    100% { transform: scale(1.05); opacity: 1; }
+}
+
+/* De tekst rechts */
+.calamity-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    max-width: 55vw;
+}
+
+.calamity-title { 
+    font-family: var(--font-head); 
+    font-size: 9vh; 
+    margin: 0 0 2vh 0; 
+    line-height: 1; 
+    text-transform: uppercase; 
+    letter-spacing: 4px; 
+    border-bottom: 4px solid rgba(255,255,255,0.3);
+    padding-bottom: 2vh;
+}
+
+.calamity-text { 
+    font-family: var(--font-body); 
+    font-size: 4vh; 
+    font-weight: 500; 
+    margin: 0; 
+    line-height: 1.4; 
+}
+
+.calamity-text b {
+    font-weight: 900;
+    color: #ffffff; /* Goudgele kleur voor de belangrijke NS-woorden */
+    text-transform: uppercase;
+}
+
+.calamity-time { 
+    font-family: monospace; 
+    font-size: 3vh; 
+    background: rgba(0,0,0,0.5); 
+    padding: 1.5vh 2vw; 
+    border-radius: 10px; 
+    font-weight: bold; 
+    margin-top: 4vh; 
+    display: inline-block;
+    width: max-content;
+}
+
+/* === SIDEBAR INFO MODUS === */
+.sidebar.info-active {
+    background: linear-gradient(to bottom, #1e3a8a, #0f172a) !important; 
+    border-left: 4px solid #3b82f6 !important;
+    display: flex !important; flex-direction: column !important; justify-content: center !important;
+    align-items: center !important; padding: 40px !important;
+}
+
+.sidebar.info-active > * { display: none !important; }
+
+/* Dwing de info-box om te tonen */
+.sidebar.info-active > #sidebar-full-info {
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; text-align: center !important; width: 100% !important;
+}
+
+.sidebar-info-title { font-family: var(--font-head); font-size: 3.5rem; color: #93c5fd; margin-bottom: 20px; border-bottom: 2px dashed rgba(147, 197, 253, 0.3); width: 100%; }
+.sidebar-info-body { font-size: 1.6rem; color: #fff; line-height: 1.4; }
+.sidebar-info-body b { color: #fbbf24; font-weight: 900; }
+
+/* --- NOODVERLICHTING MODUS (WIT SCHERM) --- */
+.calamity-white-mode {
+    background-color: #ffffff !important;
+}
+.calamity-white-mode .calamity-content-box {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+.calamity-white-mode .calamity-icon-huge,
+.calamity-white-mode .calamity-title,
+.calamity-white-mode .calamity-text,
+.calamity-white-mode .calamity-time {
+    color: #000000 !important;
+}
+.calamity-white-mode .calamity-title {
+    border-bottom-color: rgba(0,0,0,0.2);
+}
+.calamity-white-mode .calamity-text b {
+    color: #e53e3e !important; /* Rood op witte achtergrond voor contrast */
+}
+.calamity-white-mode .hazard-border {
+    background: repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) 40px, transparent 40px, transparent 80px);
+}
