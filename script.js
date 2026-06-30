@@ -79,8 +79,21 @@ function syncScreens() {
 setTimeout(syncScreens, 200);
 
 // ===============================================
-// 2. BEDIENINGSKNOPPEN (FIX)
+// 2. BEDIENINGSKNOPPEN & TIJD EN DATUM
 // ===============================================
+
+setInterval(() => {
+    const n = new Date();
+    const hours = String(n.getHours()).padStart(2, '0');
+    const minutes = String(n.getMinutes()).padStart(2, '0');
+    
+    const timeEl = document.getElementById('time');
+    if (timeEl) timeEl.innerHTML = `${hours}<span class="blink-colon">:</span>${minutes}`;
+    
+    const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
+    const dateEl = document.getElementById('date');
+    if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
+}, 1000);
 
 // De functie "next()" zit al in je HTML, die linken we nu aan de forceer-actie
 window.next = function() {
@@ -139,7 +152,8 @@ let msgs = [
     "WEBSITE TIJDELIJK OFFLINE WEGENS TECHNISCHE PROBLEMEN",
     "LAAT PLASTIC BEKERS BINNEN!",
     "HEB JIJ AL DE NIEUWE ZONNEBRIL?",
-    "VOLG ONS OP TIKTOK, INSTA & FACEBOOK!"
+    "VOLG ONS OP TIKTOK, INSTA & FACEBOOK!",
+    "BRENG LEGE FLESJES EN BLIKJES TERUG NAAR DE BAR!"
 ];
 let mIdx = 0;
 let tickerTickCount = 0; 
@@ -196,8 +210,8 @@ const mainPricesList = [
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
     { name: 'FRIS', val: '0,5 Munt' },
-    { name: 'SNACK (ZONDER SAUS)', val: '1 Munt' },
-    { name: 'SNACK (MET SAUS)', val: '1,5 Munt' }
+    { name: 'SNACK', val: '1 Munt' },
+    { name: 'SNACK+', val: '1,5 Munt' }
 ];
 
 let normalScrollIndex = 0;
