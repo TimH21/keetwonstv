@@ -144,8 +144,8 @@ const mainPricesList = [
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
     { name: 'FRIS', val: '0,5 Munt' },
-    { name: 'SNACK (ZONDER SAUS)', val: '1 Munt' },
-    { name: 'SNACK (MET SAUS)', val: '1,5 Munt' }
+    { name: 'SNACK', val: '1 Munt' },
+    { name: 'SNACK+', val: '1,5 Munt' }
 ];
 
 let normalScrollIndex = 0;
