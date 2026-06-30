@@ -596,14 +596,17 @@ let isPaused = false;
 // 1. Luister naar de muis
 document.addEventListener('mousemove', () => {
     const btn = document.getElementById('local-admin-btn');
-    if (btn && !isAdminMenuOpen) {
-        btn.classList.add('visible'); // Laat knop zien
+    const closeBtn = document.getElementById('local-calamity-close-btn'); // NIEUW
+    
+    if (!isAdminMenuOpen) {
+        if (btn) btn.classList.add('visible'); 
+        if (closeBtn) closeBtn.classList.add('visible'); // NIEUW: Laat kruisje ook zien
         
-        clearTimeout(mouseTimer); // Reset de wekker
+        clearTimeout(mouseTimer); 
         
-        // Verberg weer na 5 seconden
         mouseTimer = setTimeout(() => {
-            btn.classList.remove('visible');
+            if (btn) btn.classList.remove('visible');
+            if (closeBtn) closeBtn.classList.remove('visible'); // NIEUW: Verberg kruisje weer
         }, 5000);
     }
 });
@@ -959,6 +962,9 @@ window.updateMatrixPreview = function() {
 window.zendCalamiteitMatrix = function(actionType) {
     const overlay = document.getElementById('calamity-overlay');
 
+    // Verberg het rode kruisje weer!
+    const closeBtn = document.getElementById('local-calamity-close-btn');
+    if (closeBtn) closeBtn.style.display = 'none';
     if (actionType === 'geen') {
         if(!confirm("Weet je zeker dat je alle noodschermen op veilig/normaal wilt zetten?")) return;
         overlay.style.display = 'none'; 
@@ -1029,6 +1035,9 @@ function toonLokaleCalamiteit(data) {
     
     overlay.style.backgroundColor = data.kleur;
     overlay.style.display = 'flex';
+    // Toon het rode kruisje!
+    const closeBtn = document.getElementById('local-calamity-close-btn');
+    if (closeBtn) closeBtn.style.display = 'flex';
 }
 
 function getIcoonVoorScenario(tekst) {
