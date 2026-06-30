@@ -2,19 +2,18 @@
 // KEET WONS TV - NOODOMGEVING (ZONDER FIREBASE)
 // =======================================================
 
-// 1. SLIDE SYSTEEM
+// 1. SLIDE SYSTEEM MET DYNAMISCHE TIMERS
 let slides = document.querySelectorAll('.slide');
 let idx = 0;
-const TIME = 20000;
+const DEFAULT_TIME = 20000; // Standaard 20 seconden
 let currentNextTitleStr = "...";
+let slideTimer;
 
 function next() {
     if (!slides || slides.length === 0) return;
     
-    // DE FIX: Haal eerst overal de 'active' class weg voordat we verder gaan!
     slides.forEach(s => s.classList.remove('active'));
     
-    // Blijf zoeken tot we een slide vinden die NIET overgeslagen mag worden
     let attempts = 0;
     do {
         idx = (idx + 1) % slides.length;
@@ -24,46 +23,44 @@ function next() {
     const nextSlideEl = slides[idx];
     nextSlideEl.classList.add('active');
     
-    // Volgende titel voor footer
+    // Check of deze slide langer moet blijven staan (data-time)
+    const customTime = nextSlideEl.getAttribute('data-time');
+    const slideDuration = customTime ? parseInt(customTime) : DEFAULT_TIME;
+    
+    // Volgende titel bepalen
     const nextIdx = (idx + 1) % slides.length;
     let nextTitleSearch = nextIdx;
     while(slides[nextTitleSearch].classList.contains('skip-slide')) {
         nextTitleSearch = (nextTitleSearch + 1) % slides.length;
     }
-    const nextTitle = slides[nextTitleSearch].getAttribute('data-title') || "...";
-    currentNextTitleStr = nextTitle;
+    currentNextTitleStr = slides[nextTitleSearch].getAttribute('data-title') || "...";
     
     const footerTitleEl = document.getElementById('footer-next-title');
-    if(footerTitleEl) footerTitleEl.textContent = nextTitle;
+    if(footerTitleEl) footerTitleEl.textContent = currentNextTitleStr;
     
-    // Voortgangsbalk resetten
+    // Voortgangsbalk synchroniseren met de nieuwe tijd
     let bar = document.getElementById('global-progress-bar');
     if(bar) {
         bar.style.transition = 'none'; 
         bar.style.width = '0%';
         setTimeout(() => { 
-            bar.style.transition = `width ${TIME}ms linear`; 
+            bar.style.transition = `width ${slideDuration}ms linear`; 
             bar.style.width = '100%'; 
         }, 50);
     }
 
-    // Effecten beheren (Regen e.d.)
     const fx = document.getElementById('weather-fx');
-    if(fx) {
-        fx.style.opacity = (nextSlideEl.id === 'slide-weather') ? '1' : '0';
+    if(fx) fx.style.opacity = (nextSlideEl.id === 'slide-weather') ? '1' : '0';
+
+    // Timer resetten en instellen op de specifieke tijd van deze slide
+    clearInterval(slideTimer);
+    if (!isPaused) {
+        slideTimer = setInterval(next, slideDuration);
     }
 }
 
-// Start de cyclus
-let slideTimer = setInterval(next, TIME);
-setTimeout(() => { 
-    let bar = document.getElementById('global-progress-bar');
-    if(bar) {
-        bar.style.transition = `width ${TIME}ms linear`;
-        bar.style.width = '100%';
-    }
-    next(); // Pak direct de eerste slide logica op
-}, 100);
+// Start de cyclus (begint na 100ms om alles in te laden)
+setTimeout(() => { next(); }, 100);
 
 // ===============================================
 // 2. KLOK & DATUM
