@@ -3,16 +3,18 @@
 // =======================================================
 
 // ===============================================
-// 1. ATOMIC CLOCK SLIDE SYSTEEM (100% SYNCHROON)
+// 1. ATOMIC CLOCK SLIDE SYSTEEM (MET HANDMATIGE BEDIENING)
 // ===============================================
 let slideTimer;
 const DEFAULT_TIME = 20000;
+let isPaused = false;
+let globalTimeOffset = 0; // Bewaart jouw handmatige "volgende" sprongen
+let pauseStartTime = 0;   // Bewaart de tijd tijdens pauze
 
 function syncScreens() {
     const allActiveSlides = Array.from(document.querySelectorAll('.slide:not(.skip-slide)'));
     if (allActiveSlides.length === 0) return;
 
-    // 1. Bereken de totale cyclus-tijd van alle actieve dia's
     let totalCycleMs = 0;
     const timings = [];
     allActiveSlides.forEach(slide => {
@@ -21,11 +23,17 @@ function syncScreens() {
         totalCycleMs += dur;
     });
 
-    // 2. Waar zijn we NU in de wereldwijde tijdlijn?
-    const now = Date.now();
-    let elapsedInCycle = now % totalCycleMs;
+    let now = Date.now();
+    
+    // Als we gepauzeerd zijn, loopt de tijd voor de diashow niet verder
+    if (isPaused) {
+        globalTimeOffset -= (now - pauseStartTime);
+        pauseStartTime = now;
+    }
 
-    // 3. Zoek uit welke slide we NU moeten tonen
+    let elapsedInCycle = (now + globalTimeOffset) % totalCycleMs;
+    if (elapsedInCycle < 0) elapsedInCycle += totalCycleMs;
+
     let currentSlideIdx = 0;
     for (let i = 0; i < timings.length; i++) {
         if (elapsedInCycle < timings[i].duration) {
@@ -38,52 +46,88 @@ function syncScreens() {
     const currentSlide = timings[currentSlideIdx].el;
     const timeRemaining = timings[currentSlideIdx].duration - elapsedInCycle;
 
-    // 4. Zet de juiste slide aan (en de rest uit)
     document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
     currentSlide.classList.add('active');
 
-    // 5. Update Footer Titel
     const nextIdx = (currentSlideIdx + 1) % timings.length;
     const nextTitle = timings[nextIdx].el.getAttribute('data-title') || "...";
     const footerTitleEl = document.getElementById('footer-next-title');
-    if (footerTitleEl) footerTitleEl.textContent = nextTitle;
+    
+    if (footerTitleEl) {
+        if (isPaused) footerTitleEl.textContent = "GEPAUZEERD";
+        else footerTitleEl.textContent = nextTitle;
+    }
 
-    // 6. Sync de voortgangsbalk (Zelfs als je halverwege de slide instroomt!)
     let bar = document.getElementById('global-progress-bar');
     if (bar) {
         bar.style.transition = 'none';
         let startPercentage = (elapsedInCycle / timings[currentSlideIdx].duration) * 100;
         bar.style.width = startPercentage + '%';
         
-        setTimeout(() => {
-            bar.style.transition = `width ${timeRemaining}ms linear`;
-            bar.style.width = '100%';
-        }, 50);
+        if (!isPaused) {
+            setTimeout(() => {
+                bar.style.transition = `width ${timeRemaining}ms linear`;
+                bar.style.width = '100%';
+            }, 50);
+        }
     }
 
-    // 7. Zet de wekker voor de VOLGENDE slide wissel
     clearTimeout(slideTimer);
     if (!isPaused) {
         slideTimer = setTimeout(syncScreens, timeRemaining);
     }
 }
-
-// Start de motor na laden
 setTimeout(syncScreens, 200);
 
 // ===============================================
-// 2. KLOK & DATUM
+// 2. BEDIENINGSKNOPPEN (FIX)
 // ===============================================
-setInterval(() => {
-    const n = new Date();
-    const hours = String(n.getHours()).padStart(2, '0');
-    const minutes = String(n.getMinutes()).padStart(2, '0');
+
+// De functie "next()" zit al in je HTML, die linken we nu aan de forceer-actie
+window.next = function() {
+    const currentActive = document.querySelector('.slide.active');
+    if(!currentActive) return;
     
-    document.getElementById('time').innerHTML = `${hours}<span class="blink-colon">:</span>${minutes}`;
+    let dur = parseInt(currentActive.getAttribute('data-time')) || DEFAULT_TIME;
+    let bar = document.getElementById('global-progress-bar');
+    let percentage = bar ? parseFloat(bar.style.width) || 0 : 0;
     
-    const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
-    document.getElementById('date').textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
-}, 1000);
+    // Bereken hoeveel milliseconden de huidige slide nog had, en spoel dat exact door
+    let timeRemaining = dur - (dur * (percentage / 100));
+    globalTimeOffset += timeRemaining + 100; // +100ms marge om hem over de drempel te duwen
+    
+    if (isPaused) {
+        // Als we gepauzeerd zijn, updaten we direct het scherm zonder de wekker aan te zetten
+        pauseStartTime = Date.now();
+    }
+    syncScreens();
+};
+
+window.togglePause = function() {
+    const btn = document.getElementById('btn-pause');
+    isPaused = !isPaused;
+    
+    if (isPaused) {
+        pauseStartTime = Date.now();
+        clearTimeout(slideTimer);
+        btn.innerHTML = "Hervat Rotatie ▶️";
+        btn.style.background = "#2ecc71"; // Groen om weer aan te zetten
+        btn.style.color = "black";
+        
+        let bar = document.getElementById('global-progress-bar');
+        if (bar) {
+            let currentWidth = window.getComputedStyle(bar).width;
+            bar.style.transition = 'none';
+            bar.style.width = currentWidth; // Bevries de neon balk
+        }
+        document.getElementById('footer-next-title').textContent = "GEPAUZEERD";
+    } else {
+        btn.innerHTML = "Pauzeer Rotatie ⏸️";
+        btn.style.background = "#333";
+        btn.style.color = "white";
+        syncScreens(); // Start motor weer op
+    }
+};
 
 // ===============================================
 // 3. STATISCHE TICKER (NIEUWSZENDER ONDERIN)
@@ -144,7 +188,7 @@ function tick() {
 setInterval(tick, 6000);
 
 // ===============================================
-// 4. STATISCHE PRIJZENLIJST ZIJBALK (SLIMME SCROLLER)
+// 4. STATISCHE PRIJZENLIJST ZIJBALK (SCROLL FIX)
 // ===============================================
 const mainPricesList = [
     { name: 'MUNT', val: '€ 1,50' },
@@ -153,8 +197,8 @@ const mainPricesList = [
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
     { name: 'FRIS', val: '0,5 Munt' },
-    { name: 'SNACK', val: '1 Munt' },
-    { name: 'SNACK+', val: '1,5 Munt' }
+    { name: 'SNACK (ZONDER SAUS)', val: '1 Munt' },
+    { name: 'SNACK (MET SAUS)', val: '1,5 Munt' }
 ];
 
 let normalScrollIndex = 0;
@@ -164,18 +208,17 @@ function startSidebarMasterController() {
     const container = document.querySelector('.train-ticker-sub-container');
     if (!normalTrack || !container) return;
 
-    // 1. Vul de lijst in (ALTIJD de standaard lijst)
     normalTrack.innerHTML = mainPricesList.map(p => `
         <div class="price-row"><span>${p.name}</span> <strong>${p.val}</strong></div>
     `).join('');
 
-    // 2. Slimme Scroll-logica
     setInterval(() => {
         const trackHeight = normalTrack.scrollHeight;
         const viewHeight = container.clientHeight;
+        const maxScroll = trackHeight - viewHeight;
 
         // Als het makkelijk past op de TV, stop dan met scrollen!
-        if (trackHeight <= viewHeight + 5) {
+        if (maxScroll <= 5) {
             normalTrack.style.transform = 'translateY(0)';
             return;
         }
@@ -187,17 +230,19 @@ function startSidebarMasterController() {
 
         normalTrack.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
         
-        const visibleItems = Math.floor(viewHeight / itemHeight);
-        const maxIndex = normalTrack.children.length - visibleItems;
-
         normalScrollIndex += 2; // Scroll 2 items per keer
+        let targetY = normalScrollIndex * itemHeight;
 
-        if (normalScrollIndex > maxIndex) {
-            normalScrollIndex = 0; // Terug naar het begin
+        if (targetY > maxScroll + itemHeight) {
+            // We zijn helemaal beneden geweest en hebben even gewacht, reset naar top!
+            normalScrollIndex = 0;
+            targetY = 0;
+        } else if (targetY > maxScroll) {
+            // Fixeer hem exact op de bodem, zodat "Snack met saus" nooit wordt afgesneden
+            targetY = maxScroll;
         }
 
-        const totalMove = normalScrollIndex * itemHeight;
-        normalTrack.style.transform = `translateY(-${totalMove}px)`;
+        normalTrack.style.transform = `translateY(-${targetY}px)`;
 
     }, 4500);
 }
