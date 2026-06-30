@@ -1957,3 +1957,49 @@ body.standby-mode .weather-row {
 
 /* Accent kleur voor speciale items */
 .snack-pill.accent { border-color: var(--accent); color: var(--accent); }
+
+/* =========================================
+   🚀 UI 3.0: GLASSMORPHISM & DYNAMIC ISLAND
+   ========================================= */
+
+/* Zwevende, Moderne Sidebar */
+.sidebar {
+    margin: 2vh; height: 96vh; border-radius: 30px;
+    background: rgba(15, 15, 20, 0.6) !important;
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 10px 0 40px rgba(0,0,0,0.6);
+    z-index: 10;
+}
+
+/* Floating "Dynamic Island" Footer */
+.ticker-bar-new {
+    bottom: 3vh !important; left: 28vw !important; right: 3vw !important; width: auto !important;
+    border-radius: 20px; overflow: hidden;
+    background: rgba(15, 15, 20, 0.65) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+/* Perfecte uitlijning (Stippellijntjes tussen product en prijs) */
+.menu-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    font-size: 2.6vh; margin-bottom: 1.5vh;
+}
+.menu-row span:first-child { font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+.menu-row .dots {
+    flex-grow: 1; border-bottom: 3px dotted rgba(255,255,255,0.15);
+    margin: 0 1vw; position: relative; top: -0.5vh;
+}
+.menu-row b { color: var(--accent); font-weight: 900; font-size: 2.8vh; }
+.menu-row .blue-munt { color: #3498db; }
+
+/* Subtiele glow achter de kaarten */
+.modern-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+}
+.modern-card h2 { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1vh; margin-bottom: 2vh; }
