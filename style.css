@@ -2031,3 +2031,94 @@ body.standby-mode .weather-row {
     0% { opacity: 0; transform: scale(1.05) translateY(10px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* =========================================
+   🌌 UI 5.0: FESTIVAL MAINSTAGE ACHTERGROND (FORCE OVERRIDE)
+   ========================================= */
+
+/* De basis is inktzwart */
+.bg-layer {
+    position: fixed !important; inset: 0 !important; z-index: 0 !important;
+    background-color: #030305 !important;
+    overflow: hidden !important;
+}
+
+/* Het 3D Cyber-Grid op de achtergrond */
+.bg-grid {
+    position: fixed !important; inset: 0 !important; z-index: 1 !important;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) !important;
+    background-size: 5vw 5vw !important;
+    transform: perspective(1000px) rotateX(60deg) translateY(-10vh) scale(2.5) !important;
+    transform-origin: top !important;
+    animation: gridMove 30s linear infinite !important;
+    pointer-events: none !important;
+}
+
+/* De Vloeiende Aurora Kleuren (Neon Groen, Diepblauw, Paars) */
+.fluid-blob {
+    position: fixed !important; border-radius: 50% !important;
+    will-change: transform !important;
+    mix-blend-mode: screen !important; 
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+.blob-1 {
+    width: 80vw !important; height: 80vw !important; top: -30vw !important; left: -20vw !important;
+    background: radial-gradient(circle, rgba(46, 204, 113, 0.12) 0%, transparent 60%) !important;
+    animation: floatBlob1 15s infinite alternate ease-in-out !important;
+}
+.blob-2 {
+    width: 70vw !important; height: 70vw !important; bottom: -20vw !important; right: -10vw !important;
+    background: radial-gradient(circle, rgba(52, 152, 219, 0.15) 0%, transparent 60%) !important;
+    animation: floatBlob2 18s infinite alternate-reverse ease-in-out !important;
+}
+.blob-3 {
+    width: 65vw !important; height: 65vw !important; top: 15vh !important; left: 25vw !important;
+    background: radial-gradient(circle, rgba(142, 68, 173, 0.08) 0%, transparent 60%) !important;
+    animation: floatBlob3 22s infinite alternate ease-in-out !important;
+}
+
+/* =========================================
+   💎 PREMIUM GLAZEN KAARTEN (Modern Card 2.0)
+   ========================================= */
+.modern-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.02) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,255,255,0.01) !important;
+    border-radius: 20px !important;
+    padding: 4vh 3vw !important; 
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex !important; flex-direction: column !important;
+}
+
+.modern-card::before {
+    content: '' !important; position: absolute !important; top: 0 !important; left: -150% !important; width: 50% !important; height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent) !important;
+    transform: skewX(-35deg) !important; 
+    animation: premiumShine 8s infinite !important; 
+    pointer-events: none !important;
+}
+
+.modern-card h2 { 
+    border-bottom: 2px solid rgba(255,255,255,0.1) !important; 
+    padding-bottom: 1vh !important; 
+    margin-bottom: 3.5vh !important; 
+    color: var(--primary) !important;
+    text-shadow: 0 0 15px rgba(46, 204, 113, 0.3) !important; 
+}
+
+/* Keyframes hebben zelf geen !important nodig, zolang de aanroep hierboven het wel heeft */
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 5vw; }
+}
+@keyframes floatBlob1 { 0% { transform: translate(0, 0) scale(1) rotate(0deg); } 100% { transform: translate(5vw, 8vh) scale(1.1) rotate(10deg); } }
+@keyframes floatBlob2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-6vw, -6vh) scale(1.2); } }
+@keyframes floatBlob3 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(8vw, -5vh) scale(1.1); } }
+@keyframes premiumShine { 0% { left: -150%; } 15%, 100% { left: 250%; } }
