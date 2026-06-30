@@ -1862,3 +1862,49 @@ body.standby-mode .weather-row {
     font-weight: bold; border-radius: 5px; transition: 0.2s;
 }
 .button:hover { opacity: 0.8; }
+
+/* =========================================
+   ✨ MODERNE FESTIVAL UPGRADES (UI 2.0)
+   ========================================= */
+
+/* Zwevende lichtbollen (Ambient Glow) op de achtergrond */
+.orb-1, .orb-2 { 
+    position: fixed; border-radius: 50%; filter: blur(90px); z-index: 1; opacity: 0.35; 
+    animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none;
+}
+.orb-1 { width: 50vw; height: 50vw; background: rgba(46, 204, 113, 0.2); top: -10vw; left: -10vw; }
+.orb-2 { width: 45vw; height: 45vw; background: rgba(52, 152, 219, 0.2); bottom: -10vw; right: -5vw; animation-delay: -6s; }
+
+@keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(6vw, 6vw) scale(1.1); } }
+
+/* De nieuwe Moderne Kaarten (Voor de menulijst) */
+.modern-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 3vh 2vw;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+}
+
+/* De glanzende animatie over de kaarten */
+.modern-card::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: skewX(-20deg); animation: shine 6s infinite; pointer-events: none;
+}
+@keyframes shine { 0% { left: -100%; } 20%, 100% { left: 200%; } }
+
+/* Voor de Sterke Drank (Kleine pil-vormige knopjes) */
+.pill-badge {
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+    padding: 1vh 1.5vw; border-radius: 50px; color: #ddd; font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Flexibele Sidebar Prijzen container */
+.price-sidebar { display: flex; flex-direction: column; height: 100%; }
+.prices-stage { flex-grow: 1; display: flex; flex-direction: column; }
+.train-ticker-sub-container { height: 100% !important; max-height: 100% !important; flex-grow: 1; }
