@@ -1959,44 +1959,51 @@ body.standby-mode .weather-row {
 .snack-pill.accent { border-color: var(--accent); color: var(--accent); }
 
 /* =========================================
-   🚀 UI 3.0: GLASSMORPHISM & DYNAMIC ISLAND
+   🚀 UI 4.0: FULL-WIDTH BALK & PERFORMANCE FIX
    ========================================= */
 
-/* Zwevende, Moderne Sidebar */
+/* Zorg dat de layout niet onder de balk valt */
+.main-layout {
+    height: 92vh !important; /* Claimt exact de bovenste 92% van je TV */
+    margin: 0 !important;
+}
+
+/* De Sidebar - Strak en flush tegen de randen */
 .sidebar {
-    margin: 2vh; height: 96vh; border-radius: 30px;
+    margin: 0 !important; 
+    height: 100% !important; 
+    border-radius: 0 !important; /* Strakke hoeken, geen zwevend eiland meer */
     background: rgba(15, 15, 20, 0.6) !important;
-    backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 10px 0 40px rgba(0,0,0,0.6);
+    backdrop-filter: blur(15px); /* Iets lager voor betere performance */
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
     z-index: 10;
 }
 
-/* Fix voor de Sidebar tekst (Zorgt dat BIER/WIJN netjes afbreekt) */
+/* Fix voor de Sidebar tekst (Breekt mooi af op kleine schermen) */
 .price-sidebar .price-row span:first-child {
     max-width: 65%; line-height: 1.1; display: inline-block;
 }
 
-/* Floating "Dynamic Island" Footer - Nu perfect gecentreerd naast de sidebar! */
+/* Full-width Footer Balk - De absolute fundering */
 .ticker-bar-new {
     position: fixed;
-    bottom: 2vh !important; 
-    left: 34vw !important; /* Begint exact rechts van de sidebar */
-    right: 2vw !important; 
-    width: auto !important;
-    height: 7.5vh !important; /* Strakkere balk */
-    border-radius: 15px !important;
-    background: rgba(15, 15, 20, 0.85) !important;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.7);
-    z-index: 50; /* Zorgt dat hij áltijd bovenop ligt */
+    bottom: 0 !important; 
+    left: 0 !important; 
+    right: 0 !important; 
+    width: 100vw !important; /* Volledige breedte */
+    height: 8vh !important; /* Claimt de onderste 8% */
+    border-radius: 0 !important;
+    background: rgba(10, 10, 12, 0.95) !important; /* Solide donker, geen wazig glas */
+    border-top: 2px solid var(--primary); /* Strakke groene lijn als afscheiding */
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+    z-index: 500; 
     padding: 0 2vw !important;
+    display: flex; align-items: center; justify-content: space-between;
 }
 
-/* Zorg dat de tekst in de ticker mooi in het midden staat */
 .ticker-right-msg {
-    flex: 1; text-align: center; padding-left: 1vw;
+    flex: 1; text-align: right; padding-left: 1vw;
 }
 
 /* Perfecte uitlijning (Stippellijntjes tussen product en prijs) */
@@ -2015,7 +2022,7 @@ body.standby-mode .weather-row {
 .menu-row b { color: var(--accent); font-weight: 900; font-size: 2.8vh; }
 .menu-row .blue-munt { color: #3498db; }
 
-/* NIEUW: Compacte rijen speciaal voor de drukke Snack-kaart */
+/* Compacte rijen speciaal voor de drukke Snack-kaart */
 .menu-row-compact {
     display: flex; align-items: flex-end; justify-content: space-between;
     font-size: 2.2vh; margin-bottom: 0.6vh;
@@ -2026,10 +2033,63 @@ body.standby-mode .weather-row {
     margin: 0 0.5vw 0.5vh 0.5vw;
 }
 
-/* Subtiele glow achter de kaarten */
+/* Subtiele glow achter de kaarten (Performance geoptimaliseerd) */
 .modern-card {
     background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
     border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 10px rgba(255,255,255,0.02);
+    border-radius: 15px;
 }
 .modern-card h2 { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1vh; margin-bottom: 2vh; }
+
+
+/* =========================================
+   ✨ GEOPTIMALISEERDE ANIMATIES (100% VLOEIEND)
+   ========================================= */
+
+/* Zwevende lichtbollen (ZONDER laggy filter) */
+.orb-1, .orb-2 { 
+    position: fixed; border-radius: 50%; z-index: 1; opacity: 0.4; 
+    animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none;
+    will-change: transform; /* Vraagt de videokaart om dit vlot te renderen */
+}
+.orb-1 { 
+    width: 70vw; height: 70vw; top: -20vw; left: -20vw; 
+    /* Gradient in plaats van Blur is oneindig veel sneller! */
+    background: radial-gradient(circle, rgba(46, 204, 113, 0.2) 0%, transparent 60%);
+}
+.orb-2 { 
+    width: 60vw; height: 60vw; bottom: -10vw; right: -10vw; animation-delay: -6s; 
+    background: radial-gradient(circle, rgba(52, 152, 219, 0.2) 0%, transparent 60%);
+}
+
+@keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(4vw, 4vw) scale(1.05); } }
+
+/* De kaarten zweven één voor één naar binnen */
+.slide.active .modern-card {
+    opacity: 0;
+    transform: translateY(30px); /* Kortere afstand zorgt voor minder stotteren */
+    animation: slideUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    will-change: transform, opacity;
+}
+
+/* Stagger effect: elke kaart start net iets later */
+.slide.active .modern-card:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .modern-card:nth-child(2) { animation-delay: 0.25s; }
+.slide.active .modern-card:nth-child(3) { animation-delay: 0.4s; }
+.slide.active .modern-card:nth-child(4) { animation-delay: 0.55s; }
+
+@keyframes slideUpFade {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animatie voor de grote titels (Zonder Blur!) */
+.slide.active .slide-title {
+    animation: textFocus 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    letter-spacing: 2px;
+    will-change: transform, opacity;
+}
+@keyframes textFocus {
+    0% { opacity: 0; transform: scale(1.05) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
