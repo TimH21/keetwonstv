@@ -2,65 +2,75 @@
 // KEET WONS TV - NOODOMGEVING (ZONDER FIREBASE)
 // =======================================================
 
-// 1. SLIDE SYSTEEM MET DYNAMISCHE TIMERS
-let slides = document.querySelectorAll('.slide');
-let idx = 0;
-const DEFAULT_TIME = 20000; // Standaard 20 seconden
-let currentNextTitleStr = "...";
+// ===============================================
+// 1. ATOMIC CLOCK SLIDE SYSTEEM (100% SYNCHROON)
+// ===============================================
 let slideTimer;
+const DEFAULT_TIME = 20000;
+let isPaused = false;
 
-function next() {
-    if (!slides || slides.length === 0) return;
-    
-    slides.forEach(s => s.classList.remove('active'));
-    
-    let attempts = 0;
-    do {
-        idx = (idx + 1) % slides.length;
-        attempts++;
-    } while (slides[idx].classList.contains('skip-slide') && attempts < slides.length);
-    
-    const nextSlideEl = slides[idx];
-    nextSlideEl.classList.add('active');
-    
-    // Check of deze slide langer moet blijven staan (data-time)
-    const customTime = nextSlideEl.getAttribute('data-time');
-    const slideDuration = customTime ? parseInt(customTime) : DEFAULT_TIME;
-    
-    // Volgende titel bepalen
-    const nextIdx = (idx + 1) % slides.length;
-    let nextTitleSearch = nextIdx;
-    while(slides[nextTitleSearch].classList.contains('skip-slide')) {
-        nextTitleSearch = (nextTitleSearch + 1) % slides.length;
+function syncScreens() {
+    const allActiveSlides = Array.from(document.querySelectorAll('.slide:not(.skip-slide)'));
+    if (allActiveSlides.length === 0) return;
+
+    // 1. Bereken de totale cyclus-tijd van alle actieve dia's
+    let totalCycleMs = 0;
+    const timings = [];
+    allActiveSlides.forEach(slide => {
+        const dur = parseInt(slide.getAttribute('data-time')) || DEFAULT_TIME;
+        timings.push({ el: slide, duration: dur });
+        totalCycleMs += dur;
+    });
+
+    // 2. Waar zijn we NU in de wereldwijde tijdlijn?
+    const now = Date.now();
+    let elapsedInCycle = now % totalCycleMs;
+
+    // 3. Zoek uit welke slide we NU moeten tonen
+    let currentSlideIdx = 0;
+    for (let i = 0; i < timings.length; i++) {
+        if (elapsedInCycle < timings[i].duration) {
+            currentSlideIdx = i;
+            break;
+        }
+        elapsedInCycle -= timings[i].duration;
     }
-    currentNextTitleStr = slides[nextTitleSearch].getAttribute('data-title') || "...";
-    
+
+    const currentSlide = timings[currentSlideIdx].el;
+    const timeRemaining = timings[currentSlideIdx].duration - elapsedInCycle;
+
+    // 4. Zet de juiste slide aan (en de rest uit)
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    currentSlide.classList.add('active');
+
+    // 5. Update Footer Titel
+    const nextIdx = (currentSlideIdx + 1) % timings.length;
+    const nextTitle = timings[nextIdx].el.getAttribute('data-title') || "...";
     const footerTitleEl = document.getElementById('footer-next-title');
-    if(footerTitleEl) footerTitleEl.textContent = currentNextTitleStr;
-    
-    // Voortgangsbalk synchroniseren met de nieuwe tijd
+    if (footerTitleEl) footerTitleEl.textContent = nextTitle;
+
+    // 6. Sync de voortgangsbalk (Zelfs als je halverwege de slide instroomt!)
     let bar = document.getElementById('global-progress-bar');
-    if(bar) {
-        bar.style.transition = 'none'; 
-        bar.style.width = '0%';
-        setTimeout(() => { 
-            bar.style.transition = `width ${slideDuration}ms linear`; 
-            bar.style.width = '100%'; 
+    if (bar) {
+        bar.style.transition = 'none';
+        let startPercentage = (elapsedInCycle / timings[currentSlideIdx].duration) * 100;
+        bar.style.width = startPercentage + '%';
+        
+        setTimeout(() => {
+            bar.style.transition = `width ${timeRemaining}ms linear`;
+            bar.style.width = '100%';
         }, 50);
     }
 
-    const fx = document.getElementById('weather-fx');
-    if(fx) fx.style.opacity = (nextSlideEl.id === 'slide-weather') ? '1' : '0';
-
-    // Timer resetten en instellen op de specifieke tijd van deze slide
-    clearInterval(slideTimer);
+    // 7. Zet de wekker voor de VOLGENDE slide wissel
+    clearTimeout(slideTimer);
     if (!isPaused) {
-        slideTimer = setInterval(next, slideDuration);
+        slideTimer = setTimeout(syncScreens, timeRemaining);
     }
 }
 
-// Start de cyclus (begint na 100ms om alles in te laden)
-setTimeout(() => { next(); }, 100);
+// Start de motor na laden
+setTimeout(syncScreens, 200);
 
 // ===============================================
 // 2. KLOK & DATUM
