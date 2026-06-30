@@ -33,6 +33,8 @@
                 </select>
             </div>
 
+            <button class="admin-btn" style="background:#e53e3e;" onclick="document.getElementById('calamity-control-modal').style.display='flex'; toggleAdminMenu();">🚨 Noodpaneel Openen</button>
+
             <div class="admin-group">
                 <label>Scherm Besturing:</label>
                 <button class="admin-btn" onclick="next(); toggleAdminMenu();">Volgende Slide Forceer ⏭️</button>
@@ -40,6 +42,8 @@
             </div>
         </div>
     </div>
+
+    <div id="calamity-overlay" style="display:none;"></div>
     
     <div class="bg-layer"></div>
     <div id="weather-fx" class="weather-fx"></div>
