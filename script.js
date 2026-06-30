@@ -86,9 +86,11 @@ let msgs = [
     "WELKOM BIJ KEET WONS", 
     "1 MUNT = € 1,50", 
     "ROKEN OF VAPEN? GA NAAR BUITEN!",
-    "BETALEN KAN VIA TIKKIE OF CONTANT AAN DE BAR",
-    "WEBSITE TIJDELIJK OFFLINE WEGENS ONDERHOUD",
-    "LAAT PLASTIC BEKERS BINNEN!"
+    "BETALEN KAN VIA PIN OF CONTANT AAN DE BAR",
+    "WEBSITE TIJDELIJK OFFLINE WEGENS TECHNISCHE PROBLEMEN",
+    "LAAT PLASTIC BEKERS BINNEN!",
+    "HEB JIJ AL DE NIEUWE ZONNEBRIL?",
+    "VOLG ONS OP TIKTOK, INSTA & FACEBOOK!"
 ];
 let mIdx = 0;
 let tickerTickCount = 0; 
@@ -146,17 +148,17 @@ const mainPricesList = [
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
     { name: 'SNACK', val: '1 Munt' },
-    { name: '+ SAUS', val: '0,5 Munt Extra' }
+    { name: 'SNACK+', val: '0,5 Munt' }
 ];
 
 const assortimenten = [
-    { type: 'DRANKEN', items: [{name: 'Bier/Wijn/0.0', val: '1 Munt'}, {name: 'Mixdrank', val: '1,5 Munt'}, {name: 'Stelz', val: '2 Munten'}, {name: 'Shotjes', val: '1 Munt'}] },
-    { type: 'FRIS', items: [{name: 'Cola / Sinas / Ice Tea', val: '0,5 Munt'}, {name: 'Water', val: '0,5 Munt'}] },
+    { type: 'DRANKEN', items: [{name: 'Bier/Wijn', val: '1 Munt'}, {name: 'Mixdrank', val: '1,5 Munt'}, {name: 'Stelz', val: '2 Munten'}, {name: 'Shotjes', val: '1 Munt'}] },
+    { type: 'FRIS', items: [{name: 'Cola/Sinas', val: '0,5 Munt'}, {name: 'Water', val: '0,5 Munt'}] },
     { type: 'SNACKS', items: [
-        {name: 'Snack zonder saus', val: '1 Munt'},
-        {name: 'Snack met saus', val: '1,5 Munt'},
-        {name: 'Patat zonder saus', val: '1 Munt'},
-        {name: 'Patat met saus', val: '1,5 Munt'}
+        {name: 'Snack', val: '1 Munt'},
+        {name: 'Snack+', val: '1,5 Munt'},
+        {name: 'Patat', val: '1 Munt'},
+        {name: 'Patat+', val: '1,5 Munt'}
     ] }
 ];
 
