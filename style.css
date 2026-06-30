@@ -1864,107 +1864,12 @@ body.standby-mode .weather-row {
 .button:hover { opacity: 0.8; }
 
 /* =========================================
-   ✨ MODERNE FESTIVAL UPGRADES (UI 2.0)
-   ========================================= */
-
-/* Zwevende lichtbollen (Ambient Glow) op de achtergrond */
-.orb-1, .orb-2 { 
-    position: fixed; border-radius: 50%; filter: blur(90px); z-index: 1; opacity: 0.35; 
-    animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none;
-}
-.orb-1 { width: 50vw; height: 50vw; background: rgba(46, 204, 113, 0.2); top: -10vw; left: -10vw; }
-.orb-2 { width: 45vw; height: 45vw; background: rgba(52, 152, 219, 0.2); bottom: -10vw; right: -5vw; animation-delay: -6s; }
-
-@keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(6vw, 6vw) scale(1.1); } }
-
-/* De nieuwe Moderne Kaarten (Voor de menulijst) */
-.modern-card {
-    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 3vh 2vw;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    position: relative;
-    overflow: hidden;
-    display: flex; flex-direction: column;
-}
-
-/* De glanzende animatie over de kaarten */
-.modern-card::before {
-    content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    transform: skewX(-20deg); animation: shine 6s infinite; pointer-events: none;
-}
-@keyframes shine { 0% { left: -100%; } 20%, 100% { left: 200%; } }
-
-/* Voor de Sterke Drank (Kleine pil-vormige knopjes) */
-.pill-badge {
-    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
-    padding: 1vh 1.5vw; border-radius: 50px; color: #ddd; font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-/* Flexibele Sidebar Prijzen container */
-.price-sidebar { display: flex; flex-direction: column; height: 100%; }
-.prices-stage { flex-grow: 1; display: flex; flex-direction: column; }
-.train-ticker-sub-container { height: 100% !important; max-height: 100% !important; flex-grow: 1; }
-
-/* =========================================
-   ✨ ANIMATIES & VERNIEUWDE LAYOUT
-   ========================================= */
-
-/* De kaarten zweven één voor één naar binnen als de slide actief wordt */
-.slide.active .modern-card {
-    opacity: 0;
-    transform: translateY(50px);
-    animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-/* Stagger effect: elke kaart start net iets later */
-.slide.active .modern-card:nth-child(1) { animation-delay: 0.1s; }
-.slide.active .modern-card:nth-child(2) { animation-delay: 0.3s; }
-.slide.active .modern-card:nth-child(3) { animation-delay: 0.5s; }
-.slide.active .modern-card:nth-child(4) { animation-delay: 0.7s; }
-
-@keyframes slideUpFade {
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Animatie voor de grote titels */
-.slide.active .slide-title {
-    animation: textFocus 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    letter-spacing: 2px;
-}
-@keyframes textFocus {
-    0% { filter: blur(10px); opacity: 0; transform: scale(1.05); }
-    100% { filter: blur(0); opacity: 1; transform: scale(1); }
-}
-
-/* De vernieuwde Snack Pills (Flexibel voor elk scherm) */
-.snack-container {
-    display: flex; flex-wrap: wrap; gap: 1.5vh 1vw; justify-content: center;
-    margin-bottom: 2vh; margin-top: 1vh;
-}
-.snack-pill {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 1.2vh 1.5vw; border-radius: 8px; color: #fff;
-    font-size: 2.2vh; font-weight: 600;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    transition: transform 0.3s, background 0.3s;
-}
-.snack-pill:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.2); }
-
-/* Accent kleur voor speciale items */
-.snack-pill.accent { border-color: var(--accent); color: var(--accent); }
-
-/* =========================================
-   🚀 UI 4.0: FULL-WIDTH BALK & PERFORMANCE FIX
+   🚀 UI 4.0: DE DEFINITIEVE UPGRADE (GEEN LAG, RONDE BALK)
    ========================================= */
 
 /* Zorg dat de layout niet onder de balk valt */
 .main-layout {
-    height: 92vh !important; /* Claimt exact de bovenste 92% van je TV */
+    height: 92vh !important;
     margin: 0 !important;
 }
 
@@ -1972,33 +1877,41 @@ body.standby-mode .weather-row {
 .sidebar {
     margin: 0 !important; 
     height: 100% !important; 
-    border-radius: 0 !important; /* Strakke hoeken, geen zwevend eiland meer */
+    border-radius: 0 !important; 
     background: rgba(15, 15, 20, 0.6) !important;
-    backdrop-filter: blur(15px); /* Iets lager voor betere performance */
+    backdrop-filter: blur(15px);
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 10px 0 30px rgba(0,0,0,0.5);
     z-index: 10;
+    display: flex; flex-direction: column;
 }
 
-/* Fix voor de Sidebar tekst (Breekt mooi af op kleine schermen) */
+/* Fix voor de Sidebar tekst & Overflow afsnijden */
+.price-sidebar {
+    flex-grow: 1;
+    display: flex; flex-direction: column;
+    overflow: hidden; 
+    margin-bottom: 2vh; 
+}
+.prices-stage, .train-ticker-sub-container { height: 100% !important; overflow: hidden; }
 .price-sidebar .price-row span:first-child {
     max-width: 65%; line-height: 1.1; display: inline-block;
 }
 
-/* Full-width Footer Balk - De absolute fundering */
+/* Full-width Footer Balk - Ronde hoeken bovenop */
 .ticker-bar-new {
     position: fixed;
     bottom: 0 !important; 
     left: 0 !important; 
     right: 0 !important; 
-    width: 100vw !important; /* Volledige breedte */
-    height: 8vh !important; /* Claimt de onderste 8% */
-    border-radius: 0 !important;
-    background: rgba(10, 10, 12, 0.95) !important; /* Solide donker, geen wazig glas */
-    border-top: 2px solid var(--primary); /* Strakke groene lijn als afscheiding */
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+    width: 100vw !important; 
+    height: 8vh !important; 
+    border-radius: 30px 30px 0 0 !important; 
+    background: rgba(10, 10, 12, 0.95) !important; 
+    border-top: 3px solid var(--primary); 
+    box-shadow: 0 -10px 40px rgba(46, 204, 113, 0.15);
     z-index: 500; 
-    padding: 0 2vw !important;
+    padding: 0 3vw !important;
     display: flex; align-items: center; justify-content: space-between;
 }
 
@@ -2033,6 +1946,21 @@ body.standby-mode .weather-row {
     margin: 0 0.5vw 0.5vh 0.5vw;
 }
 
+/* De Snack Pills */
+.snack-container {
+    display: flex; flex-wrap: wrap; gap: 1.5vh 1vw; justify-content: center;
+    margin-bottom: 3vh; margin-top: 1.5vh;
+}
+.snack-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5vh 1.8vw; border-radius: 12px; color: #fff;
+    font-size: 2.2vh; font-weight: 700; text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s, background 0.3s;
+}
+.snack-pill:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.15); }
+
 /* Subtiele glow achter de kaarten (Performance geoptimaliseerd) */
 .modern-card {
     background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
@@ -2051,11 +1979,10 @@ body.standby-mode .weather-row {
 .orb-1, .orb-2 { 
     position: fixed; border-radius: 50%; z-index: 1; opacity: 0.4; 
     animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none;
-    will-change: transform; /* Vraagt de videokaart om dit vlot te renderen */
+    will-change: transform; 
 }
 .orb-1 { 
     width: 70vw; height: 70vw; top: -20vw; left: -20vw; 
-    /* Gradient in plaats van Blur is oneindig veel sneller! */
     background: radial-gradient(circle, rgba(46, 204, 113, 0.2) 0%, transparent 60%);
 }
 .orb-2 { 
@@ -2068,12 +1995,11 @@ body.standby-mode .weather-row {
 /* De kaarten zweven één voor één naar binnen */
 .slide.active .modern-card {
     opacity: 0;
-    transform: translateY(30px); /* Kortere afstand zorgt voor minder stotteren */
+    transform: translateY(30px);
     animation: slideUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     will-change: transform, opacity;
 }
 
-/* Stagger effect: elke kaart start net iets later */
 .slide.active .modern-card:nth-child(1) { animation-delay: 0.1s; }
 .slide.active .modern-card:nth-child(2) { animation-delay: 0.25s; }
 .slide.active .modern-card:nth-child(3) { animation-delay: 0.4s; }
