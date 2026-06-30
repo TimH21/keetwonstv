@@ -2122,3 +2122,42 @@ body.standby-mode .weather-row {
 @keyframes floatBlob2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-6vw, -6vh) scale(1.2); } }
 @keyframes floatBlob3 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(8vw, -5vh) scale(1.1); } }
 @keyframes premiumShine { 0% { left: -150%; } 15%, 100% { left: 250%; } }
+
+/* =========================================
+   🛠️ UITLIJNING & OVERFLOW FIX (TITELS IN BEELD)
+   ========================================= */
+
+/* Zorg dat de hoofd-titels iets compacter zijn en niet buiten beeld vallen */
+.slide-title { 
+    font-size: 10vh !important;  /* Was 12vh, net te groot voor lange woorden */
+    margin-bottom: 3vh !important; /* Minder nutteloze lucht onder de titel */
+    margin-top: 1vh !important;
+}
+
+/* Maak de glazen kaarten efficiënter qua ruimte */
+.modern-card {
+    padding: 2.5vh 2.5vw !important; /* Iets minder loze ruimte aan de randen */
+}
+
+/* Titels in de kaarten strakker afstellen */
+.modern-card h2 {
+    font-size: 3.5vh !important;
+    margin-bottom: 2vh !important; /* Minder lucht onder de categorie-titels */
+    padding-bottom: 0.5vh !important;
+}
+
+/* De rijen met drankjes weer netjes op elkaar laten aansluiten */
+.menu-row {
+    margin-bottom: 1.2vh !important; /* Was 2.2vh (Dit nam te veel ruimte in beslag) */
+    font-size: 2.6vh !important; 
+}
+
+/* De Snack Pills container iets compacter */
+.snack-container {
+    margin-top: 1vh !important;
+    margin-bottom: 1.5vh !important;
+    gap: 1.2vh 1vw !important;
+}
+.snack-pill {
+    padding: 1.2vh 1.5vw !important; /* Pills iets kleiner gemaakt */
+}
