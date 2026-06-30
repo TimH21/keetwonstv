@@ -9,6 +9,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
+    <div id="local-admin-btn" class="local-admin-btn" onclick="toggleAdminMenu()">
+        <i class="fa-solid fa-gear"></i>
+    </div>
+
+    <div id="local-admin-modal" class="local-admin-modal" style="display: none;">
+        <div class="local-admin-content">
+            <h2><i class="fa-solid fa-sliders"></i> LOKALE BEDIENING</h2>
+            <button class="close-admin" onclick="toggleAdminMenu()"><i class="fa-solid fa-xmark"></i></button>
+
+            <div class="admin-group">
+                <label>Achtergrond Kleur (Hex):</label>
+                <input type="color" id="admin-color" value="#060606" onchange="updateLocalSettings()">
+            </div>
+
+            <div class="admin-group">
+                <label>Zijbalk Widget:</label>
+                <select id="admin-sidebar" onchange="updateLocalSettings()">
+                    <option value="status">Status (OPEN)</option>
+                    <option value="frituur">Frituur (AAN)</option>
+                    <option value="knmi">KNMI Alarm Status</option>
+                </select>
+            </div>
+
+            <div class="admin-group">
+                <label>Scherm Besturing:</label>
+                <button class="admin-btn" onclick="next(); toggleAdminMenu();">Volgende Slide Forceer ⏭️</button>
+                <button class="admin-btn" id="btn-pause" onclick="togglePause()">Pauzeer Rotatie ⏸️</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="bg-layer"></div>
     <div id="weather-fx" class="weather-fx"></div>
     <div id="wind-fx" class="wind-fx"></div>
