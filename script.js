@@ -406,9 +406,33 @@ async function checkKnmiAlarm() {
             isAlarmActive = true;
             currentAlarmDetails = weer; 
             if(!currentAlarmDetails.wrschklr || currentAlarmDetails.wrschklr === '') currentAlarmDetails.wrschklr = 'geel'; 
+            
+            // --- NIEUW: Update de KNMI Slide en zet hem AAN ---
+            const knmiSlide = document.getElementById('slide-knmi');
+            if (knmiSlide) {
+                knmiSlide.classList.remove('skip-slide'); // Slide doet weer mee in de rotatie!
+                
+                const codeTxt = currentAlarmDetails.wrschklr.toLowerCase();
+                document.getElementById('knmi-title').textContent = `CODE ${codeTxt}`;
+                document.getElementById('knmi-desc').textContent = currentAlarmDetails.lkop || currentAlarmDetails.alarmtxt || "Gevaarlijk weer op komst.";
+                
+                // Kleuren fixen
+                let hexColor = '#f1c40f'; // Geel
+                if (codeTxt === 'oranje') hexColor = '#e67e22';
+                if (codeTxt === 'rood') hexColor = '#e53e3e';
+                
+                document.getElementById('knmi-title').style.color = hexColor;
+                document.getElementById('knmi-badge').style.backgroundColor = hexColor;
+                document.getElementById('knmi-icon').style.color = hexColor;
+                document.getElementById('knmi-box').style.borderColor = hexColor;
+            }
+
         } else {
             isAlarmActive = false;
             currentAlarmDetails = null;
+            // --- NIEUW: Verberg de slide als het veilig is ---
+            const knmiSlide = document.getElementById('slide-knmi');
+            if (knmiSlide) knmiSlide.classList.add('skip-slide');
         }
         updateFooterAlarmDisplay();
     } catch (error) { console.error("KNMI Fout:", error); }
