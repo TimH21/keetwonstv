@@ -675,3 +675,87 @@ function togglePause() {
         document.getElementById('footer-next-title').textContent = currentNextTitleStr;
     }
 }
+
+// ==========================================
+// 🚀 LOKAAL UITZENDEN (OFFLINE MATRIX)
+// ==========================================
+window.zendCalamiteitMatrix = function(actionType) {
+    const overlay = document.getElementById('calamity-overlay');
+
+    if (actionType === 'geen') {
+        if(!confirm("Weet je zeker dat je alle noodschermen op veilig/normaal wilt zetten?")) return;
+        overlay.style.display = 'none'; // Verberg lokaal
+        overlay.innerHTML = ''; 
+        overlay.classList.remove('calamity-white-mode');
+        resetCalamityModal();
+        return;
+    }
+
+    const instrVeld = document.getElementById('calamity-custom-instruction');
+    const customInstr = instrVeld ? instrVeld.value : "";
+    
+    // Bouw de zin
+    const finalMsg = buildCalamitySentence(matrixOorzaak, matrixGevolg, actionType, customInstr);
+    const timeInput = document.getElementById('calamity-time-input').value;
+    const cleaneTitel = matrixOorzaak.label.split(' ').slice(1).join(' ').trim() || matrixOorzaak.val;
+
+    let payload = {
+        eindTijd: timeInput || null,
+        scenarioTekst: cleaneTitel, 
+        icoon: getIcoonVoorScenario(matrixOorzaak.val),
+        tekst: finalMsg,
+        whiteMode: false
+    };
+
+    // Kleuren en TV-modus bepalen
+    if (actionType === 'verlaat') {
+        payload.kleur = '#e53e3e'; payload.animatie = 'verlaten'; payload.categorie = 'VERLAAT DE KEET';
+    } else if (actionType === 'binnen') {
+        payload.kleur = '#e53e3e'; payload.animatie = 'binnen'; payload.categorie = 'BLIJF BINNEN';
+    } else if (actionType === 'dicht-full' || actionType === 'dicht-side') {
+        payload.kleur = '#d69e2e'; payload.animatie = 'dicht'; payload.categorie = 'BAR GESLOTEN';
+    } else if (actionType === 'info-side' || actionType === 'info-full') {
+        payload.kleur = '#3182ce'; payload.categorie = 'MEDEDELING'; payload.animatie = 'info';
+    } else if (actionType === 'verlichting') {
+        payload.kleur = '#ffffff'; payload.whiteMode = true; payload.categorie = 'NOODVERLICHTING'; payload.animatie = 'info';
+    }
+
+    if (!confirm(`Direct op dit scherm tonen?\n\n"${finalMsg.replace(/<br>/g, '\n')}"`)) return;
+
+    // --- DE DIRECTE LOKALE RENDER (Geen database nodig!) ---
+    toonLokaleCalamiteit(payload);
+    
+    document.getElementById('calamity-control-modal').style.display = 'none';
+};
+
+// De functie die de vette animaties direct op het scherm bouwt
+function toonLokaleCalamiteit(data) {
+    const overlay = document.getElementById('calamity-overlay');
+    const msg = (data.tekst || "").replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+    if (data.whiteMode) overlay.classList.add('calamity-white-mode');
+    else overlay.classList.remove('calamity-white-mode');
+
+    let mainIcon = 'fa-triangle-exclamation'; 
+    if (data.animatie === 'verlaten') mainIcon = 'fa-person-walking-dashed-line-arrow-right'; 
+    else if (data.animatie === 'binnen') mainIcon = 'fa-person-shelter';
+    else if (data.animatie === 'dicht') mainIcon = 'fa-lock';
+    else if (data.animatie === 'info' || data.whiteMode) mainIcon = 'fa-circle-info';
+    else if (data.icoon) mainIcon = data.icoon; 
+
+    overlay.innerHTML = `
+        <div class="hazard-border top"></div>
+        <div class="calamity-content-box">
+            <i class="fa-solid ${mainIcon} calamity-icon-huge"></i>
+            <div class="calamity-text-wrapper">
+                <h1 class="calamity-title">${data.categorie}</h1>
+                <div class="calamity-text">${msg}</div>
+                ${data.eindTijd ? `<div class="calamity-time">Verwachting: tot ca. ${data.eindTijd} uur</div>` : ''}
+            </div>
+        </div>
+        <div class="hazard-border bottom"></div>
+    `;
+    
+    overlay.style.backgroundColor = data.kleur;
+    overlay.style.display = 'flex';
+}
