@@ -138,105 +138,60 @@ function tick() {
 setInterval(tick, 6000);
 
 // ===============================================
-// 4. STATISCHE PRIJZENLIJST ZIJBALK
+// 4. STATISCHE PRIJZENLIJST ZIJBALK (SLIMME SCROLLER)
 // ===============================================
 const mainPricesList = [
     { name: 'MUNT', val: '€ 1,50' },
-    { name: 'BIER / WIJN', val: '1 Munt' },
-    { name: 'FRIS', val: '0,5 Munt' },
+    { name: 'BIER / WIJN / 0.0', val: '1 Munt' },
     { name: 'MIXDRANK', val: '1,5 Munt' },
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
-    { name: 'SNACK', val: '1 Munt' },
-    { name: 'SNACK+', val: '0,5 Munt' }
-];
-
-const assortimenten = [
-    { type: 'DRANKEN', items: [{name: 'Bier/Wijn', val: '1 Munt'}, {name: 'Mixdrank', val: '1,5 Munt'}, {name: 'Stelz', val: '2 Munten'}, {name: 'Shotjes', val: '1 Munt'}] },
-    { type: 'FRIS', items: [{name: 'Cola/Sinas', val: '0,5 Munt'}, {name: 'Water', val: '0,5 Munt'}] },
-    { type: 'SNACKS', items: [
-        {name: 'Snack', val: '1 Munt'},
-        {name: 'Snack+', val: '1,5 Munt'},
-        {name: 'Patat', val: '1 Munt'},
-        {name: 'Patat+', val: '1,5 Munt'}
-    ] }
+    { name: 'FRIS', val: '0,5 Munt' },
+    { name: 'SNACK (ZONDER SAUS)', val: '1 Munt' },
+    { name: 'SNACK (MET SAUS)', val: '1,5 Munt' }
 ];
 
 let normalScrollIndex = 0;
-let specificScrollIndex = 0;
-
-function renderSpecificList(categorie) {
-    const track = document.getElementById('sidebar-price-track-specific');
-    const header = document.getElementById('sidebar-cat-header');
-    if (!track || !header) return;
-
-    specificScrollIndex = 0;
-    track.style.transform = 'translateY(0)';
-    header.innerHTML = `<span>${categorie.type}</span>`;
-    
-    track.innerHTML = categorie.items.map(p => `
-        <div class="price-row"><span>${p.name.toUpperCase()}</span> <strong>${p.val}</strong></div>
-    `).join('');
-}
 
 function startSidebarMasterController() {
     const normalTrack = document.getElementById('sidebar-price-track-normal');
-    if (!normalTrack) return;
+    const container = document.querySelector('.train-ticker-sub-container');
+    if (!normalTrack || !container) return;
 
+    // 1. Vul de lijst in (ALTIJD de standaard lijst)
     normalTrack.innerHTML = mainPricesList.map(p => `
-        <div class="price-row"><span>${p.name.toUpperCase()}</span> <strong>${p.val}</strong></div>
+        <div class="price-row"><span>${p.name}</span> <strong>${p.val}</strong></div>
     `).join('');
 
-    const normalBox = document.getElementById('sidebar-normal-box');
-    const specificBox = document.getElementById('sidebar-specific-box');
-    let isShowingCategory = false;
-
+    // 2. Slimme Scroll-logica
     setInterval(() => {
-        if (isShowingCategory) return;
-        isShowingCategory = true;
-        const cat = assortimenten[Math.floor(Math.random() * assortimenten.length)];
-        
-        renderSpecificList(cat);
-        normalBox.className = "price-normal-list-box c-panel-reveal-out";
-        specificBox.style.display = 'block'; 
-        specificBox.className = "price-specific-list-box c-panel-reveal-in"; 
+        const trackHeight = normalTrack.scrollHeight;
+        const viewHeight = container.clientHeight;
 
-        setTimeout(() => {
-            isShowingCategory = false;
-            specificBox.className = "price-specific-list-box c-panel-reveal-out";
-            normalBox.className = "price-normal-list-box c-panel-reveal-in";
-            setTimeout(() => { specificBox.style.display = 'none'; }, 1000);
-        }, 20000); 
-    }, 40000);
-
-    setInterval(() => {
-        const track = isShowingCategory ? document.getElementById('sidebar-price-track-specific') : normalTrack;
-        const visibleItems = isShowingCategory ? 2 : 3; 
-
-        if (!track || track.children.length <= visibleItems) return; 
-
-        const item = track.children[0];
-        const style = window.getComputedStyle(item);
-        const margin = parseFloat(style.marginBottom) || parseFloat(style.marginTop) || 0;
-        const itemHeight = item.getBoundingClientRect().height + margin;
-        
-        if (itemHeight === 0) return;
-        track.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-
-        let currentScrollIndex = isShowingCategory ? specificScrollIndex : normalScrollIndex;
-        let previousIndex = currentScrollIndex;
-        currentScrollIndex += 2; 
-        const maxIndex = track.children.length - visibleItems; 
-
-        if (currentScrollIndex > maxIndex) {
-            currentScrollIndex = (previousIndex === maxIndex) ? 0 : maxIndex;
+        // Als het makkelijk past op de TV, stop dan met scrollen!
+        if (trackHeight <= viewHeight + 5) {
+            normalTrack.style.transform = 'translateY(0)';
+            return;
         }
 
-        const totalMove = currentScrollIndex * itemHeight;
-        track.style.transform = `translateY(-${totalMove}px)`;
+        const item = normalTrack.children[0];
+        if (!item) return;
+        const margin = parseFloat(window.getComputedStyle(item).marginBottom) || 0;
+        const itemHeight = item.getBoundingClientRect().height + margin;
+
+        normalTrack.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
         
-        if (isShowingCategory) specificScrollIndex = currentScrollIndex; 
-        else normalScrollIndex = currentScrollIndex; 
+        const visibleItems = Math.floor(viewHeight / itemHeight);
+        const maxIndex = normalTrack.children.length - visibleItems;
+
+        normalScrollIndex += 2; // Scroll 2 items per keer
+
+        if (normalScrollIndex > maxIndex) {
+            normalScrollIndex = 0; // Terug naar het begin
+        }
+
+        const totalMove = normalScrollIndex * itemHeight;
+        normalTrack.style.transform = `translateY(-${totalMove}px)`;
 
     }, 4500);
 }
