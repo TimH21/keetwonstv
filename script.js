@@ -7,7 +7,6 @@
 // ===============================================
 let slideTimer;
 const DEFAULT_TIME = 20000;
-let isPaused = false;
 let globalTimeOffset = 0; // Bewaart jouw handmatige "volgende" sprongen
 let pauseStartTime = 0;   // Bewaart de tijd tijdens pauze
 
