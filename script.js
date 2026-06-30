@@ -439,7 +439,7 @@ checkKnmiAlarm();
 setInterval(checkKnmiAlarm, 900000);
 
 // ===============================================
-// 7. EXTERNE APIS: VOETBAL (ESPN)
+// 7. EXTERNE APIS: VOETBAL (WK 2026 FIFA WORLD CUP)
 // ===============================================
 async function getNextMatch() {
     const today = new Date();
@@ -454,7 +454,8 @@ async function getNextMatch() {
     };
 
     const dateStr = `${formatDate(today)}-${formatDate(nextWeek)}`;
-    const apiUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/ned.1/scoreboard?dates=${dateStr}`;
+    // NIEUW: fifa.world API in plaats van ned.1
+    const apiUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=${dateStr}`;
 
     try {
         const response = await fetch(apiUrl);
@@ -512,17 +513,17 @@ async function getNextMatch() {
                 `;
             });
         } else {
-            if(container) container.innerHTML = '<h2 style="color:#aaa;">GEEN WEDSTRIJDEN</h2>';
+            if(container) container.innerHTML = '<h2 style="color:#aaa;">GEEN WEDSTRIJDEN DEZE WEEK</h2>';
         }
     } catch (error) { console.error("⚽ Fout:", error); }
 }
 
 function shortenName(name) {
-    return name.replace('SC ', '').replace('FC ', '').replace('AFC ', '')
-        .replace('Heracles Almelo', 'Heracles').replace('Fortuna Sittard', 'Fortuna')
-        .replace('Go Ahead Eagles', 'GA Eagles').replace('Sparta Rotterdam', 'Sparta')
-        .replace('Almere City FC', 'Almere').replace('PEC Zwolle', 'PEC')
-        .replace('RKC Waalwijk', 'RKC').replace('NEC', 'N.E.C.').toUpperCase();
+    // Korte namen voor landen om het strak te houden
+    return name.replace('United States', 'USA')
+               .replace('South Korea', 'Zuid-Korea')
+               .replace('Netherlands', 'Nederland')
+               .toUpperCase();
 }
 getNextMatch();
 setInterval(getNextMatch, 3600000);
