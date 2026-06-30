@@ -677,14 +677,291 @@ function togglePause() {
 }
 
 // ==========================================
-// 🚀 LOKAAL UITZENDEN (OFFLINE MATRIX)
+// 🚨 COMPLETE KEET MATRIX ENGINE (OFFLINE)
 // ==========================================
+
+const MATRIX_OORZAKEN_GROUPED = [
+    {
+        title: "🆘 Incidenten & Veiligheid", color: "#e53e3e",
+        items: [
+            { label: "🆘 Medisch Incident", val: "een medisch incident", type: "event" },
+            { label: "🚑 Ongeval", val: "een ongeval", type: "event" },
+            { label: "🔥 Brand / Rook", val: "brand of rookontwikkeling", type: "event" },
+            { label: "🚨 Afgaande Melder", val: "een afgaande brandmelder", type: "event" },
+            { label: "🤛 Geweldpleging", val: "een incident met geweldpleging", type: "event" },
+            { label: "🧨 Vandalisme", val: "vernieling of vandalisme", type: "event" },
+            { label: "⚠️ Incident Elders", val: "een incident elders op het terrein", type: "event" },
+            { label: "❓ Onbekend Incident", val: "een onbekend incident", type: "event" },
+            { label: "🥷 Diefstal", val: "diefstal", type: "event" },
+            { label: "🧍‍♂️ Overvolle Keet", val: "een overvolle keet en kans op verdrukking", type: "event" }
+        ]
+    },
+    {
+        title: "👮 Op Last Van...", color: "#d69e2e",
+        items: [
+            { label: "🌾 Grondeigenaar", val: "de grondeigenaar", type: "person" },
+            { label: "🏠 Ecohûs", val: "Ecohûs", type: "person" },
+            { label: "🚓 Hulpdiensten", val: "de hulpdiensten", type: "person" },
+            { label: "👮 Politie", val: "de politie", type: "person" },
+            { label: "⚖️ Handhaving", val: "de handhaving", type: "person" },
+            { label: "🤝 Bestuur Keet Wûns", val: "het bestuur van Keet Wûns", type: "person" },
+            { label: "🏘️ Omwonenden", val: "omwonenden", type: "person" }
+        ]
+    },
+    {
+        title: "🔌 Techniek & Storingen", color: "#805ad5",
+        items: [
+            { label: "🔌 Stroomuitval", val: "stroomuitval", type: "event" },
+            { label: "🌐 Internetstoring", val: "een internetstoring", type: "event" },
+            { label: "🚰 Water- of Gaslek", val: "een vermoedelijk water- of gaslek", type: "event" },
+            { label: "⚙️ Technische Problemen", val: "technische problemen", type: "event" },
+            { label: "🚧 Urgente Werkzaamheden", val: "urgente werkzaamheden", type: "event" },
+            { label: "🔨 Werkzaamheden Binnen", val: "werkzaamheden binnen de keet", type: "event" },
+            { label: "🚜 Werkzaamheden Buiten", val: "werkzaamheden buiten de keet", type: "event" },
+            { label: "🔥 Kachel / Verwarming Storing", val: "een storing aan de kachel of verwarming", type: "event" }
+        ]
+    },
+    {
+        title: "🌿 Natuur & Omgeving", color: "#38a169",
+        items: [
+            { label: "⛈️ Noodweer", val: "noodweer", type: "event" },
+            { label: "🌡️ Extreme Hitte", val: "extreme hitte", type: "event" },
+            { label: "🌊 Wateroverlast", val: "wateroverlast", type: "event" },
+            { label: "💨 Stank / Geur", val: "stank- of geurhinder", type: "event" },
+            { label: "🧹 Schoonmaak", val: "schoonmaakwerkzaamheden", type: "event" },
+            { label: "☕ Pauze Personeel", val: "een pauze van het personeel", type: "event" }
+        ]
+    },
+    {
+        title: "📄 Algemeen & Huisregels", color: "#718096",
+        items: [
+            { label: "🌙 Einde Avond", val: "het einde van de avond", type: "event" },
+            { label: "⏰ Vroege Sluiting", val: "een vroege sluiting van de keet", type: "event" },
+            { label: "🎉 Evenement / Feest", val: "een besloten evenement", type: "event" },
+            { label: "🛑 Huisregels", val: "overtreding van de huisregels", type: "event" },
+            { label: "🔍 Gevonden Voorwerp", val: "een gevonden voorwerp", type: "event" },
+            { label: "🚕 Taxi Gearriveerd", val: "gearriveerd vervoer", type: "event" },
+            { label: "🍕 Voedselbezorging", val: "de bezorging van eten of snacks", type: "event" }
+        ]
+    }
+];
+
+const MATRIX_GEVOLGEN_GROUPED = [
+    {
+        title: "✅ Geen / Standaard", color: "#718096",
+        items: [
+            { label: "✅ Geen specifiek gevolg", val: "", type: "none" }
+        ]
+    },
+    {
+        title: "🔌 Techniek & Storingen", color: "#805ad5",
+        items: [
+            { label: "🔌 Stroomuitval", val: "een stroomuitval", type: "situation" },
+            { label: "🌐 Geen WiFi", val: "het uitvallen van het WiFi-netwerk", type: "situation" },
+            { label: "💡 Defecte Verlichting", val: "defecte verlichting", type: "situation" },
+            { label: "🔊 Defect Geluid/Muziek", val: "een storing in de geluidsapparatuur", type: "situation" },
+            { label: "⚙️ Defecte Apparatuur", val: "defecte apparatuur", type: "situation" },
+            { label: "❄️ Defecte Koelkasten", val: "defecte koelkasten", type: "situation" },
+            { label: "🚽 Defecte / Gesloten WC", val: "een gesloten of defecte sanitaire voorziening", type: "situation" },
+            { label: "🍟 Frituur / Keuken Defect", val: "een defect aan de frituur of keukenapparatuur", type: "situation" }
+        ]
+    },
+    {
+        title: "🍺 Bar, Kassa & Regels", color: "#3182ce",
+        items: [
+            { label: "💻 Storing Kassasysteem", val: "een storing in het kassasysteem", type: "situation" },
+            { label: "💳 Alleen Pinnen", val: "het dat er tijdelijk uitsluitend gepind kan worden", type: "situation" },
+            { label: "🪙 Alleen Contant", val: "het tijdelijk uitsluitend contant betaald kan worden", type: "situation" },
+            { label: "🛑 Stop Alcoholverkoop", val: "het tijdelijk stopzetten van de alcoholverkoop", type: "situation" },
+            { label: "🍺 Geen Bier & Fris", val: "een tekort aan bier en fris in de koelkasten", type: "situation" },
+            { label: "🏃 Onderbezetting Bar", val: "onderbezetting van het barpersoneel", type: "situation" },
+            { label: "💰 Facturen Afbetalen", val: "uw openstaande facturen direct te voldoen", type: "action" },
+            { label: "🆔 Legitimatie Tonen", val: "uw legitimatiebewijs gereed te houden", type: "action" },
+            { label: "🍻 Glazen Inleveren", val: "alle lege glazen en flessen direct in te leveren bij de bar", type: "action" }
+        ]
+    },
+    {
+        title: "🚗 Logistiek & Voertuigen", color: "#2d3748",
+        items: [
+            { label: "🚑 Weg Vrijmaken", val: "de toegangsweg direct vrij te maken voor hulpdiensten", type: "action" },
+            { label: "🚪 Nooduitgangen Vrij", val: "alle nooduitgangen direct vrij te maken", type: "action" },
+            { label: "🚗 Auto's Betonpad Weg", val: "uw auto op het betonpad richting de windmolen te verplaatsen", type: "action" },
+            { label: "🚗 Auto's Uitgang Weg", val: "uw auto voor de uitgang te verplaatsen", type: "action" },
+            { label: "🚲 Fietsen Betonpad Weg", val: "uw fiets op het betonpad richting de windmolen te verplaatsen", type: "action" },
+            { label: "🚲 Fietsen Uitgang Weg", val: "uw fiets voor de uitgang te verplaatsen", type: "action" }
+        ]
+    },
+    {
+        title: "🤫 Gedrag & Overig", color: "#d69e2e",
+        items: [
+            { label: "🔕 Muziek Zachter/Uit", val: "het verzoek om de muziek tijdelijk uit te zetten", type: "situation" },
+            { label: "🤫 Stilte Buiten", val: "buiten stilte te bewaren om overlast te voorkomen", type: "action" },
+            { label: "🚭 Buiten Roken", val: "uitsluitend buiten te roken of vapen", type: "action" },
+            { label: "❌ Niet Op Terrein Ecohûs", val: "om niet het terrein van Ecohûs te betreden", type: "action" }
+        ]
+    }
+];
+
+let matrixOorzaak = null;
+let matrixGevolg = null;
+
+// NIEUW: Functie die het menu bouwt (wordt direct aangeroepen!)
+function initMatrixMenu() {
+    const oorzaakBox = document.getElementById('matrix-col-oorzaak');
+    const gevolgBox = document.getElementById('matrix-col-gevolg');
+    if (!oorzaakBox || !gevolgBox) return;
+
+    // 1. Teken Oorzaken 
+    let oorzaakHtml = MATRIX_OORZAKEN_GROUPED.map(cat => {
+        const buttons = cat.items.map(o => `
+            <button class="cal-btn" style="background:${cat.color}; color:white; border:none; margin-bottom:5px;" onclick="selectMatrixPart('oorzaak', this, '${o.val}')">${o.label}</button>
+        `).join('');
+        return `<details style="margin-bottom: 10px; border: 1px solid ${cat.color}; border-radius: 8px; background: white;"><summary style="padding: 10px; cursor: pointer; font-weight: bold; color: ${cat.color}; list-style: none; display: flex; justify-content: space-between;"><span>${cat.title}</span> <span>▼</span></summary><div style="padding: 10px; display: flex; flex-direction: column;">${buttons}</div></details>`;
+    }).join('');
+
+    oorzaakHtml += `
+        <div style="margin-top: 15px; border-top: 2px solid #e2e8f0; padding-top: 15px;">
+            <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">✍️ ANDERS, NAMELIJK:</label>
+            <input type="text" id="manual-oorzaak" class="input-field" placeholder="Typ eigen oorzaak..." oninput="kiesHandmatigeOorzaak(this.value)" style="width:100%; margin-top:5px; border:1px solid #cbd5e0; padding:8px; border-radius:5px;">
+        </div>`;
+    oorzaakBox.innerHTML = oorzaakHtml;
+
+    // 2. Teken Gevolgen
+    let gevolgHtml = MATRIX_GEVOLGEN_GROUPED.map(cat => {
+        const buttons = cat.items.map(o => `
+            <button class="cal-btn" style="background:${cat.color}; color:white; border:none; margin-bottom:5px;" onclick="selectMatrixPart('gevolg', this, '${o.val}')">${o.label}</button>
+        `).join('');
+        return `<details style="margin-bottom: 10px; border: 1px solid ${cat.color}; border-radius: 8px; background: white;"><summary style="padding: 10px; cursor: pointer; font-weight: bold; color: ${cat.color}; list-style: none; display: flex; justify-content: space-between;"><span>${cat.title}</span> <span>▼</span></summary><div style="padding: 10px; display: flex; flex-direction: column;">${buttons}</div></details>`;
+    }).join('');
+
+    gevolgHtml += `
+        <div style="margin-top: 15px; border-top: 2px solid #e2e8f0; padding-top: 15px;">
+            <label style="font-size:0.8rem; font-weight:bold; color:#4a5568;">✍️ ANDERS, NAMELIJK:</label>
+            <input type="text" id="manual-gevolg" class="input-field" placeholder="Typ eigen gevolg/situatie..." oninput="kiesHandmatigGevolg(this.value)" style="width:100%; margin-top:5px; border:1px solid #cbd5e0; padding:8px; border-radius:5px;">
+        </div>`;
+    gevolgBox.innerHTML = gevolgHtml;
+}
+
+// ROEP DE FUNCTIE DIRECT AAN!
+initMatrixMenu();
+
+// Standaard knoppen selectie
+window.selectMatrixPart = function(type, btn, waarde) {
+    const container = type === 'oorzaak' ? 'matrix-col-oorzaak' : 'matrix-col-gevolg';
+    document.querySelectorAll(`#${container} .cal-btn`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    if (type === 'oorzaak') {
+        const alleOorzaken = MATRIX_OORZAKEN_GROUPED.flatMap(c => c.items);
+        matrixOorzaak = alleOorzaken.find(o => o.val === waarde);
+        document.getElementById('manual-oorzaak').value = ''; 
+    } else {
+        const alleGevolgen = MATRIX_GEVOLGEN_GROUPED.flatMap(c => c.items);
+        matrixGevolg = alleGevolgen.find(g => g.val === waarde);
+        document.getElementById('manual-gevolg').value = ''; 
+    }
+    updateMatrixPreview();
+};
+
+window.kiesHandmatigeOorzaak = function(val) {
+    document.querySelectorAll('#matrix-col-oorzaak .cal-btn').forEach(b => b.classList.remove('selected'));
+    if(val.trim() === "") { matrixOorzaak = null; } 
+    else { matrixOorzaak = { val: val.trim(), type: "event", label: "✍️ " + val.trim() }; }
+    updateMatrixPreview();
+};
+
+window.kiesHandmatigGevolg = function(val) {
+    document.querySelectorAll('#matrix-col-gevolg .cal-btn').forEach(b => b.classList.remove('selected'));
+    if(val.trim() === "") { matrixGevolg = null; } 
+    else { matrixGevolg = { val: val.trim(), type: "situation" }; }
+    updateMatrixPreview();
+};
+
+function buildCalamitySentence(oorzaak, gevolg, actionType, customInstr) {
+    if (!oorzaak) return "Kies of typ eerst een oorzaak om de zin te bouwen...";
+
+    let zin = "";
+    const oCaps = oorzaak.val.toUpperCase();
+    const gCaps = gevolg && gevolg.val ? gevolg.val.toUpperCase() : "";
+
+    let aanloop = oorzaak.type === "person" ? `Op verzoek van **${oCaps}**` : `In verband met **${oCaps}**`;
+    let midden = "";
+    let heeftGevolg = gevolg && gevolg.type !== "none";
+
+    if (heeftGevolg) {
+        if (gevolg.type === "situation") midden = ` melden wij dat er sprake is van **${gCaps}**.`;
+        else if (gevolg.type === "action") midden = ` is er het dringende verzoek om **${gCaps}**.`;
+    }
+
+    let slot = "";
+    const excuses = "<br><br>Onze excuses voor het ongemak.";
+
+    if (actionType) {
+        if (actionType === 'verlaat') {
+            slot = heeftGevolg ? ` Daarbij wordt u verzocht de keet direct rustig te **VERLATEN** via de dichtstbijzijnde uitgang.${excuses}` : ` wordt u verzocht de keet direct rustig te **VERLATEN** via de dichtstbijzijnde uitgang.${excuses}`;
+        } else if (actionType === 'binnen') {
+            slot = heeftGevolg ? ` Daarbij verzoeken wij u om **BINNEN TE BLIJVEN** tot de situatie verholpen is.${excuses}` : ` verzoeken wij u om **BINNEN TE BLIJVEN** tot de situatie verholpen is.${excuses}`;
+        } else if (actionType === 'dicht-full') {
+            slot = heeftGevolg ? ` Hierdoor is de bar momenteel **GESLOTEN**.${excuses}` : ` is de bar momenteel **GESLOTEN**.${excuses}`;
+        } else if (actionType === 'dicht-side') {
+            slot = heeftGevolg ? ` Hierdoor is de bar tijdelijk gesloten.` : ` is de bar tijdelijk gesloten.`;
+        } else if (actionType === 'info-side' || actionType === 'info-full') {
+            slot = heeftGevolg ? ` Wij danken u voor uw medewerking.` : ` vragen wij uw aandacht voor deze mededeling. Wij danken u voor uw medewerking.`;
+        } else if (actionType === 'verlichting') {
+            slot = heeftGevolg ? ` Deze schermen dienen als **NOODVERLICHTING**.` : ` dienen deze schermen als **NOODVERLICHTING**.`;
+        }
+    } else {
+        if (!heeftGevolg) slot = " <i>... (kies rechts een uitzend-actie om de zin af te maken)</i>";
+    }
+
+    let finalZin = "";
+    if (!actionType) {
+        finalZin = zin + aanloop + midden + slot; 
+    } else {
+        if (actionType === 'dicht-side' || actionType === 'info-side') {
+            finalZin = aanloop + midden + slot;
+        } else {
+            finalZin = zin + aanloop + midden + slot;
+        }
+    }
+
+    if (customInstr && customInstr.trim() !== "") {
+        let extraTekst = ` **${customInstr.trim().toUpperCase()}**.`;
+        if (finalZin.includes(excuses)) {
+            finalZin = finalZin.replace(excuses, extraTekst + excuses);
+        } else {
+            finalZin += extraTekst;
+        }
+    }
+
+    return finalZin;
+}
+
+window.updateMatrixPreview = function() {
+    const preview = document.getElementById('matrix-preview');
+    const buttons = document.getElementById('matrix-action-buttons');
+    
+    if (!matrixOorzaak) {
+        preview.innerHTML = "Kies of typ eerst een oorzaak om de zin te bouwen...";
+        buttons.style.opacity = "0.3"; buttons.style.pointerEvents = "none";
+        return;
+    }
+
+    const instrVeld = document.getElementById('calamity-custom-instruction');
+    const customInstr = instrVeld ? instrVeld.value : "";
+    const previewZin = buildCalamitySentence(matrixOorzaak, matrixGevolg, null, customInstr);
+
+    preview.innerHTML = `<small>VOORVERTONING:</small><br><strong style="font-size: 1.1rem; line-height: 1.4;">${previewZin}</strong>`;
+    buttons.style.opacity = "1";
+    buttons.style.pointerEvents = "all";
+};
+
 window.zendCalamiteitMatrix = function(actionType) {
     const overlay = document.getElementById('calamity-overlay');
 
     if (actionType === 'geen') {
         if(!confirm("Weet je zeker dat je alle noodschermen op veilig/normaal wilt zetten?")) return;
-        overlay.style.display = 'none'; // Verberg lokaal
+        overlay.style.display = 'none'; 
         overlay.innerHTML = ''; 
         overlay.classList.remove('calamity-white-mode');
         resetCalamityModal();
@@ -693,8 +970,6 @@ window.zendCalamiteitMatrix = function(actionType) {
 
     const instrVeld = document.getElementById('calamity-custom-instruction');
     const customInstr = instrVeld ? instrVeld.value : "";
-    
-    // Bouw de zin
     const finalMsg = buildCalamitySentence(matrixOorzaak, matrixGevolg, actionType, customInstr);
     const timeInput = document.getElementById('calamity-time-input').value;
     const cleaneTitel = matrixOorzaak.label.split(' ').slice(1).join(' ').trim() || matrixOorzaak.val;
@@ -707,7 +982,6 @@ window.zendCalamiteitMatrix = function(actionType) {
         whiteMode: false
     };
 
-    // Kleuren en TV-modus bepalen
     if (actionType === 'verlaat') {
         payload.kleur = '#e53e3e'; payload.animatie = 'verlaten'; payload.categorie = 'VERLAAT DE KEET';
     } else if (actionType === 'binnen') {
@@ -722,13 +996,10 @@ window.zendCalamiteitMatrix = function(actionType) {
 
     if (!confirm(`Direct op dit scherm tonen?\n\n"${finalMsg.replace(/<br>/g, '\n')}"`)) return;
 
-    // --- DE DIRECTE LOKALE RENDER (Geen database nodig!) ---
     toonLokaleCalamiteit(payload);
-    
     document.getElementById('calamity-control-modal').style.display = 'none';
 };
 
-// De functie die de vette animaties direct op het scherm bouwt
 function toonLokaleCalamiteit(data) {
     const overlay = document.getElementById('calamity-overlay');
     const msg = (data.tekst || "").replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -758,4 +1029,48 @@ function toonLokaleCalamiteit(data) {
     
     overlay.style.backgroundColor = data.kleur;
     overlay.style.display = 'flex';
+}
+
+function getIcoonVoorScenario(tekst) {
+    const t = tekst.toLowerCase();
+    if (t.includes('brand') || t.includes('rook')) return 'fa-fire';
+    if (t.includes('medisch') || t.includes('ongeval') || t.includes('ehbo')) return 'fa-truck-medical';
+    if (t.includes('geweld') || t.includes('verdrukking') || t.includes('vandalisme')) return 'fa-triangle-exclamation';
+    if (t.includes('stroom')) return 'fa-bolt';
+    if (t.includes('internet') || t.includes('wifi')) return 'fa-wifi';
+    if (t.includes('verlichting')) return 'fa-lightbulb';
+    if (t.includes('geluid') || t.includes('muziek') || t.includes('stilte')) return 'fa-volume-xmark';
+    if (t.includes('koelkast')) return 'fa-snowflake';
+    if (t.includes('wc') || t.includes('sanitair')) return 'fa-restroom';
+    if (t.includes('kassa') || t.includes('pin') || t.includes('contant')) return 'fa-cash-register';
+    if (t.includes('bier') || t.includes('fris') || t.includes('alcohol') || t.includes('glazen')) return 'fa-beer-mug-empty';
+    if (t.includes('weer') || t.includes('water') || t.includes('noodweer')) return 'fa-cloud-showers-water';
+    if (t.includes('hitte')) return 'fa-temperature-high';
+    if (t.includes('stank') || t.includes('geur') || t.includes('gaslek')) return 'fa-wind';
+    if (t.includes('roken') || t.includes('vapen')) return 'fa-ban-smoking';
+    if (t.includes('schoonmaak')) return 'fa-broom';
+    if (t.includes('auto') || t.includes('hulpdiensten') || t.includes('weg vrijmaken')) return 'fa-car';
+    if (t.includes('fiets')) return 'fa-bicycle';
+    if (t.includes('gevonden')) return 'fa-magnifying-glass';
+    if (t.includes('taxi') || t.includes('vervoer')) return 'fa-taxi';
+    if (t.includes('legitimatie') || t.includes('id')) return 'fa-id-card';
+    if (t.includes('politie') || t.includes('handhaving')) return 'fa-building-shield';
+    if (t.includes('personeel') || t.includes('omwonenden') || t.includes('bestuur') || t.includes('huisregels')) return 'fa-users';
+    if (t.includes('einde') || t.includes('sluiting') || t.includes('nooduitgang')) return 'fa-door-open';
+    if (t.includes('kachel') || t.includes('verwarming') || t.includes('hitte')) return 'fa-temperature-high';
+    if (t.includes('eten') || t.includes('voedsel') || t.includes('pizza') || t.includes('snack') || t.includes('frituur')) return 'fa-pizza-slice';
+    return 'fa-circle-exclamation';
+}
+
+function resetCalamityModal() {
+    document.querySelectorAll('.cal-btn').forEach(b => b.classList.remove('selected'));
+    matrixOorzaak = null; 
+    matrixGevolg = null;
+    const previewBox = document.getElementById('matrix-preview');
+    if (previewBox) previewBox.innerHTML = "Kies een oorzaak en gevolg om de zin te bouwen...";
+    const actieKnoppen = document.getElementById('matrix-action-buttons');
+    if (actieKnoppen) { actieKnoppen.style.opacity = "0.3"; actieKnoppen.style.pointerEvents = "none"; }
+    const timeInput = document.getElementById('calamity-time-input');
+    if(timeInput) timeInput.value = '';
+    document.getElementById('calamity-control-modal').style.display = 'none';
 }
