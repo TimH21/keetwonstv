@@ -1796,12 +1796,13 @@ body.standby-mode .weather-row {
    LOKALE ADMIN MENU (MUIS BEDIENING)
    ========================================= */
 .local-admin-btn {
-    position: fixed; top: 3vh; right: 2vw; z-index: 10000;
+    position: fixed; top: 3vh; right: 2vw; 
+    z-index: 9999999; /* DEZE IS NU VERHOOGD */
     background: rgba(0,0,0,0.8); color: #fff;
     width: 7vh; height: 7vh; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 3.5vh; cursor: pointer; border: 2px solid #555;
-    opacity: 0; pointer-events: none; /* Standaard onzichtbaar! */
+    opacity: 0; pointer-events: none;
     transition: opacity 0.5s, transform 0.2s;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
@@ -1811,7 +1812,8 @@ body.standby-mode .weather-row {
 .local-admin-btn:hover { background: var(--primary); color: black; transform: scale(1.1); border-color: white;}
 
 .local-admin-modal {
-    position: fixed; inset: 0; z-index: 10001;
+    position: fixed; inset: 0; 
+    z-index: 9999999; /* DEZE IS NU VERHOOGD */
     background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
     display: flex; align-items: center; justify-content: center;
 }
