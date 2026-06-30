@@ -7,7 +7,6 @@
 // ===============================================
 let slideTimer;
 const DEFAULT_TIME = 20000;
-let isPaused = false;
 
 function syncScreens() {
     const allActiveSlides = Array.from(document.querySelectorAll('.slide:not(.skip-slide)'));
