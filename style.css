@@ -1984,14 +1984,19 @@ body.standby-mode .weather-row {
 }
 
 /* Perfecte uitlijning (Stippellijntjes tussen product en prijs) */
+/* Perfecte uitlijning (Stippellijntjes tussen product en prijs) */
 .menu-row {
-    display: flex; align-items: baseline; justify-content: space-between;
+    display: flex; align-items: flex-end; justify-content: space-between;
     font-size: 2.6vh; margin-bottom: 1.5vh;
 }
-.menu-row span:first-child { font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+.menu-row span:first-child { 
+    font-weight: 600; text-transform: uppercase; letter-spacing: 1px; 
+    max-width: 65%; /* Zorgt dat superlange tekst niet de prijs wegdrukt */
+    line-height: 1.2; 
+}
 .menu-row .dots {
     flex-grow: 1; border-bottom: 3px dotted rgba(255,255,255,0.15);
-    margin: 0 1vw; position: relative; top: -0.5vh;
+    margin: 0 1vw 0.6vh 1vw; /* Margin verplaatst zodat hij de onderkant van de tekst volgt */
 }
 .menu-row b { color: var(--accent); font-weight: 900; font-size: 2.8vh; }
 .menu-row .blue-munt { color: #3498db; }
