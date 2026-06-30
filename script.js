@@ -596,17 +596,17 @@ let isPaused = false;
 // 1. Luister naar de muis
 document.addEventListener('mousemove', () => {
     const btn = document.getElementById('local-admin-btn');
-    const closeBtn = document.getElementById('local-calamity-close-btn'); // NIEUW
+    const closeBtn = document.getElementById('local-calamity-close-btn');
     
     if (!isAdminMenuOpen) {
         if (btn) btn.classList.add('visible'); 
-        if (closeBtn) closeBtn.classList.add('visible'); // NIEUW: Laat kruisje ook zien
+        if (closeBtn) closeBtn.classList.add('visible'); // Toon ook het kruisje
         
         clearTimeout(mouseTimer); 
         
         mouseTimer = setTimeout(() => {
             if (btn) btn.classList.remove('visible');
-            if (closeBtn) closeBtn.classList.remove('visible'); // NIEUW: Verberg kruisje weer
+            if (closeBtn) closeBtn.classList.remove('visible'); // Verberg het kruisje weer
         }, 5000);
     }
 });
