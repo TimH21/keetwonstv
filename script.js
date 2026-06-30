@@ -205,7 +205,7 @@ setInterval(tick, 6000);
 // ===============================================
 const mainPricesList = [
     { name: 'MUNT', val: '€ 1,50' },
-    { name: 'BIER / WIJN / 0.0', val: '1 Munt' },
+    { name: 'BIER / WIJN', val: '1 Munt' },
     { name: 'MIXDRANK', val: '1,5 Munt' },
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
