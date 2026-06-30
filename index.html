@@ -241,8 +241,75 @@
         </div>
     </footer>
 
+    <style>
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); color: #000; }
+        .input-field { padding: 10px; border-radius: 5px; font-size: 1rem; font-family: var(--font-body); outline: none; box-sizing: border-box; }
+        .button { cursor: pointer; border: none; color: white; font-weight: bold; border-radius: 5px; transition: 0.2s; }
+        .button:hover { opacity: 0.8; }
+        
+        .calamity-matrix { display: flex; flex-direction: row; height: 100%; background: #f7fafc; border-radius: 0 0 12px 12px; }
+        .cal-col { flex: 1; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; }
+        .cal-col:last-child { border-right: none; }
+        .cal-scroll { padding: 15px; overflow-y: auto; flex: 1; }
+        .cal-header { background: #edf2f7; padding: 10px 15px; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; color: #4a5568; border-bottom: 1px solid #e2e8f0; }
+        .cal-btn { width: 100%; text-align: left; padding: 12px; margin-bottom: 5px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: transform 0.1s; }
+        .cal-btn:active { transform: scale(0.98); }
+        .cal-btn.selected { outline: 3px solid #3182ce; outline-offset: -3px; box-shadow: 0 0 10px rgba(49, 130, 206, 0.4); }
+        .cal-summary-box { background: #1a202c; color: white; padding: 15px; font-size: 0.95rem; line-height: 1.4; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #3182ce; }
+    </style>
+
     <div id="calamity-control-modal" class="modal-overlay" style="z-index: 100000; display: none;">
+        <div class="modal-content" style="max-width: 1200px; width: 98%; padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 90vh;">
+            
+            <div style="background: #1a202c; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 1.3rem;">🚨 Keet Matrix Schakelpaneel</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="zendCalamiteitMatrix('geen')" class="button" style="background: #38a169; padding: 8px 20px;">✅ ALLES VEILIG</button>
+                    <span onclick="document.getElementById('calamity-control-modal').style.display='none'" style="font-size: 1.5rem; cursor: pointer; padding-left: 20px;">&times;</span>
+                </div>
+            </div>
+            
+            <div class="calamity-matrix">
+                <div class="cal-col">
+                    <div class="cal-header">1. Wat is de oorzaak?</div>
+                    <div class="cal-scroll" id="matrix-col-oorzaak"></div>
+                </div>
+
+                <div class="cal-col">
+                    <div class="cal-header">2. Wat is het gevolg?</div>
+                    <div class="cal-scroll" id="matrix-col-gevolg"></div>
+                </div>
+
+                <div class="cal-col" style="background: #ebf8ff; flex: 1.2;">
+                    <div class="cal-header">3. Voorvertoning & Uitzenden</div>
+                    <div class="cal-scroll">
+                        <div id="matrix-preview" class="cal-summary-box">Kies een oorzaak en gevolg om de zin te bouwen...</div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: bold; font-size: 0.8rem; color: #4a5568; display: block;">EIGEN EXTRA INSTRUCTIE (OPTIONEEL):</label>
+                            <input type="text" id="calamity-custom-instruction" class="input-field" placeholder="Bijv: Verzamel bij de windmolen..." style="width: 100%; margin-top:5px; border: 1px solid #90cdf4;" oninput="updateMatrixPreview()">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-weight: bold; font-size: 0.8rem; color: #4a5568; display: block;">VERWACHTE EINDTIJD (OPTIONEEL):</label>
+                            <input type="time" id="calamity-time-input" class="input-field" style="width: 100%; margin-top:5px; border: 1px solid #90cdf4;">
+                        </div>
+
+                        <div id="matrix-action-buttons" style="display: flex; flex-direction: column; gap: 8px; opacity: 0.3; pointer-events: none;">
+                            <button onclick="zendCalamiteitMatrix('verlaat')" class="cal-btn" style="background:#e53e3e; color:white;">🔴 VERLAAT KEET (Fullscreen)</button>
+                            <button onclick="zendCalamiteitMatrix('binnen')" class="cal-btn" style="background:#e53e3e; color:white;">🔴 BLIJF BINNEN (Fullscreen)</button>
+                            <button onclick="zendCalamiteitMatrix('dicht-full')" class="cal-btn" style="background:#d69e2e; color:white;">🟡 BAR GESLOTEN (Fullscreen)</button>
+                            <button onclick="zendCalamiteitMatrix('dicht-side')" class="cal-btn" style="background:#d69e2e; color:white;">🟡 BAR GESLOTEN (Sidebar)</button>
+                            <button onclick="zendCalamiteitMatrix('info-side')" class="cal-btn" style="background:#3182ce; color:white;">🔵 INFORMATIE (Sidebar)</button>
+                            <button onclick="zendCalamiteitMatrix('info-full')" class="cal-btn" style="background:#3182ce; color:white;">🔵 INFORMATIE (Fullscreen)</button>
+                            <button onclick="zendCalamiteitMatrix('verlichting')" class="cal-btn" style="background:#fff; border: 2px solid #ccc; color:black;">💡 NOODVERLICHTING (Wit)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 
     <div id="local-admin-btn" class="local-admin-btn" onclick="toggleAdminMenu()">
         <i class="fa-solid fa-gear"></i>
