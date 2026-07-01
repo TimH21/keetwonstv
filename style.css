@@ -2259,20 +2259,20 @@ body.fullscreen-mode .sidebar {
 @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
 /* =========================================
-   📺 UI 7.0: OMROP FRYSLÂN BRANDING & ANIMATIES
+   📺 UI 7.0: OMROP FRYSLÂN BRANDING & ANIMATIES (PRO VERSIE)
    ========================================= */
 
 /* Achtergrond sfeer */
 .omrop-bg-glow {
     position: absolute; inset: 0; z-index: 0;
-    background: radial-gradient(circle at 10% 90%, rgba(0, 86, 179, 0.15) 0%, transparent 60%),
-                radial-gradient(circle at 90% 10%, rgba(227, 27, 35, 0.1) 0%, transparent 50%) !important;
+    background: radial-gradient(circle at 10% 90%, rgba(0, 86, 179, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(227, 27, 35, 0.08) 0%, transparent 40%) !important;
     pointer-events: none;
 }
 
-/* Gestileerde Pompeblêden als subtiele Festival-Watermerken */
+/* Gestileerde Pompeblêden */
 .pompebled {
-    position: absolute; width: 15vh; height: 15vh; opacity: 0.04; z-index: 0;
+    position: absolute; width: 15vh; height: 15vh; opacity: 0.03; z-index: 0;
     background: #e31b23;
     clip-path: path('M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z');
     transform: scale(2);
@@ -2283,59 +2283,104 @@ body.fullscreen-mode .sidebar {
 /* Header balk */
 .omrop-header-bar {
     width: 100%; display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 3px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh; margin-bottom: 3vh; z-index: 10;
+    border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh; margin-bottom: 3vh; z-index: 10;
 }
-.omrop-logo { font-family: var(--font-head); font-size: 6vh; letter-spacing: 1px; }
-.omrop-red { color: #e31b23; font-weight: 900; }
-.omrop-blue { color: #0056b3; font-weight: 900; }
-.omrop-badge { background: #0056b3; color: white; padding: 0.8vh 1.5vw; border-radius: 30px; font-weight: 800; font-size: 1.8vh; }
+.omrop-logo { font-family: 'Montserrat', sans-serif; font-size: 4vh; font-weight: 900; text-transform: uppercase; letter-spacing: -1px;}
+.omrop-red { color: #e31b23; }
+.omrop-blue { color: #0056b3; }
+.omrop-badge { background: #0056b3; color: white; padding: 0.6vh 1.2vw; border-radius: 5px; font-weight: 800; font-size: 1.6vh; text-transform: uppercase; letter-spacing: 1px;}
 
 /* Grid indeling */
 .omrop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; width: 100%; height: 68vh; z-index: 10; }
 #slide-omrop.journaal-active #omrop-split-layout { display: none !important; }
 #slide-omrop.journaal-active #omrop-journaal-layout { display: flex !important; }
 
-/* Kaarten */
-.omrop-card { height: 100% !important; background: rgba(10, 15, 30, 0.4) !important; border-top: 3px solid #0056b3 !important; }
-.omrop-card h2 { font-size: 3.5vh !important; margin-bottom: 2vh !important; }
+/* Kaarten Algemeen - Professionele look */
+.omrop-card { 
+    height: 100% !important; 
+    background: rgba(20, 25, 35, 0.85) !important; /* Strakke donkerblauwe/grijze tint */
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    border-top: 4px solid #0056b3 !important; /* Omrop Blauwe bovenkant */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    display: flex !important; 
+    flex-direction: column !important;
+    justify-content: flex-start !important; /* Druk alles netjes naar boven */
+    padding: 3vh 2.5vw !important;
+}
+.omrop-card:nth-child(2) { border-top-color: #e31b23 !important; } /* Rode bovenkant voor 112 */
+
+/* Titels van de kaarten */
+.omrop-card h2 { 
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 2.2vh !important; 
+    margin-bottom: 2.5vh !important; 
+    text-align: left !important;
+    color: #fff !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    padding-bottom: 1.5vh !important;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
 
 /* Links: Los artikel */
-.omrop-article-content { display: flex; flex-direction: column; justify-content: center; height: 80%; padding: 0 1vw; }
-.omrop-article-content .art-title { font-size: 4.5vh; color: var(--accent); margin: 0 0 2vh 0; font-weight: 800; line-height: 1.2; }
-.omrop-article-content .art-body { font-size: 2.8vh; color: #eee; line-height: 1.4; }
+.omrop-article-content { 
+    display: flex; flex-direction: column; justify-content: flex-start; 
+    flex: 1; overflow: hidden; text-align: left; 
+}
+.omrop-article-content .art-title { 
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3.5vh; color: #fff; margin: 0 0 2vh 0; font-weight: 800; line-height: 1.3; 
+}
+.omrop-article-content .art-body { 
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.2vh; color: #cbd5e1; line-height: 1.6; font-weight: 400; 
+}
 
 /* Rechts: 112 Lijst & Accordion */
-.omrop-112-container { width: 100%; height: 52vh; overflow: hidden; position: relative; }
-.omrop-112-track { display: flex; flex-direction: column; gap: 1.5vh; transform: translateY(0); }
+.omrop-112-container { width: 100%; flex: 1; overflow: hidden; position: relative; }
+.omrop-112-track { display: flex; flex-direction: column; gap: 1.2vh; transform: translateY(0); }
 
-/* Het 112 item */
+/* Het 112 item (Ingeklapt) */
 .omrop-112-item {
-    background: rgba(255,255,255,0.03); border-left: 5px solid #e31b23;
-    border-radius: 8px; padding: 1.5vh; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden; max-height: 10vh; /* Standaard ingeklapt */
+    background: rgba(255,255,255,0.03); border-left: 4px solid #e31b23;
+    border-radius: 6px; padding: 1.5vh 2vw; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden; max-height: 7vh; 
+    text-align: left;
 }
-.omrop-112-item h4 { font-size: 2.5vh; margin: 0 0 0.5vh 0; color: white; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.omrop-112-item p { font-size: 2vh; margin: 0; color: #bbb; line-height: 1.3; }
+.omrop-112-item h4 { 
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2vh; margin: 0; color: #e2e8f0; font-weight: 600; 
+    white-space: nowrap; text-overflow: ellipsis; overflow: hidden; 
+}
+.omrop-112-item p { display: none; } /* Verberg tekst als ingeklapt */
 
 /* Het Actief UITGEKLAPTE 112 item (Luxe Accordion) */
 .omrop-112-item.expanded {
-    background: rgba(227, 27, 35, 0.15) !important;
-    border-left-width: 10px !important;
-    max-height: 35vh !important; /* Ruimte om te ademen */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    background: rgba(227, 27, 35, 0.08) !important;
+    border-left-width: 6px !important;
+    max-height: 40vh !important; 
+    padding: 2.5vh 2vw !important;
 }
-.omrop-112-item.expanded h4 { white-space: normal !important; overflow: visible !important; color: var(--accent); font-size: 2.8vh; }
-.omrop-112-item.expanded p { color: #fff; font-size: 2.3vh; margin-top: 1vh; }
+.omrop-112-item.expanded h4 { 
+    white-space: normal !important; overflow: visible !important; 
+    color: #fff; font-size: 2.5vh; line-height: 1.4; margin-bottom: 1.5vh;
+    font-weight: 800;
+}
+.omrop-112-item.expanded p { 
+    display: block;
+    color: #a0aec0; font-size: 2vh; line-height: 1.5; font-family: 'Montserrat', sans-serif; 
+}
 
 /* MODUS B: Het Uur-Journaal */
 .omrop-journaal-box {
     width: 100%; height: 68vh; display: none; flex-direction: column; 
-    background: rgba(0, 56, 179, 0.08); border: 2px solid rgba(0, 86, 179, 0.3);
-    border-radius: 20px; padding: 4vh; box-sizing: border-box; z-index: 10;
+    background: rgba(20, 25, 35, 0.9); border-top: 4px solid #0056b3;
+    border-radius: 12px; padding: 4vh; box-sizing: border-box; z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left;
 }
-.omrop-journaal-box h1 { font-family: var(--font-head); font-size: 7vh; color: #e31b23; margin: 0 0 3vh 0; text-align: center; }
-.journaal-rows-container { display: flex; flex-direction: column; gap: 2vh; overflow: hidden; height: 100%; }
-.journaal-row { display: flex; gap: 2vw; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5vh; }
-.jr-time { font-family: monospace; font-size: 2.5vh; color: var(--accent); font-weight: bold; }
-.jr-body b { font-size: 2.6vh; color: white; display: block; margin-bottom: 0.5vh; }
-.jr-body span { font-size: 2.2vh; color: #ccc; }
+.omrop-journaal-box h1 { font-family: 'Montserrat', sans-serif; font-size: 3.5vh; color: #fff; margin: 0 0 3vh 0; text-align: left; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh; font-weight: 900;}
+.journaal-rows-container { display: flex; flex-direction: column; gap: 2.5vh; overflow: hidden; height: 100%; }
+.journaal-row { display: flex; gap: 2vw; padding-bottom: 1.5vh; }
+.jr-time { font-family: monospace; font-size: 2.2vh; color: #0056b3; font-weight: bold; background: rgba(255,255,255,0.9); padding: 0.5vh 1vw; border-radius: 5px; height: fit-content;}
+.jr-body b { font-size: 2.4vh; color: white; display: block; margin-bottom: 0.5vh; font-family: 'Montserrat', sans-serif; font-weight: 800; line-height: 1.3;}
+.jr-body span { font-size: 2vh; color: #cbd5e1; line-height: 1.5; font-family: 'Montserrat', sans-serif;}
