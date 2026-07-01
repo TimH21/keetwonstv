@@ -2161,3 +2161,181 @@ body.standby-mode .weather-row {
 .snack-pill {
     padding: 1.2vh 1.5vw !important; /* Pills iets kleiner gemaakt */
 }
+
+/* =========================================
+   SIDEBAR PRECISIE FIX (SNACK+ ZICHTBAARHEID)
+   ========================================= */
+
+.price-sidebar .price-row {
+    height: 4.5vh !important; /* Dwing elk item op een vaste hoogte */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    white-space: nowrap !important; /* Voorkom dat tekst naar 2 regels springt */
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    margin-bottom: 0 !important;
+    padding: 0 0.5vw !important;
+    font-size: 2.2vh !important;
+}
+
+.price-sidebar .price-row span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important; /* Zet ... bij te lange namen */
+    max-width: 70% !important;
+}
+
+.price-sidebar .price-row strong {
+    color: var(--accent) !important;
+    font-weight: 800 !important;
+}
+
+/* De container moet precies passen bij de rij-hoogtes */
+.train-ticker-sub-container {
+    height: 18vh !important; /* Past precies 4 rijen van 4.5vh */
+    overflow: hidden !important;
+}
+
+/* =========================================
+   🚨 UI 6.0: KNMI EMERGENCY BROADCAST SYSTEM
+   ========================================= */
+
+/* 1. Sidebar Inklap-Modus (Full Focus) */
+body.fullscreen-mode .main-layout {
+    grid-template-columns: 100vw 0vw !important; /* Sidebar wordt weggedrukt */
+}
+body.fullscreen-mode .sidebar {
+    transform: translateX(-100%); /* Schuift soepel uit beeld */
+    opacity: 0;
+    pointer-events: none;
+}
+/* Soepele overgang voor de layout */
+.main-layout {
+    transition: grid-template-columns 0.8s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+.sidebar {
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s !important;
+}
+
+/* 2. KNMI Hoofdcontainer */
+.knmi-container {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 5vh 10vw; box-sizing: border-box;
+    position: relative; z-index: 10;
+}
+
+/* 3. Kleurcodes (Geel, Oranje, Rood) met pulserende alarm-gloed */
+.knmi-bg { position: absolute; inset: 0; z-index: 0; opacity: 0.9; transition: background 1s ease; }
+
+.knmi-geel .knmi-bg { 
+    background: radial-gradient(circle, #f1c40f 0%, #7f8c8d 100%); 
+    animation: pulseGeel 3s infinite alternate;
+}
+.knmi-oranje .knmi-bg { 
+    background: radial-gradient(circle, #e67e22 0%, #8e44ad 100%); 
+    animation: pulseOranje 2s infinite alternate;
+}
+.knmi-rood .knmi-bg { 
+    background: radial-gradient(circle, #c0392b 0%, #2c3e50 100%); 
+    animation: pulseRood 1s infinite alternate;
+}
+
+@keyframes pulseGeel { 0% { box-shadow: inset 0 0 50px rgba(241,196,15,0.2); } 100% { box-shadow: inset 0 0 150px rgba(241,196,15,0.6); } }
+@keyframes pulseOranje { 0% { box-shadow: inset 0 0 50px rgba(230,126,34,0.3); } 100% { box-shadow: inset 0 0 200px rgba(230,126,34,0.7); } }
+@keyframes pulseRood { 0% { box-shadow: inset 0 0 100px rgba(192,57,43,0.5); } 100% { box-shadow: inset 0 0 300px rgba(192,57,43,0.9); } }
+
+/* 4. Typografie & Iconen */
+.knmi-header-box { display: flex; align-items: center; gap: 3vw; margin-bottom: 3vh; }
+.knmi-logo-txt { font-family: var(--font-head); font-size: 8vh; font-weight: 900; background: #fff; color: #000; padding: 1vh 2vw; border-radius: 15px; }
+
+.knmi-icon-box { display: flex; gap: 2vw; font-size: 10vh; color: #fff; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); }
+.knmi-icon-box i { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
+.knmi-icon-box i:nth-child(2) { animation-delay: 0.2s; }
+.knmi-icon-box i:nth-child(3) { animation-delay: 0.4s; }
+
+#knmi-title { font-family: var(--font-head); font-size: 11vh; color: #fff; text-transform: uppercase; margin: 0 0 2vh 0; text-shadow: 0 10px 30px rgba(0,0,0,0.8); line-height: 1; }
+#knmi-info { font-size: 4.5vh; color: #fff; font-weight: 700; max-width: 80%; line-height: 1.4; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+
+@keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* =========================================
+   📺 UI 7.0: OMROP FRYSLÂN BRANDING & ANIMATIES
+   ========================================= */
+
+/* Achtergrond sfeer */
+.omrop-bg-glow {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(circle at 10% 90%, rgba(0, 86, 179, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 90% 10%, rgba(227, 27, 35, 0.1) 0%, transparent 50%) !important;
+    pointer-events: none;
+}
+
+/* Gestileerde Pompeblêden als subtiele Festival-Watermerken */
+.pompebled {
+    position: absolute; width: 15vh; height: 15vh; opacity: 0.04; z-index: 0;
+    background: #e31b23;
+    clip-path: path('M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z');
+    transform: scale(2);
+}
+.pompebled.p-1 { top: 15vh; right: 8vw; transform: rotate(25deg) scale(2); }
+.pompebled.p-2 { bottom: 12vh; left: 32vw; transform: rotate(-40deg) scale(1.5); }
+
+/* Header balk */
+.omrop-header-bar {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 3px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh; margin-bottom: 3vh; z-index: 10;
+}
+.omrop-logo { font-family: var(--font-head); font-size: 6vh; letter-spacing: 1px; }
+.omrop-red { color: #e31b23; font-weight: 900; }
+.omrop-blue { color: #0056b3; font-weight: 900; }
+.omrop-badge { background: #0056b3; color: white; padding: 0.8vh 1.5vw; border-radius: 30px; font-weight: 800; font-size: 1.8vh; }
+
+/* Grid indeling */
+.omrop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; width: 100%; height: 68vh; z-index: 10; }
+#slide-omrop.journaal-active #omrop-split-layout { display: none !important; }
+#slide-omrop.journaal-active #omrop-journaal-layout { display: flex !important; }
+
+/* Kaarten */
+.omrop-card { height: 100% !important; background: rgba(10, 15, 30, 0.4) !important; border-top: 3px solid #0056b3 !important; }
+.omrop-card h2 { font-size: 3.5vh !important; margin-bottom: 2vh !important; }
+
+/* Links: Los artikel */
+.omrop-article-content { display: flex; flex-direction: column; justify-content: center; height: 80%; padding: 0 1vw; }
+.omrop-article-content .art-title { font-size: 4.5vh; color: var(--accent); margin: 0 0 2vh 0; font-weight: 800; line-height: 1.2; }
+.omrop-article-content .art-body { font-size: 2.8vh; color: #eee; line-height: 1.4; }
+
+/* Rechts: 112 Lijst & Accordion */
+.omrop-112-container { width: 100%; height: 52vh; overflow: hidden; position: relative; }
+.omrop-112-track { display: flex; flex-direction: column; gap: 1.5vh; transform: translateY(0); }
+
+/* Het 112 item */
+.omrop-112-item {
+    background: rgba(255,255,255,0.03); border-left: 5px solid #e31b23;
+    border-radius: 8px; padding: 1.5vh; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden; max-height: 10vh; /* Standaard ingeklapt */
+}
+.omrop-112-item h4 { font-size: 2.5vh; margin: 0 0 0.5vh 0; color: white; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.omrop-112-item p { font-size: 2vh; margin: 0; color: #bbb; line-height: 1.3; }
+
+/* Het Actief UITGEKLAPTE 112 item (Luxe Accordion) */
+.omrop-112-item.expanded {
+    background: rgba(227, 27, 35, 0.15) !important;
+    border-left-width: 10px !important;
+    max-height: 35vh !important; /* Ruimte om te ademen */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+.omrop-112-item.expanded h4 { white-space: normal !important; overflow: visible !important; color: var(--accent); font-size: 2.8vh; }
+.omrop-112-item.expanded p { color: #fff; font-size: 2.3vh; margin-top: 1vh; }
+
+/* MODUS B: Het Uur-Journaal */
+.omrop-journaal-box {
+    width: 100%; height: 68vh; display: none; flex-direction: column; 
+    background: rgba(0, 56, 179, 0.08); border: 2px solid rgba(0, 86, 179, 0.3);
+    border-radius: 20px; padding: 4vh; box-sizing: border-box; z-index: 10;
+}
+.omrop-journaal-box h1 { font-family: var(--font-head); font-size: 7vh; color: #e31b23; margin: 0 0 3vh 0; text-align: center; }
+.journaal-rows-container { display: flex; flex-direction: column; gap: 2vh; overflow: hidden; height: 100%; }
+.journaal-row { display: flex; gap: 2vw; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5vh; }
+.jr-time { font-family: monospace; font-size: 2.5vh; color: var(--accent); font-weight: bold; }
+.jr-body b { font-size: 2.6vh; color: white; display: block; margin-bottom: 0.5vh; }
+.jr-body span { font-size: 2.2vh; color: #ccc; }
