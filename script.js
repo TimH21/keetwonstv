@@ -283,7 +283,7 @@ function startSidebarMasterController() {
 
         normalTrack.style.transform = `translateY(-${targetY}px)`;
 
-    }
+    }, 5000)
     setTimeout(startSidebarMasterController, 3000);            
 }
 
