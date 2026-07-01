@@ -131,15 +131,20 @@
                 </div>
             </div>
 
-            <div class="slide skip-slide" id="slide-knmi" data-title="Weeralarm">
-                <div class="slide-inner centered-layout">
-                    <div class="header-badge" id="knmi-badge" style="background: #e67e22; color: white;"><i class="fa-solid fa-triangle-exclamation"></i> WAARSCHUWING</div>
-                    <h1 class="slide-title" id="knmi-title" style="font-size: 10vh; margin-bottom: 2vh; text-transform: uppercase;">CODE ORANJE</h1>
+            <div class="slide skip-slide" id="slide-knmi" data-title="Weeralarm" data-time="20000">
+                <div class="knmi-bg"></div>
+                <div class="knmi-container" id="knmi-wrapper">
                     
-                    <div id="knmi-box" style="background: rgba(0,0,0,0.6); padding: 4vh; border-radius: 20px; border: 3px solid #e67e22; max-width: 80%; display: flex; flex-direction: column; align-items: center;">
-                        <i id="knmi-icon" class="fa-solid fa-cloud-bolt" style="font-size: 10vh; margin-bottom: 2vh; color: #e67e22; animation: pulse 2s infinite;"></i>
-                        <p id="knmi-desc" style="font-size: 4.5vh; font-weight: 600; margin: 0; line-height: 1.4; color: white;">Zware onweersbuien met kans op hagel en windstoten.</p>
+                    <div class="knmi-header-box">
+                        <div class="knmi-logo-txt">KNMI</div>
+                        <div class="knmi-icon-box" id="knmi-icons">
+                            <i class="fa-solid fa-sun"></i>
+                        </div>
                     </div>
+                    
+                    <h1 id="knmi-title">GEEN WAARSCHUWINGEN</h1>
+                    <p id="knmi-info">Op dit moment is er geen actueel weeralarm voor de provincie Friesland.</p>
+                    
                 </div>
             </div>
 
@@ -305,6 +310,49 @@
                     <div class="qr-box">
                             <p>WEBSITE TIJDELIJK OFFLINE!</p>
                     </div>
+                </div>
+            </div>
+
+            <div class="slide" id="slide-omrop" data-title="Omrop Fryslân" data-time="60000">
+                <div class="omrop-bg-glow"></div>
+                <div class="pompebled p-1"></div>
+                <div class="pompebled p-2"></div>
+
+                <div class="slide-inner" style="width: 95%; height: 100%; justify-content: flex-start; padding-top: 4vh;">
+                    
+                    <div class="omrop-header-bar">
+                        <div class="omrop-logo">
+                            <span class="omrop-red">Omrop</span> <span class="omrop-blue">Fryslân</span>
+                        </div>
+                        <div id="omrop-mode-badge" class="omrop-badge">LIVE NIJS</div>
+                    </div>
+
+                    <div id="omrop-split-layout" class="omrop-grid">
+                        
+                        <div class="modern-card omrop-card">
+                            <h2><i class="fa-solid fa-newspaper"></i> HJOED</h2>
+                            <div id="omrop-random-article" class="omrop-article-content">
+                                <h3 class="art-title">Nijs ynladen...</h3>
+                                <p class="art-body">In momint geduld asjebleaft, it lêste nijs wurdt ophelle.</p>
+                            </div>
+                        </div>
+
+                        <div class="modern-card omrop-card">
+                            <h2><i class="fa-solid fa-triangle-exclamation" style="color:#e74c3c;"></i> LÊSTE 112-NIJS</h2>
+                            <div class="omrop-112-container">
+                                <div id="omrop-112-track" class="omrop-112-track">
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="omrop-journaal-layout" class="omrop-journaal-box">
+                        <h1><i class="fa-solid fa-radio"></i> HJOED IEN FRYSLÂN</h1>
+                        <div id="omrop-journaal-list" class="journaal-rows-container">
+                            </div>
+                    </div>
+
                 </div>
             </div>
 
