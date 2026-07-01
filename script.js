@@ -652,7 +652,6 @@ document.addEventListener('click', preventSleepMode, { once: true });
 // ===============================================
 let mouseTimer;
 let isAdminMenuOpen = false;
-let isPaused = false;
 
 // 1. Luister naar de muis
 document.addEventListener('mousemove', () => {
@@ -661,13 +660,13 @@ document.addEventListener('mousemove', () => {
     
     if (!isAdminMenuOpen) {
         if (btn) btn.classList.add('visible'); 
-        if (closeBtn) closeBtn.classList.add('visible'); // Toon ook het kruisje
+        if (closeBtn) closeBtn.classList.add('visible'); 
         
         clearTimeout(mouseTimer); 
         
         mouseTimer = setTimeout(() => {
             if (btn) btn.classList.remove('visible');
-            if (closeBtn) closeBtn.classList.remove('visible'); // Verberg het kruisje weer
+            if (closeBtn) closeBtn.classList.remove('visible'); 
         }, 5000);
     }
 });
@@ -681,27 +680,25 @@ function toggleAdminMenu() {
     if (isAdminMenuOpen) {
         modal.style.display = 'flex';
         btn.classList.add('visible');
-        clearTimeout(mouseTimer); // Blijf permanent zichtbaar als menu open is
+        clearTimeout(mouseTimer); 
     } else {
         modal.style.display = 'none';
-        mouseTimer = setTimeout(() => { btn.classList.remove('visible'); }, 5000); // Start timer weer
+        mouseTimer = setTimeout(() => { btn.classList.remove('visible'); }, 5000); 
     }
 }
 
 // 3. Wijzigingen toepassen
 function updateLocalSettings() {
-    // Kleur aanpassen
     const color = document.getElementById('admin-color').value;
     document.querySelector('.bg-layer').style.backgroundColor = color;
 
-    // Sidebar aanpassen
     const sidebar = document.getElementById('admin-sidebar').value;
     const widget = document.getElementById('sidebar-widget');
     const icon = document.getElementById('sw-icon');
     const label = document.getElementById('sw-label');
     const text = document.getElementById('sw-text');
 
-    widget.className = 'sidebar-widget'; // reset oude klasses
+    widget.className = 'sidebar-widget';
 
     if (sidebar === 'status') {
         widget.classList.add('sw-green');
@@ -718,25 +715,7 @@ function updateLocalSettings() {
         icon.className = 'fa-solid fa-triangle-exclamation';
         label.textContent = 'KNMI';
         text.textContent = 'VEILIG'; 
-        checkKnmiAlarm(); // Roep functie aan voor live update
-    }
-}
-
-// 4. Pauzeknop logica
-function togglePause() {
-    const btn = document.getElementById('btn-pause');
-    isPaused = !isPaused;
-    
-    if (isPaused) {
-        clearInterval(slideTimer);
-        btn.innerHTML = "Hervat Rotatie ▶️";
-        btn.style.background = "#e74c3c";
-        document.getElementById('footer-next-title').textContent = "GEPAUZEERD";
-    } else {
-        slideTimer = setInterval(next, TIME);
-        btn.innerHTML = "Pauzeer Rotatie ⏸️";
-        btn.style.background = "#333";
-        document.getElementById('footer-next-title').textContent = currentNextTitleStr;
+        checkKnmiAlarm(); 
     }
 }
 
@@ -1156,18 +1135,25 @@ let omropSequenceTimers = [];
 let lastRandomArticleIndex = 0;
 
 async function fetchOmropFryslanNews() {
-    // Probeer deze link (zonder de /fy/rss.xml)
-    const rssFeedUrl = 'https://www.omropfryslan.nl/rss';
-    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+    // Omrop Fryslân RSS feed (direct, geen rss2json via backend, via allorigins.win)
+    const rssFeedUrl = 'https://www.omropfryslan.nl/rss/nijs.xml?siteId=fryslan';
+    const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssFeedUrl)}`;
 
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Omrop API weigert de verbinding");
         const data = await response.json();
         
-        // Check of we echt items hebben gekregen
-        if (data.items && data.items.length > 0) {
-            omropAllNews = data.items;
+        // Gebruik DOMParser om de geretourneerde XML te lezen
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+        const items = xmlDoc.querySelectorAll("item");
+
+        if (items.length > 0) {
+            omropAllNews = Array.from(items).map(item => ({
+                title: item.querySelector("title").textContent.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim(),
+                description: item.querySelector("description").textContent.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim()
+            }));
         } else {
             throw new Error("Lege feed ontvangen");
         }
@@ -1230,7 +1216,6 @@ async function fetchOmropFryslanNews() {
     rotateRandomArticle();
 }
 
-// Draait elk paar minuten een gloednieuw willekeurig hoofdartikel op het scherm
 function rotateRandomArticle() {
     if (omropNormalNews.length === 0) return;
     let idx = Math.floor(Math.random() * omropNormalNews.length);
@@ -1244,26 +1229,23 @@ function rotateRandomArticle() {
         `;
     }
 }
-// Haal live nieuws op en herhaal dit elke 15 minuten
+
 fetchOmropFryslanNews();
 setInterval(fetchOmropFryslanNews, 900000);
-setInterval(rotateRandomArticle, 180000); // Roteert random artikel elke 3 minuten
+setInterval(rotateRandomArticle, 180000);
 
-// ANIMATIE: DE DRIEVOUDIGE SCROLL EN ACCORDION SEQUENCE (MODUS A)
 function startOmrop112Sequence() {
-    stopOmropSequences(); // Reset lopende klokken
+    stopOmropSequences(); 
     
     const track = document.getElementById('omrop-112-track');
     if (!track || omrop112News.length === 0) return;
 
-    // Pak de huidige batch van 5 stuks
     let batch = omrop112News.slice(current112BatchStart, current112BatchStart + 5);
     if (batch.length === 0) {
-        current112BatchStart = 0; // Terug naar boven als we aan het einde zijn
+        current112BatchStart = 0; 
         batch = omrop112News.slice(0, 5);
     }
 
-    // Bouw de HTML rijen op
     track.innerHTML = batch.map((art, i) => `
         <div class="omrop-112-item" id="omrop-item-${i}">
             <h4>${art.cleanTitle}</h4>
@@ -1274,7 +1256,6 @@ function startOmrop112Sequence() {
     track.style.transition = 'none';
     track.style.transform = 'translateY(0)';
 
-    // STAP 1: De Drievoudige radar-scroll (net zoals de sidebar, duurt ~6 seconden)
     let scrollDuration = 6000;
     track.style.transition = `transform ${scrollDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
     track.style.transform = 'translateY(-15vh)';
@@ -1284,20 +1265,17 @@ function startOmrop112Sequence() {
         track.style.transform = 'translateY(0)';
     }, scrollDuration / 2));
 
-    // STAP 2: De Accordion carrousel (Start na het scrollen op seconde 7)
     let currentItemIdx = 0;
     
     function expandNextItem() {
-        // Klap vorige dicht
         document.querySelectorAll('.omrop-112-item').forEach(el => el.classList.remove('expanded'));
         
         let targetItem = document.getElementById(`omrop-item-${currentItemIdx}`);
         if (targetItem) {
             targetItem.classList.add('expanded');
             
-            // Slimme leestijd: bereken de lengte van de tekst en pas de vertraging daarop aan!
             let textLength = targetItem.innerText.length;
-            let readTime = Math.max(5000, textLength * 55); // Minimaal 5 seconden leestijd per item
+            let readTime = Math.max(5000, textLength * 55); 
             
             currentItemIdx++;
             if (currentItemIdx < batch.length) {
@@ -1308,20 +1286,16 @@ function startOmrop112Sequence() {
 
     omropSequenceTimers.push(setTimeout(expandNextItem, scrollDuration + 1000));
 
-    // Verschuif de pointer alvast voor de volgende keer dat deze slide langskomt (volgende 5 stuks)
     current112BatchStart += 5;
 }
 
-// HET ELK-UUR-JOURNAAL COMPILEREN (MODUS B)
 function renderOmropJournaal() {
     const listContainer = document.getElementById('omrop-journaal-list');
     if (!listContainer || omropAllNews.length === 0) return;
 
-    // Pak de top 5 allerlaatste headlines uit Friesland
     let topNews = omropAllNews.slice(0, 5);
     
     listContainer.innerHTML = topNews.map((art, i) => {
-        // Genereer een fictief live-tijdstip gebaseerd op het huidige uur om het een echte journaallook te geven
         let currentHour = new Date().getHours();
         let minutePlaceholder = 55 - (i * 12);
         if (minutePlaceholder < 0) minutePlaceholder = "02";
