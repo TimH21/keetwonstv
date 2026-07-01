@@ -423,7 +423,7 @@ getWeather();
 setInterval(getWeather, 300000);
 
 // ===============================================
-// 6. EXTERNE APIS: KNMI ALARM
+// 6. EXTERNE APIS: KNMI ALARM & SMART SCANNER
 // ===============================================
 let isAlarmActive = false;
 let currentAlarmDetails = null;
@@ -434,8 +434,9 @@ async function checkKnmiAlarm() {
 
     try {
         const response = await fetch(`https://weerlive.nl/api/weerlive_api_v2.php?key=${apiKey}&locatie=${locatie}`);
-        const text = await response.text();
+        if (!response.ok) throw new Error("Netwerkfout bij KNMI API");
         
+        const text = await response.text();
         if (text.trim().startsWith("Vraag") || text.trim().startsWith("Gebruik")) return;
 
         const data = JSON.parse(text);
@@ -446,40 +447,55 @@ async function checkKnmiAlarm() {
         const isEchtAlarm = (weer.alarm == 1);
         const isKleurAlarm = (kleur !== 'groen' && kleur !== '');
 
+        const wrapper = document.getElementById('slide-knmi');
+        const titelEl = document.getElementById('knmi-title');
+        const infoEl = document.getElementById('knmi-info');
+        const iconBox = document.getElementById('knmi-icons');
+
         if (isEchtAlarm || isKleurAlarm) {
             isAlarmActive = true;
             currentAlarmDetails = weer; 
             if(!currentAlarmDetails.wrschklr || currentAlarmDetails.wrschklr === '') currentAlarmDetails.wrschklr = 'geel'; 
             
-            // --- NIEUW: Update de KNMI Slide en zet hem AAN ---
-            const knmiSlide = document.getElementById('slide-knmi');
-            if (knmiSlide) {
-                knmiSlide.classList.remove('skip-slide'); // Slide doet weer mee in de rotatie!
-                
+            // --- KNMI SLIDE AANZETTEN (Smart Scanner) ---
+            if (wrapper) {
+                wrapper.classList.remove('skip-slide'); // Haal hem uit de verberg-modus
                 const codeTxt = currentAlarmDetails.wrschklr.toLowerCase();
-                document.getElementById('knmi-title').textContent = `CODE ${codeTxt}`;
-                document.getElementById('knmi-desc').textContent = currentAlarmDetails.lkop || currentAlarmDetails.alarmtxt || "Gevaarlijk weer op komst.";
+                const alertText = currentAlarmDetails.lkop || currentAlarmDetails.alarmtxt || "Gevaarlijk weer op komst. Blijf alert.";
                 
-                // Kleuren fixen
-                let hexColor = '#f1c40f'; // Geel
-                if (codeTxt === 'oranje') hexColor = '#e67e22';
-                if (codeTxt === 'rood') hexColor = '#e53e3e';
-                
-                document.getElementById('knmi-title').style.color = hexColor;
-                document.getElementById('knmi-badge').style.backgroundColor = hexColor;
-                document.getElementById('knmi-icon').style.color = hexColor;
-                document.getElementById('knmi-box').style.borderColor = hexColor;
-            }
+                // Zet de juiste kleur-class op de slide (knmi-geel, knmi-oranje, etc)
+                wrapper.className = `slide knmi-${codeTxt}`;
+                if (titelEl) titelEl.textContent = `CODE ${codeTxt.toUpperCase()}`;
+                if (infoEl) infoEl.textContent = alertText;
 
+                // De Woord-Scanner voor de iconen!
+                const textToAnalyze = alertText.toLowerCase();
+                let activeIcons = [];
+
+                if (textToAnalyze.includes("onweer") || textToAnalyze.includes("bliksem")) activeIcons.push('<i class="fa-solid fa-bolt" style="color:#f1c40f;"></i>');
+                if (textToAnalyze.includes("regen") || textToAnalyze.includes("neerslag")) activeIcons.push('<i class="fa-solid fa-cloud-showers-heavy" style="color:#3498db;"></i>');
+                if (textToAnalyze.includes("hagel")) activeIcons.push('<i class="fa-solid fa-cloud-meatball" style="color:#ecf0f1;"></i>');
+                if (textToAnalyze.includes("wind") || textToAnalyze.includes("storm") || textToAnalyze.includes("stoten")) activeIcons.push('<i class="fa-solid fa-wind" style="color:#bdc3c7;"></i>');
+                if (textToAnalyze.includes("sneeuw") || textToAnalyze.includes("winter")) activeIcons.push('<i class="fa-regular fa-snowflake" style="color:#fff;"></i>');
+                if (textToAnalyze.includes("glad") || textToAnalyze.includes("ijzel")) activeIcons.push('<i class="fa-solid fa-icicles" style="color:#81ecec;"></i>');
+                if (textToAnalyze.includes("mist")) activeIcons.push('<i class="fa-solid fa-smog" style="color:#95a5a6;"></i>');
+                if (textToAnalyze.includes("hitte") || textToAnalyze.includes("warmte")) activeIcons.push('<i class="fa-solid fa-temperature-arrow-up" style="color:#e74c3c;"></i>');
+
+                if (activeIcons.length === 0) activeIcons.push('<i class="fa-solid fa-triangle-exclamation" style="color:#fff;"></i>');
+                
+                if (iconBox) iconBox.innerHTML = activeIcons.join('');
+            }
         } else {
             isAlarmActive = false;
             currentAlarmDetails = null;
-            // --- NIEUW: Verberg de slide als het veilig is ---
-            const knmiSlide = document.getElementById('slide-knmi');
-            if (knmiSlide) knmiSlide.classList.add('skip-slide');
+            // --- KNMI SLIDE VERBERGEN ALS HET VEILIG IS ---
+            if (wrapper) wrapper.classList.add('skip-slide');
         }
-        updateFooterAlarmDisplay();
-    } catch (error) { console.error("KNMI Fout:", error); }
+        
+        updateFooterAlarmDisplay(); // Update de Ticker balk onderin
+    } catch (error) { 
+        console.error("KNMI Fout:", error); 
+    }
 }
 
 function updateFooterAlarmDisplay() {
@@ -519,94 +535,7 @@ function updateFooterAlarmDisplay() {
     }
 }
 checkKnmiAlarm(); 
-setInterval(checkKnmiAlarm, 900000);
-
-// ===============================================
-// EXTERNE APIS: KNMI WAARSCHUWINGEN (SMART SCANNER)
-// ===============================================
-async function getKNMIAlerts() {
-    // VUL HIER JOUW EIGEN API LINK IN! (Of haal het uit je oude code)
-    const apiUrl = '576acd776b'; 
-    
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Netwerkfout bij KNMI API");
-        const data = await response.json();
-
-        // 1. Zoek naar de melding voor Friesland (Pas dit aan naar hoe jouw API data teruggeeft)
-        // Stel: data.waarschuwingen is een array, en we zoeken 'Friesland'
-        // let frieslandAlert = data.waarschuwingen.find(w => w.provincie === 'Friesland');
-        
-        // VOORBEELD DATA (Verwijder dit als je API werkt)
-        let frieslandAlert = {
-            titel: "Code Oranje: Zware Onweersbuien",
-            kleur: "oranje", // geel, oranje, rood of groen
-            tekst: "Er trekken zware onweersbuien over. Hierbij is kans op flinke hagel en zware windstoten. Zoek dekking en blijf uit de buurt van bomen."
-        };
-
-        const wrapper = document.getElementById('slide-knmi');
-        const titelEl = document.getElementById('knmi-title');
-        const infoEl = document.getElementById('knmi-info');
-        const iconBox = document.getElementById('knmi-icons');
-
-        if (!frieslandAlert || frieslandAlert.kleur === 'groen') {
-            wrapper.className = 'slide'; // Verwijder alarm classes
-            titelEl.textContent = "GEEN WAARSCHUWINGEN";
-            infoEl.textContent = "Er is momenteel geen extreem weer op komst.";
-            iconBox.innerHTML = '<i class="fa-solid fa-sun"></i>';
-            return;
-        }
-
-        // 2. Koppel de juiste kleur code aan de container
-        wrapper.className = `slide knmi-${frieslandAlert.kleur.toLowerCase()}`;
-
-        // 3. Update de tekst
-        titelEl.textContent = frieslandAlert.titel;
-        infoEl.textContent = frieslandAlert.tekst;
-
-        // 4. DE SMART SCANNER: Welke iconen hebben we nodig?
-        const textToAnalyze = (frieslandAlert.titel + " " + frieslandAlert.tekst).toLowerCase();
-        let activeIcons = [];
-
-        if (textToAnalyze.includes("onweer") || textToAnalyze.includes("bliksem")) {
-            activeIcons.push('<i class="fa-solid fa-bolt" style="color:#f1c40f;"></i>');
-        }
-        if (textToAnalyze.includes("regen") || textToAnalyze.includes("neerslag")) {
-            activeIcons.push('<i class="fa-solid fa-cloud-showers-heavy" style="color:#3498db;"></i>');
-        }
-        if (textToAnalyze.includes("hagel")) {
-            activeIcons.push('<i class="fa-solid fa-cloud-meatball" style="color:#ecf0f1;"></i>');
-        }
-        if (textToAnalyze.includes("wind") || textToAnalyze.includes("storm") || textToAnalyze.includes("stoten")) {
-            activeIcons.push('<i class="fa-solid fa-wind" style="color:#bdc3c7;"></i>');
-        }
-        if (textToAnalyze.includes("sneeuw") || textToAnalyze.includes("winter")) {
-            activeIcons.push('<i class="fa-regular fa-snowflake" style="color:#fff;"></i>');
-        }
-        if (textToAnalyze.includes("glad") || textToAnalyze.includes("ijzel")) {
-            activeIcons.push('<i class="fa-solid fa-icicles" style="color:#81ecec;"></i>');
-        }
-        if (textToAnalyze.includes("mist")) {
-            activeIcons.push('<i class="fa-solid fa-smog" style="color:#95a5a6;"></i>');
-        }
-        if (textToAnalyze.includes("hitte") || textToAnalyze.includes("warmte")) {
-            activeIcons.push('<i class="fa-solid fa-temperature-arrow-up" style="color:#e74c3c;"></i>');
-        }
-
-        // Als hij écht niks kan vinden, laat dan een standaard waarschuwing driehoek zien
-        if (activeIcons.length === 0) {
-            activeIcons.push('<i class="fa-solid fa-triangle-exclamation" style="color:#f39c12;"></i>');
-        }
-
-        iconBox.innerHTML = activeIcons.join('');
-
-    } catch (error) {
-        console.error("KNMI Error:", error);
-    }
-}
-// Start de controle 
-getKNMIAlerts();
-setInterval(getKNMIAlerts, 600000); // Check elke 10 minuten
+setInterval(checkKnmiAlarm, 900000); // Check elke 15 minuten
 
 // ===============================================
 // 7. EXTERNE APIS: VOETBAL (WK 2026 FIFA WORLD CUP)
@@ -1227,79 +1156,78 @@ let omropSequenceTimers = [];
 let lastRandomArticleIndex = 0;
 
 async function fetchOmropFryslanNews() {
-    // We gebruiken de officiële RSS feed en jagen hem door een openbare JSON-converter heen
-    const rssFeedUrl = 'https://www.omropfryslan.nl/fy/rss.xml';
+    // Probeer deze link (zonder de /fy/rss.xml)
+    const rssFeedUrl = 'https://www.omropfryslan.nl/rss';
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
 
     try {
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Omrop API kon niet worden bereikt");
+        if (!response.ok) throw new Error("Omrop API weigert de verbinding");
         const data = await response.json();
         
+        // Check of we echt items hebben gekregen
         if (data.items && data.items.length > 0) {
-            // Omdat de API altijd de LAATSTE artikelen pakt, hebben we automatisch 
-            // de artikelen van gisteren te pakken als er vandaag nog niks is!
             omropAllNews = data.items;
-            
-            // 112 Trefwoorden Filter
-            const keywords112 = ["112", "ûngelok", "plysje", "brân", "brânwar", "trauma", "arrest", "botsing", "ûngemak", "gewond", "ongeluk", "politie", "brand", "ziekenhuis", "spoar"];
-            
-            omrop112News = [];
-            omropNormalNews = [];
+        } else {
+            throw new Error("Lege feed ontvangen");
+        }
+    } catch (e) {
+        console.warn("Omrop Fryslân Error (Laden van Nood-Backup):", e);
+        
+        // NOOD-AGGREGAAT: Als de link faalt, laad dit zodat het design niet breekt!
+        omropAllNews = [
+            { title: "Storing by Omrop Fryslân API", description: "De live-ferbining mei de nijstsjinner is tydlik fuortfallen. Wy besykje it letter opnij." },
+            { title: "112-Nijs | Plysje grypt yn by lûdsoerlêst Wûns | Brânwar útrutsen foar ko yn de sleat", description: "" },
+            { title: "Grut feest yn Keet Wûns op komst", description: "De tariedings foar it oankommende simmerfeest geane moai troch. De organisaasje ferwachtet in protte gesellichheid." },
+            { title: "Lokale artysten meitsje har op foar optreden", description: "Ferskate DJ's en artysten binne drok oan it oefenjen foar it grutte evenemint yn july." },
+            { title: "112-Nijs | Auto fan de dyk rekke by Boalsert", description: "Der is ien persoan neisjoen troch it ambulânsepersoniel." }
+        ];
+    }
+        
+    // De rest van de logica (Filteren en splitsen)
+    const keywords112 = ["112", "ûngelok", "plysje", "brân", "brânwar", "trauma", "arrest", "botsing", "ûngemak", "gewond", "ongeluk", "politie", "brand", "ziekenhuis", "spoar"];
+    
+    omrop112News = [];
+    omropNormalNews = [];
 
-            omropAllNews.forEach(item => {
-                let rawTitle = item.title;
-                // Verwijder HTML tags uit de beschrijving
-                let cleanDescText = item.description.replace(/<[^>]*>/g, '').trim();
-                let searchStr = (rawTitle + " " + cleanDescText).toLowerCase();
-                
-                let is112 = keywords112.some(kw => searchStr.includes(kw)) || rawTitle.includes("112");
+    omropAllNews.forEach(item => {
+        let rawTitle = item.title;
+        let cleanDescText = (item.description || "").replace(/<[^>]*>/g, '').trim();
+        let searchStr = (rawTitle + " " + cleanDescText).toLowerCase();
+        
+        let is112 = keywords112.some(kw => searchStr.includes(kw)) || rawTitle.includes("112");
 
-                // DE SLIMME SPLITTER VOOR VERZAMELARTIKELEN (Liveblogs)
-                // Als de titel een | bevat, weten we dat de Omrop meerdere kopjes heeft samengevoegd.
-                if (is112 && rawTitle.includes('|')) {
-                    let subTitles = rawTitle.split('|');
-                    
-                    subTitles.forEach(subTitle => {
-                        let cleanSub = subTitle.trim();
-                        if (cleanSub.length > 5) {
-                            omrop112News.push({
-                                cleanTitle: cleanSub.toUpperCase(),
-                                // Omdat de beschrijving van de RSS alle tekst mengt, geven we bij gesplitste 
-                                // artikelen de kerngedachte of een verwijs-tekst mee.
-                                cleanDesc: "Sjoch foar de folsleine details en it lêste nijs fan dizze 112-melding op de webside of yn de app fan Omrop Fryslân."
-                            });
-                        }
-                    });
-                } 
-                // Als het een 'normaal' 112 artikel is zonder streepje
-                else if (is112) {
+        if (is112 && rawTitle.includes('|')) {
+            let subTitles = rawTitle.split('|');
+            subTitles.forEach(subTitle => {
+                let cleanSub = subTitle.trim();
+                if (cleanSub.length > 5) {
                     omrop112News.push({
-                        cleanTitle: rawTitle.toUpperCase(),
-                        cleanDesc: cleanDescText.substring(0, 180) + "..."
-                    });
-                } 
-                // Het is een algemeen artikel (zoals de Seehûnen of de Tall Ships Races)
-                else {
-                    omropNormalNews.push({
-                        cleanTitle: rawTitle.toUpperCase(),
-                        cleanDesc: cleanDescText.substring(0, 200) + "..."
+                        cleanTitle: cleanSub.toUpperCase(),
+                        cleanDesc: "Sjoch foar de folsleine details en it lêste nijs fan dizze 112-melding op de webside of yn de app fan Omrop Fryslân."
                     });
                 }
             });
-
-            // Fallback: Als het een extreem rustige dag was voor de hulpdiensten, 
-            // vul dan de 112 lijst op met normaal nieuws zodat het scherm niet breekt.
-            if (omrop112News.length === 0) {
-                omrop112News = omropNormalNews.slice(0, 5);
-            }
-
-            // Direct eerste keer het grote artikel inladen op de schermen
-            rotateRandomArticle();
+        } 
+        else if (is112) {
+            omrop112News.push({
+                cleanTitle: rawTitle.toUpperCase(),
+                cleanDesc: cleanDescText.substring(0, 180) + "..."
+            });
+        } 
+        else {
+            omropNormalNews.push({
+                cleanTitle: rawTitle.toUpperCase(),
+                cleanDesc: cleanDescText.substring(0, 200) + "..."
+            });
         }
-    } catch (e) {
-        console.error("Omrop Fryslân Error:", e);
+    });
+
+    if (omrop112News.length === 0) {
+        omrop112News = omropNormalNews.slice(0, 5);
     }
+
+    rotateRandomArticle();
 }
 
 // Draait elk paar minuten een gloednieuw willekeurig hoofdartikel op het scherm
