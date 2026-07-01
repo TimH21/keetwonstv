@@ -233,18 +233,17 @@ setInterval(tick, 6000);
 // ===============================================
 const mainPricesList = [
     { name: 'MUNT', val: '€ 1,50' },
-    { name: 'BIER / WIJN', val: '1 Munt' },
+    { name: 'BIER / WIJN / 0.0', val: '1 Munt' },
     { name: 'MIXDRANK', val: '1,5 Munt' },
     { name: 'STELZ', val: '2 Munten' },
     { name: 'SHOTJE', val: '1 Munt' },
     { name: 'FRIS', val: '0,5 Munt' },
-    { name: 'SNACK', val: '1 Munt' },
-    { name: 'SNACK+', val: '1,5 Munt' }
+    { name: 'SNACK (ZONDER SAUS)', val: '1 Munt' },
+    { name: 'SNACK (MET SAUS)', val: '1,5 Munt' }
 ];
 
 let normalScrollIndex = 0;
 
-// STATISCHE PRIJZENLIJST ZIJBALK (PRECISIE SCROLL)
 function startSidebarMasterController() {
     const normalTrack = document.getElementById('sidebar-price-track-normal');
     const container = document.querySelector('.train-ticker-sub-container');
@@ -264,7 +263,6 @@ function startSidebarMasterController() {
             return;
         }
 
-        // We gebruiken een vaste stapgrootte die past bij de tekstgrootte
         const step = viewHeight / 2.5; 
         
         normalTrack.style.transition = 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -273,19 +271,17 @@ function startSidebarMasterController() {
         let targetY = normalScrollIndex * step;
 
         if (targetY > maxScroll + 20) {
-            // We zijn voorbij de bodem, reset naar boven
             normalScrollIndex = 0;
             targetY = 0;
         } else if (targetY > maxScroll) {
-            // Als we bijna bij de bodem zijn, forceer hem exact op de bodem (voor Snack+)
             targetY = maxScroll;
         }
 
         normalTrack.style.transform = `translateY(-${targetY}px)`;
-
-    }, 5000)
-    setTimeout(startSidebarMasterController, 3000);            
+    }, 5000); // <-- DEZE WAS VERDWENEN!
 }
+// Start de scroll motor na 3 seconden
+setTimeout(startSidebarMasterController, 3000);
 
 // ===============================================
 // 5. EXTERNE APIS: WEER (OPEN-METEO)
