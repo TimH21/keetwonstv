@@ -60,11 +60,9 @@ function syncScreens() {
         }
     });
 
-    if (currentSlide.id === 'slide-knmi' || currentSlide.id === 'slide-omrop') {
+    if (currentSlide.id === 'slide-knmi') {
         document.body.classList.add('fullscreen-mode');
     } else {
-        document.body.classList.remove('fullscreen-mode');
-    }
 
     // Specifieke Omrop Logica triggeren bij activatie
     if (currentSlide.id === 'slide-omrop') {
@@ -285,7 +283,8 @@ function startSidebarMasterController() {
 
         normalTrack.style.transform = `translateY(-${targetY}px)`;
 
-    }, 5000);
+    }
+    setTimeout(startSidebarMasterController, 3000);            
 }
 
 // ===============================================
