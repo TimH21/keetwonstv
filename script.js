@@ -63,6 +63,8 @@ function syncScreens() {
     if (currentSlide.id === 'slide-knmi') {
         document.body.classList.add('fullscreen-mode');
     } else {
+        document.body.classList.remove('fullscreen-mode');
+    }
 
     // Specifieke Omrop Logica triggeren bij activatie
     if (currentSlide.id === 'slide-omrop') {
