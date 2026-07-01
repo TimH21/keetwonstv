@@ -7,8 +7,10 @@
 // ===============================================
 let slideTimer;
 const DEFAULT_TIME = 20000;
-let globalTimeOffset = 0; // Bewaart jouw handmatige "volgende" sprongen
-let pauseStartTime = 0;   // Bewaart de tijd tijdens pauze
+let globalTimeOffset = 0; 
+let pauseStartTime = 0;   
+let isPaused = false;            // DEZE WAS WEG!
+let currentNextTitleStr = "..."; // DEZE WAS OOK WEG!
 
 function syncScreens() {
     const allActiveSlides = Array.from(document.querySelectorAll('.slide:not(.skip-slide)'));
@@ -1135,24 +1137,25 @@ let omropSequenceTimers = [];
 let lastRandomArticleIndex = 0;
 
 async function fetchOmropFryslanNews() {
-    // Omrop Fryslân RSS feed (direct, geen rss2json via backend, via allorigins.win)
-    const rssFeedUrl = 'https://www.omropfryslan.nl/rss/nijs.xml?siteId=fryslan';
-    const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssFeedUrl)}`;
+    const rssFeedUrl = 'https://www.omropfryslan.nl/rss/nijs.xml';
+    // Gebruik de stabielere corsproxy.io
+    const apiUrl = `https://corsproxy.io/?${encodeURIComponent(rssFeedUrl)}`;
 
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Omrop API weigert de verbinding");
-        const data = await response.json();
         
-        // Gebruik DOMParser om de geretourneerde XML te lezen
+        // We halen direct de tekst op in plaats van JSON
+        const textData = await response.text();
+        
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+        const xmlDoc = parser.parseFromString(textData, "text/xml");
         const items = xmlDoc.querySelectorAll("item");
 
         if (items.length > 0) {
             omropAllNews = Array.from(items).map(item => ({
                 title: item.querySelector("title").textContent.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim(),
-                description: item.querySelector("description").textContent.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim()
+                description: item.querySelector("description") ? item.querySelector("description").textContent.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim() : ""
             }));
         } else {
             throw new Error("Lege feed ontvangen");
@@ -1171,7 +1174,7 @@ async function fetchOmropFryslanNews() {
     }
         
     // De rest van de logica (Filteren en splitsen)
-    const keywords112 = ["112", "ûngelok", "plysje", "brân", "brânwar", "trauma", "arrest", "botsing", "ûngemak", "gewond", "ongeluk", "politie", "brand", "ziekenhuis", "spoar"];
+    const keywords112 = ["112", "ûngelok", "plysje", "brân", "brânwacht", "trauma", "arrest", "botsing", "ûngemak", "gewond", "ongeluk", "politie", "brand", "ziekenhuis", "spoar"];
     
     omrop112News = [];
     omropNormalNews = [];
