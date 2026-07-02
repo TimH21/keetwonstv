@@ -775,6 +775,7 @@ const MATRIX_OORZAKEN_GROUPED = [
         title: "🌿 Natuur & Omgeving", color: "#38a169",
         items: [
             { label: "⛈️ Noodweer", val: "noodweer", type: "event" },
+            { label: "⚡ Onweer", val: "onweer", type: "event" },
             { label: "🌡️ Extreme Hitte", val: "extreme hitte", type: "event" },
             { label: "🌊 Wateroverlast", val: "wateroverlast", type: "event" },
             { label: "💨 Stank / Geur", val: "stank- of geurhinder", type: "event" },
@@ -948,15 +949,15 @@ function buildCalamitySentence(oorzaak, gevolg, actionType, customInstr) {
 
     if (actionType) {
         if (actionType === 'verlaat') {
-            slot = heeftGevolg ? ` Daarbij wordt u verzocht de keet direct rustig te **VERLATEN** via de dichtstbijzijnde uitgang.${excuses}` : ` wordt u verzocht de keet direct rustig te **VERLATEN** via de dichtstbijzijnde uitgang.${excuses}`;
+            slot = heeftGevolg ? ` Daarbij wordt er verzocht om de keet direct rustig te **VERLATEN** via de dichtstbijzijnde uitgang.${excuses}` : ` wordt er verzocht om de keet direct rustig te **VERLATEN** via de dichtstbijzijnde uitgang.${excuses}`;
         } else if (actionType === 'binnen') {
-            slot = heeftGevolg ? ` Daarbij verzoeken wij u om **BINNEN TE BLIJVEN** tot de situatie verholpen is.${excuses}` : ` verzoeken wij u om **BINNEN TE BLIJVEN** tot de situatie verholpen is.${excuses}`;
+            slot = heeftGevolg ? ` Daarbij is het verzoek om **BINNEN TE BLIJVEN** tot de situatie verholpen is.${excuses}` : ` is het verzoek om **BINNEN TE BLIJVEN** tot de situatie verholpen is.${excuses}`;
         } else if (actionType === 'dicht-full') {
             slot = heeftGevolg ? ` Hierdoor is de bar momenteel **GESLOTEN**.${excuses}` : ` is de bar momenteel **GESLOTEN**.${excuses}`;
         } else if (actionType === 'dicht-side') {
             slot = heeftGevolg ? ` Hierdoor is de bar tijdelijk gesloten.` : ` is de bar tijdelijk gesloten.`;
         } else if (actionType === 'info-side' || actionType === 'info-full') {
-            slot = heeftGevolg ? ` Wij danken u voor uw medewerking.` : ` vragen wij uw aandacht voor deze mededeling. Wij danken u voor uw medewerking.`;
+            slot = heeftGevolg ? ` Bedankt voor de medewerking.` : ` vragen wij jouw aandacht voor deze mededeling. Bedankt voor de medewerking.`;
         } else if (actionType === 'verlichting') {
             slot = heeftGevolg ? ` Deze schermen dienen als **NOODVERLICHTING**.` : ` dienen deze schermen als **NOODVERLICHTING**.`;
         }
