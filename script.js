@@ -1135,16 +1135,13 @@ let lastRandomArticleIndex = 0;
 
 async function fetchOmropFryslanNews() {
     const rssFeedUrl = 'https://www.omropfryslan.nl/rss/nijs.xml';
-    // Gebruik de stabielere corsproxy.io
     const apiUrl = `https://corsproxy.io/?${encodeURIComponent(rssFeedUrl)}`;
 
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Omrop API weigert de verbinding");
         
-        // We halen direct de tekst op in plaats van JSON
         const textData = await response.text();
-        
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(textData, "text/xml");
         const items = xmlDoc.querySelectorAll("item");
@@ -1158,20 +1155,12 @@ async function fetchOmropFryslanNews() {
             throw new Error("Lege feed ontvangen");
         }
     } catch (e) {
-        console.warn("Omrop Fryslân Error (Laden van Nood-Backup):", e);
-        
-        // NOOD-AGGREGAAT: Als de link faalt, laad dit zodat het design niet breekt!
-        omropAllNews = [
-            { title: "Storing by Omrop Fryslân API", description: "De live-ferbining mei de nijstsjinner is tydlik fuortfallen. Wy besykje it letter opnij." },
-            { title: "112-Nijs | Plysje grypt yn by lûdsoerlêst Wûns | Brânwar útrutsen foar ko yn de sleat", description: "" },
-            { title: "Grut feest yn Keet Wûns op komst", description: "De tariedings foar it oankommende simmerfeest geane moai troch. De organisaasje ferwachtet in protte gesellichheid." },
-            { title: "Lokale artysten meitsje har op foar optreden", description: "Ferskate DJ's en artysten binne drok oan it oefenjen foar it grutte evenemint yn july." },
-            { title: "112-Nijs | Auto fan de dyk rekke by Boalsert", description: "Der is ien persoan neisjoen troch it ambulânsepersoniel." }
-        ];
+        console.warn("Omrop Fryslân Error:", e);
+        return; // Stop hier als het misgaat, zo blijft het oude nieuws gewoon staan
     }
         
-    // De rest van de logica (Filteren en splitsen)
-    const keywords112 = ["112", "ûngelok", "plysje", "brân", "brânwacht", "trauma", "arrest", "botsing", "ûngemak", "gewond", "ongeluk", "politie", "brand", "ziekenhuis", "spoar"];
+    // REGEX WOORDSCANNER (Voorkomt dat 'Sybrand' wordt gezien als 'brand')
+    const keywords112 = /\b(112|ûngelok|ongeluk|plysje|politie|brân|brand|brânwar|brandweer|trauma|arrest|botsing|ûngemak|gewond|sikehûs|ziekenhuis|spoar|spoor|ferkear|verkeer)\b/i;
     
     omrop112News = [];
     omropNormalNews = [];
@@ -1179,9 +1168,14 @@ async function fetchOmropFryslanNews() {
     omropAllNews.forEach(item => {
         let rawTitle = item.title;
         let cleanDescText = (item.description || "").replace(/<[^>]*>/g, '').trim();
-        let searchStr = (rawTitle + " " + cleanDescText).toLowerCase();
-        
-        let is112 = keywords112.some(kw => searchStr.includes(kw)) || rawTitle.includes("112");
+
+        // 1. FILTER DE 'LUIE' OMROP TEKSTEN ERUIT
+        if (cleanDescText.toLowerCase().includes("hjir fynst in oersjoch") || cleanDescText.toLowerCase().includes("hier vind je een overzicht")) {
+            cleanDescText = "Foar dizze melding is gjin gearfetting beskikber. Sjoch op de webside as yn de app fan Omrop Fryslân foar alle krekte details en updates oer dizze situaasje.";
+        }
+
+        let searchStr = (rawTitle + " " + cleanDescText);
+        let is112 = keywords112.test(searchStr) || rawTitle.includes("112");
 
         if (is112 && rawTitle.includes('|')) {
             let subTitles = rawTitle.split('|');
@@ -1189,7 +1183,7 @@ async function fetchOmropFryslanNews() {
                 let cleanSub = subTitle.trim();
                 if (cleanSub.length > 5) {
                     omrop112News.push({
-                        cleanTitle: cleanSub.toUpperCase(),
+                        cleanTitle: cleanSub,
                         cleanDesc: "Sjoch foar de folsleine details en it lêste nijs fan dizze 112-melding op de webside of yn de app fan Omrop Fryslân."
                     });
                 }
@@ -1197,20 +1191,24 @@ async function fetchOmropFryslanNews() {
         } 
         else if (is112) {
             omrop112News.push({
-                cleanTitle: rawTitle.toUpperCase(),
-                cleanDesc: cleanDescText.substring(0, 180) + "..."
+                cleanTitle: rawTitle,
+                cleanDesc: cleanDescText // 2. TEKSTEN WORDEN NIET MEER AFGEHAKT!
             });
         } 
         else {
             omropNormalNews.push({
-                cleanTitle: rawTitle.toUpperCase(),
-                cleanDesc: cleanDescText.substring(0, 200) + "..."
+                cleanTitle: rawTitle,
+                cleanDesc: cleanDescText
             });
         }
     });
 
+    // 3. GEEN VERWARRING MEER: EEN VAST BERICHT ALS ER GEEN 112 NIEUWS IS
     if (omrop112News.length === 0) {
-        omrop112News = omropNormalNews.slice(0, 5);
+        omrop112News.push({
+            cleanTitle: "GJIN AKTUEL 112-NIJS",
+            cleanDesc: "Op dit stuit binne der gjin grutte 112-meldingen as needgefallen yn Fryslân. Hâld de kanalen fan Omrop Fryslân yn 'e gaten foar eventuele updates."
+        });
     }
 
     rotateRandomArticle();
@@ -1289,30 +1287,36 @@ function startOmrop112Sequence() {
     current112BatchStart += 5;
 }
 
+// HET ELK-UUR-JOURNAAL COMPILEREN (MODUS B)
 function renderOmropJournaal() {
     const listContainer = document.getElementById('omrop-journaal-list');
     if (!listContainer || omropAllNews.length === 0) return;
 
+    // Pak de top 5 allerlaatste headlines uit Friesland
     let topNews = omropAllNews.slice(0, 5);
     
     listContainer.innerHTML = topNews.map((art, i) => {
+        // Genereer een fictief live-tijdstip
         let currentHour = new Date().getHours();
         let minutePlaceholder = 55 - (i * 12);
         if (minutePlaceholder < 0) minutePlaceholder = "02";
         let timeStr = `${String(currentHour).padStart(2,'0')}:${String(minutePlaceholder).padStart(2,'0')}`;
 
+        // FIX: Gebruik art.title en art.description, en kap te lange tekst netjes af
+        let veiligeTekst = (art.description || "").replace(/<[^>]*>/g, '').trim();
+        if (veiligeTekst.length > 160) veiligeTekst = veiligeTekst.substring(0, 160) + "...";
+
         return `
             <div class="journaal-row">
                 <div class="jr-time">${timeStr}</div>
                 <div class="jr-body">
-                    <b>${art.cleanTitle}</b>
-                    <span>${art.cleanDesc}</span>
+                    <b>${art.title}</b>
+                    <span>${veiligeTekst}</span>
                 </div>
             </div>
         `;
     }).join('');
 }
-
 function stopOmropSequences() {
     omropSequenceTimers.forEach(t => clearTimeout(t));
     omropSequenceTimers = [];
