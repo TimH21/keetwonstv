@@ -2358,7 +2358,8 @@ body.fullscreen-mode .sidebar {
 .omrop-112-item.expanded {
     background: rgba(227, 27, 35, 0.08) !important;
     border-left-width: 6px !important;
-    max-height: 40vh !important; 
+    max-height: 55vh !important; 
+    overflow-y: auto !important; /* Zet onzichtbaar een scroll in als het écht te lang is */
     padding: 2.5vh 2vw !important;
 }
 .omrop-112-item.expanded h4 { 
