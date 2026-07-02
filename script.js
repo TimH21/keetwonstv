@@ -251,19 +251,21 @@ function startSidebarMasterController() {
     const container = document.querySelector('.train-ticker-sub-container');
     if (!normalTrack || !container) return;
 
-    // We bouwen de HTML, maar laten de hoogte nog even open
+    // Sloop eventuele flex-gaps uit je CSS die de boel uitrekken
+    normalTrack.style.display = 'block'; 
+    normalTrack.style.gap = '0'; 
+
     normalTrack.innerHTML = mainPricesList.map(p => `
-        <div class="price-row" style="margin-bottom: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; overflow: hidden;">
+        <div class="price-row" style="margin: 0 !important; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05);">
             <span>${p.name}</span> <strong>${p.val}</strong>
         </div>
     `).join('');
 
     setInterval(() => {
         const viewHeight = container.clientHeight;
-        // Wacht tot de browser de container daadwerkelijk getekend heeft
         if (viewHeight === 0) return; 
 
-        // Nu weten we de hoogte zeker! Forceer elk vakje naar exact 33.33%
+        // Nu weten we zeker dat 1/3e ook écht past, zonder extra CSS pixels
         const exactRowHeight = viewHeight / 3;
         const rows = normalTrack.querySelectorAll('.price-row');
         rows.forEach(row => {
