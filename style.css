@@ -2393,3 +2393,40 @@ body.fullscreen-mode .sidebar {
 .jr-time { font-family: monospace; font-size: 2.2vh; color: #0056b3; font-weight: bold; background: rgba(255,255,255,0.9); padding: 0.5vh 1vw; border-radius: 5px; height: fit-content;}
 .jr-body b { font-size: 2.4vh; color: white; display: block; margin-bottom: 0.5vh; font-family: 'Montserrat', sans-serif; font-weight: 800; line-height: 1.3;}
 .jr-body span { font-size: 2vh; color: #cbd5e1; line-height: 1.5; font-family: 'Montserrat', sans-serif;}
+
+/* =========================================
+   🛑 UITVERKOCHT / OP VOORRAAD STYLING
+   ========================================= */
+
+/* Voor de Dranken (menu-row) */
+.menu-row.uitverkocht {
+    opacity: 0.4; /* Maakt de hele regel wat grijzer/vager */
+    position: relative;
+}
+
+/* De rode streep door de drank-naam */
+.menu-row.uitverkocht span:first-child {
+    text-decoration: line-through;
+    text-decoration-color: #e31b23; /* Omrop Rood */
+    text-decoration-thickness: 3px;
+}
+
+/* Voor de Snacks (snack-pill) */
+.snack-pill.uitverkocht {
+    opacity: 0.5;
+    background: rgba(255,255,255,0.05); /* Donkerder maken */
+    color: #888; /* Grijze tekst */
+    position: relative;
+    border-color: rgba(255,255,255,0.1);
+}
+
+/* De diagonale streep door de snack (ziet er stoerder uit in een rond vakje) */
+.snack-pill.uitverkocht::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 10%; right: 10%;
+    height: 3px;
+    background: #e31b23;
+    transform: translateY(-50%) rotate(-10deg); /* Lichte diagonale hoek */
+    border-radius: 2px;
+}
