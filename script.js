@@ -246,13 +246,19 @@ const mainPricesList = [
 
 let normalScrollIndex = 0;
 
+// STATISCHE PRIJZENLIJST ZIJBALK (PRECISIE SCROLL)
 function startSidebarMasterController() {
     const normalTrack = document.getElementById('sidebar-price-track-normal');
     const container = document.querySelector('.train-ticker-sub-container');
     if (!normalTrack || !container) return;
 
+    // We dwingen elk vakje om EXACT 1/3e van de beschikbare ruimte in te nemen
+    const exactRowHeight = container.clientHeight / 3;
+
     normalTrack.innerHTML = mainPricesList.map(p => `
-        <div class="price-row"><span>${p.name}</span> <strong>${p.val}</strong></div>
+        <div class="price-row" style="height: ${exactRowHeight}px; margin-bottom: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between;">
+            <span>${p.name}</span> <strong>${p.val}</strong>
+        </div>
     `).join('');
 
     setInterval(() => {
@@ -262,17 +268,19 @@ function startSidebarMasterController() {
 
         if (maxScroll <= 5) {
             normalTrack.style.transform = 'translateY(0)';
+            normalScrollIndex = 0; // Index netjes resetten!
             return;
         }
 
-        const step = viewHeight / 2.5; 
+        // De stapgrootte is nu precies de hoogte van één vakje
+        const step = exactRowHeight; 
         
         normalTrack.style.transition = 'transform 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
         
         normalScrollIndex++;
         let targetY = normalScrollIndex * step;
 
-        if (targetY > maxScroll + 20) {
+        if (targetY > maxScroll + 5) { // Extra marge voor de reset
             normalScrollIndex = 0;
             targetY = 0;
         } else if (targetY > maxScroll) {
@@ -280,7 +288,7 @@ function startSidebarMasterController() {
         }
 
         normalTrack.style.transform = `translateY(-${targetY}px)`;
-    }, 5000); // <-- DEZE WAS VERDWENEN!
+    }, 5000); 
 }
 // Start de scroll motor na 3 seconden
 setTimeout(startSidebarMasterController, 3000);
