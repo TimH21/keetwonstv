@@ -1678,7 +1678,7 @@ body.standby-mode .weather-row {
 .hazard-border.top { top: 0; }
 .hazard-border.bottom { bottom: 0; }
 
-@keyframes hazardMove {
+@keyframes hazardSlide {
     0% { background-position: 0 0; }
     100% { background-position: 84.85px 0; }
 }
