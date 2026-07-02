@@ -1654,25 +1654,33 @@ body.standby-mode .weather-row {
     overflow: hidden;
 }
 
-/* De diagonaal bewegende gevarenstrepen (boven en onder) */
+/* =========================================
+   NOODSCHERM WAARSCHUWINGSSTREPEN
+   ========================================= */
 .hazard-border {
-    position: absolute; left: 0; right: 0; height: 4vh;
-    background: repeating-linear-gradient(
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 6vh;
+    background-image: repeating-linear-gradient(
         -45deg,
-        rgba(0, 0, 0, 0.5),
-        rgba(0, 0, 0, 0.5) 40px,
-        transparent 40px,
-        transparent 80px
+        rgba(0, 0, 0, 0.3) 0,
+        rgba(0, 0, 0, 0.3) 30px,
+        transparent 30px,
+        transparent 60px
     );
+    /* Exacte wiskundige afmeting voor 45 graden om hoek-vervorming te voorkomen */
+    background-size: 84.85px 100%;
+    animation: hazardSlide 2s linear infinite;
     z-index: 10;
-    animation: hazardMove 2s linear infinite;
 }
+
 .hazard-border.top { top: 0; }
 .hazard-border.bottom { bottom: 0; }
 
 @keyframes hazardMove {
     0% { background-position: 0 0; }
-    100% { background-position: 113px 0; } /* 113px is de wiskundige diagonaal van 80px */
+    100% { background-position: 84.85px 0; }
 }
 
 /* Het content vlak in het midden */
