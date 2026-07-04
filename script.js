@@ -1418,3 +1418,42 @@ function stopMakkumStream(video) {
 
 // Zet de bewaker aan: Check elke seconde de status
 setInterval(manageWebcamSlide, 1000);
+
+// ===============================================
+// 2. ZELFSTANDIGE DATA SAVER (LAZY LOAD MODULE)
+// ===============================================
+document.addEventListener("DOMContentLoaded", () => {
+    const allSlides = document.querySelectorAll('.slide');
+
+    // Maak een bewaker (Observer) aan die let op class-veranderingen
+    const slideObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const slide = mutation.target;
+                const isActive = slide.classList.contains('active');
+                
+                // Zoek alle iframes in deze slide die een 'data-src' hebben
+                const iframes = slide.querySelectorAll('iframe[data-src]');
+
+                if (isActive) {
+                    // De slide komt in beeld: Vul de bron in zodat hij exact NU start met laden/afspelen!
+                    iframes.forEach(iframe => {
+                        if (iframe.src === "" || iframe.src.includes("about:blank")) {
+                            iframe.src = iframe.getAttribute('data-src');
+                        }
+                    });
+                } else {
+                    // De slide verdwijnt: Gooi de iframe direct leeg om MB's en processor te sparen
+                    iframes.forEach(iframe => {
+                        iframe.src = "about:blank";
+                    });
+                }
+            }
+        });
+    });
+
+    // Koppel de bewaker aan elke slide op de tv
+    allSlides.forEach(slide => {
+        slideObserver.observe(slide, { attributes: true });
+    });
+});
