@@ -131,13 +131,18 @@
                 </div>
             </div>
 
-            <div class="slide" id="slide-radar" data-title="Regen & Onweer" data-time="20000">
-                <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative;">
-                    <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
-                        <i class="fa-solid fa-cloud-bolt"></i> LIVE WEER RADAR
+            <div class="slide" id="slide-radar" data-title="Regenradar" data-time="20000">
+                <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #222;">
+                    
+                    <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
+                        <i class="fa-solid fa-cloud-bolt"></i> LIVE REGENRADAR
                     </div>
                     
-                    <div id="windy" style="width: 100%; height: 100%;"></div>
+                    <iframe width="100%" height="100%" 
+                        src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=9&overlay=radar&product=radar&level=surface&lat=53.078&lon=5.425&detailLat=53.078&detailLon=5.425&marker=true" 
+                        frameborder="0" 
+                        style="border: none; pointer-events: none; filter: contrast(1.15) brightness(0.9);">
+                    </iframe>
                 </div>
             </div>
             
