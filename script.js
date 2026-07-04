@@ -1426,10 +1426,13 @@ setInterval(manageWebcamSlide, 1000);
 // ===============================================
 // DE SLIDE ROTOR MET RANDOM OVERGANGEN
 // ===============================================
+// 1. Veiligheid: Stop eventuele oude timers (spook-scripts)
+if (window.keetTimer) clearTimeout(window.keetTimer);
+
 let currentSlideIndex = 0;
 const slides = document.querySelectorAll('.slide');
 
-// De lijst met onze 5 epische effecten
+// De 5 epische effecten uit je CSS
 const transitionEffects = [
     'trans-diagonal-stripes', 
     'trans-logo-stamp',       
@@ -1442,36 +1445,33 @@ function goToNextSlide() {
     const overlay = document.getElementById('transition-overlay');
     if (!overlay || slides.length === 0) return;
 
-    // 1. Pak een willekeurig effect
+    // Pak een willekeurig effect en zet hem aan
     const randomEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
-    
-    // 2. Start de visuele overgang
     overlay.className = `transition-overlay ${randomEffect}`;
     
-    // 3. Verwissel de slides op het 'blinde' moment van de animatie (na 500ms)
+    // Switch de slide exact op de helft van de animatie (wanneer het scherm bedekt is)
     setTimeout(() => {
         slides[currentSlideIndex].classList.remove('active');
         
-        // Ga naar de volgende slide (en sla overgeslagen slides zoals de webcam over als nodig)
         do {
             currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-        } while (slides[currentSlideIndex].classList.contains('skip-slide'));
+        } while (slides[currentSlideIndex].classList.contains('skip-slide')); // Sla kapotte slides over
         
         slides[currentSlideIndex].classList.add('active');
     }, 500); 
 
-    // 4. Verwijder het overgangseffect na 1.5s zodat het beeld weer vrij is
+    // Ruim de animatie op en bereken wanneer de volgende slide moet komen
     setTimeout(() => {
         overlay.className = 'transition-overlay';
         
-        // Lees hoe lang deze nieuwe slide in beeld moet blijven (standaard 35s, radar 40s)
+        // Kijk hoelang deze specifieke slide op tv moet blijven (default is 35s)
         const nextTime = parseInt(slides[currentSlideIndex].getAttribute('data-time')) || 35000;
         
-        // Plan de vólgende wissel in!
-        setTimeout(goToNextSlide, nextTime);
+        // Plan de volgende overgang in!
+        window.keetTimer = setTimeout(goToNextSlide, nextTime);
     }, 1500);
 }
 
-// Start de allereerste slide-wissel nadat de pagina is geladen
+// Start de motor direct bij het inladen
 const initialTime = parseInt(slides[0].getAttribute('data-time')) || 35000;
-setTimeout(goToNextSlide, initialTime);
+window.keetTimer = setTimeout(goToNextSlide, initialTime);
