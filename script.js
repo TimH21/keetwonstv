@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
+// 11. Radar ding zooi
 // ===============================================
 let windyMapInstance = null;
 
