@@ -2434,16 +2434,16 @@ body.fullscreen-mode .sidebar {
 /* =========================================
    WINDY MAP TV-MODUS (VERBERG KNOPPEN)
    ========================================= */
-#windy-map .leaflet-control-container,
-#windy-map #bottom,
-#windy-map #plugin-rhpane,
-#windy-map #mobile-ovr-select,
-#windy-map #logo-wrapper {
+#windy .leaflet-control-container,
+#windy #bottom,
+#windy #plugin-rhpane,
+#windy #mobile-ovr-select,
+#windy #logo-wrapper {
     display: none !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
 /* Maak de kaart net iets donkerder voor een strakker tv-contrast */
-#windy-map {
+#windy {
     filter: contrast(1.1) brightness(0.85);
 }
