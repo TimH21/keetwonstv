@@ -141,7 +141,7 @@
                 </div>
             </div>
 
-           <div class="slide" id="slide-radar" data-title="Regen & Wind" data-time="40000">
+          <div class="slide" id="slide-radar" data-title="Regen & Wind" data-time="40000">
                 <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #0a0a0a; overflow: hidden;">
                     
                     <div class="radar-layer radar-regen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
@@ -149,9 +149,12 @@
                             <i class="fa-solid fa-cloud-showers-heavy"></i> LIVE REGEN RADAR
                         </div>
                         <iframe 
-                            src="https://www.rainviewer.com/map.html?loc=53.078,5.425,10&oAP=1&oF=1&layer=radar&sm=1&sn=1&theme=1" 
+                            src="https://www.rainviewer.com/map.html?loc=53.078,5.425,9&oAP=1&oF=1&layer=radar&sm=1&sn=1&theme=1&c=1&color=6" 
                             frameborder="0" allow="geolocation"
-                            style="position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; border: none; pointer-events: none; transform: scale(1.4); transform-origin: bottom center; filter: contrast(1.1) brightness(0.95);">
+                            style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; border: none; pointer-events: none; 
+                                   /* De Fix: 15% vergroten voor leesbaarheid, maar 8% omhoog trekken zodat hij bóven jouw zwarte balk valt! */
+                                   transform-origin: center bottom; transform: scale(1.15) translateY(-8%); 
+                                   filter: contrast(1.15) brightness(0.9);">
                         </iframe>
                     </div>
 
@@ -160,9 +163,9 @@
                             <i class="fa-solid fa-wind"></i> LIVE WINDRICHTING
                         </div>
                         <iframe 
-                            src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=km/h&zoom=10&overlay=wind&product=ecmwf&level=surface&lat=53.078&lon=5.425&detailLat=53.078&detailLon=5.425&marker=true" 
+                            src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=km/h&zoom=11&overlay=wind&product=ecmwf&level=surface&lat=53.078&lon=5.425&detailLat=53.078&detailLon=5.425&marker=true" 
                             frameborder="0" allow="geolocation"
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.1); transform-origin: center center; filter: contrast(1.15) brightness(0.9);">
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.05); transform-origin: center center; filter: contrast(1.15) brightness(0.9);">
                         </iframe>
                     </div>
 
