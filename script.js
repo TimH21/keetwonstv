@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. Weer map
+// 11. Weer radar ding
 // ===============================================
 let windyMapInstance = null;
 let windyPickerInstance = null;
