@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. Die domme weerradar moat it is dwan
+// 11. Die domme weerradar moat it is dwan!
 // ===============================================
 let windyMapInstance = null;
 
