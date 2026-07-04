@@ -131,20 +131,24 @@
                 </div>
             </div>
 
-                        <div class="slide" id="slide-radar" data-title="Regen Radar" data-time="20000">
-                <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #111;">
+                <div class="slide" id="slide-radar" data-title="Regen & Onweer" data-time="20000">
+                <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #000; overflow: hidden;">
                     
                     <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
                         <i class="fa-solid fa-cloud-bolt"></i> LIVE REGENRADAR
                     </div>
                     
                     <iframe width="100%" height="100%" 
-                        src="https://www.rainviewer.com/map.html?loc=53.078,5.425,8&oAP=1&oF=1&c=1&layer=radar&sm=1&sn=1" 
+                        src="https://www.rainviewer.com/map.html?loc=53.078,5.425,8&oAP=1&oF=1&c=1&mms=1&color=6&layer=radar&sm=1&sn=1" 
                         frameborder="0" 
-                        style="border: none; pointer-events: none;">
+                        allow="geolocation"
+                        style="border: none; pointer-events: none; transform: scale(1.08); transform-origin: center center; filter: contrast(1.1) brightness(0.9);">
                     </iframe>
+
+                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; box-shadow: inset 0 0 60px rgba(0,0,0,0.9); pointer-events: none; z-index: 5;"></div>
                 </div>
             </div>
+
 
             
             <div class="slide" id="slide-knmi" data-title="Weeralarm" data-time="45000">
