@@ -131,6 +131,16 @@
                 </div>
             </div>
 
+            <div class="slide" id="slide-radar" data-title="Regen & Onweer" data-time="20000">
+                <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative;">
+                    <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
+                        <i class="fa-solid fa-cloud-bolt"></i> LIVE NEERSLAG & ONWEER
+                    </div>
+                    
+                    <div id="windy-map" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+            
             <div class="slide" id="slide-knmi" data-title="Weeralarm" data-time="20000">
                 <div class="knmi-bg"></div>
                 <div class="knmi-container" id="knmi-wrapper">
@@ -308,6 +318,17 @@
                 </div>
             </div>
 
+            <div class="slide" id="slide-makkum" data-title="Makkum Strand" data-time="20000">
+                <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #000;">
+                    
+                    <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
+                        <i class="fa-solid fa-video"></i> LIVE: MAKKUMER STRAND
+                    </div>
+                    
+                    <video id="makkum-video" style="width: 100%; height: 100%; object-fit: cover;" muted playsinline></video>
+                </div>
+            </div>
+            
             <div class="slide" id="slide-socials" data-title="Socials">
                 <div class="slide-inner centered-layout">
                     <h1 class="slide-title">VOLG ONS ONLINE</h1>
@@ -497,7 +518,10 @@
             </div>
         </div>
     </div>
-    
+
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+    <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="script.js?v=99"></script>
     <video id="keepAwake" loop muted playsinline style="position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -100;">
         <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
