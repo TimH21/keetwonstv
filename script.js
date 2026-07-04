@@ -1349,76 +1349,92 @@ function stopOmropSequences() {
 // ===============================================
 // 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
 // ===============================================
-let windyMapInstance = null;
-let windyPickerInstance = null;
-let windyStoreInstance = null; // Extra geheugensteuntje voor de instellingen
-let windySetupDone = false; 
+let wMap = null;
+let wStore = null;
+let wPicker = null;
+let wBroadcast = null;
+let radarHasRun = false; 
 
 function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
+    // START BLANCO: Geen 'overlay: rain' hier, anders crasht de inlaad-motor!
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
-        zoom: 9,
-        overlay: 'rain'
+        zoom: 9
     };
 
-    windyInit(options, windyAPI => {
-        // Sla alle motoren keurig op in ons centrale geheugen
-        windyMapInstance = windyAPI.map; 
-        windyPickerInstance = windyAPI.picker; 
-        windyStoreInstance = windyAPI.store; 
+    windyInit(options, api => {
+        // Sla alle onderdelen op voor later
+        wMap = api.map;
+        wStore = api.store;
+        wPicker = api.picker;
+        wBroadcast = api.broadcast;
     });
 }
 
-// Start de basiskaart na 4 seconden op de achtergrond
+// Start op de achtergrond na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// DE CONTROLEKAMER: Start pas als de slide ECHT op het scherm verschijnt
+// DE CONTROLEKAMER: Alles in de exacte, verplichte volgorde
 setInterval(() => {
-    const radarSlide = document.getElementById('slide-radar');
-    if (!radarSlide) return;
+    const slide = document.getElementById('slide-radar');
+    if (!slide) return;
 
-    if (radarSlide.classList.contains('active')) {
+    if (slide.classList.contains('active')) {
         
-        if (!windySetupDone && windyMapInstance) {
-            windySetupDone = true; 
+        // Zodra de slide in beeld komt en we hebben de kaart...
+        if (!radarHasRun && wMap && wStore && wBroadcast) {
+            radarHasRun = true; 
 
-            // 1. Herbereken de kaart (tegen de grijze waas)
-            windyMapInstance.invalidateSize();
+            // STAP 1: Fix de grijze waas
+            wMap.invalidateSize();
 
-            // 2. Geef de kaart 300 milliseconden om te ademen, en dwing dan de juiste modus af
+            // STAP 2: Geef Leaflet 400ms ademruimte, vertel de database dán pas: Regen!
             setTimeout(() => {
-                
-                // FORCEER DE REGENKAART (Dit sloopt de windkaart en die gekke 12u/24u balken eruit!)
-                if (windyStoreInstance) {
-                    windyStoreInstance.set('overlay', 'rain');
-                }
+                wStore.set('overlay', 'rain');
 
-                // 3. Open NU de originele data-marker exact op Wons
-                if (windyPickerInstance) {
-                    windyPickerInstance.open({ lat: 53.078, lon: 5.425 });
-                }
-
-                // 4. Wacht nog heel even en druk dan pas virtueel op de Play-knop
-                setTimeout(() => {
-                    const playBtn = document.querySelector('#bottom .play') || 
-                                    document.getElementById('playpause') || 
-                                    document.querySelector('.play-pause-button') ||
-                                    document.querySelector('[id*="play"]');
-                    if (playBtn) {
-                        playBtn.click();
+                // STAP 3: Wacht tot Windy ZELF zegt: "Ik ben 100% klaar met tekenen" (redrawFinished)
+                wBroadcast.once('redrawFinished', () => {
+                    
+                    // STAP 4: Plaats nu pas veilig de originele data-marker op Wons
+                    if (wPicker) {
+                        wPicker.open({ lat: 53.078, lon: 5.425 });
                     }
-                }, 500);
 
-            }, 300); 
+                    // STAP 5: Start de play-animatie met een harde 'MouseEvent'
+                    setTimeout(() => {
+                        const playBtn = document.getElementById('playpause') || 
+                                        document.querySelector('.play-pause-button') || 
+                                        document.querySelector('.play');
+                        
+                        if (playBtn && !playBtn.classList.contains('playing')) {
+                            // Een robuuste, gesimuleerde muisklik die wél werkt op de API-knoppen
+                            const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+                            playBtn.dispatchEvent(clickEvent);
+                        }
+                    }, 500);
+
+                });
+
+            }, 400); 
         }
     } else {
-        // Slide is uit beeld: Reset het vinkje voor de volgende rotatie
-        windySetupDone = false;
+        // Slide uit beeld: Ruim netjes op voor het volgende rondje!
+        if (radarHasRun) {
+            radarHasRun = false;
+            if (wPicker) wPicker.close();
+            
+            // Pauzeer de video om je data en processor te sparen
+            const playBtn = document.getElementById('playpause') || document.querySelector('.play-pause-button');
+            if (playBtn && playBtn.classList.contains('playing')) {
+                const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+                playBtn.dispatchEvent(clickEvent);
+            }
+        }
     }
 }, 1000);
 
