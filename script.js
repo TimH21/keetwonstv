@@ -1347,66 +1347,77 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
+// 11. Dikke weer radar jonguh
 // ===============================================
 let windyMapInstance = null;
 let windyPickerInstance = null;
-let windySetupDone = false; // Houdt bij of we de marker en play-knop al geactiveerd hebben
+let windySetupDone = false; 
 
 function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
+    // START BLANCO: Zet hier absoluut geen 'overlay' in, anders crasht hij!
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
-        zoom: 9,
-        overlay: 'rain' // Verplicht om de buien in te laden
+        zoom: 9
     };
 
     windyInit(options, windyAPI => {
-        windyMapInstance = windyAPI.map; 
-        windyPickerInstance = windyAPI.picker; 
+        const { map, store, picker } = windyAPI;
+        
+        // Zodra de API succesvol is geladen, vertellen we hem pas dat we regen willen:
+        store.set('overlay', 'rain');
+        
+        // Sla de motor op in het geheugen voor onze controlekamer
+        windyMapInstance = map; 
+        windyPickerInstance = picker; 
     });
 }
 
-// Start de basiskaart na 4 seconden op de achtergrond
+// Start de inlaad-procedure na 4 seconden op de achtergrond
 setTimeout(startWindyRadar, 4000);
 
-// DE CONTROLEKAMER: Elke seconde kijken we of de slide in beeld is
+// DE CONTROLEKAMER: Wacht braaf tot de slide op de TV verschijnt
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
     if (!radarSlide) return;
 
-    // Is de slide NU zichtbaar op de TV?
     if (radarSlide.classList.contains('active')) {
         
-        // Hebben we de marker en play-knop voor dit rondje al geactiveerd? Zo nee, doe het nu!
+        // Is de slide zojuist in beeld gekomen en is dit nog niet uitgevoerd?
         if (!windySetupDone && windyMapInstance) {
-            windySetupDone = true; // Zet een vinkje zodat we dit niet oneindig blijven herhalen
+            windySetupDone = true; 
 
-            // 1. Forceer de juiste afmetingen (tegen de grijze waas)
+            // 1. Forceer de juiste afmetingen (tegen het grijze scherm)
             windyMapInstance.invalidateSize();
 
-            // 2. Wacht een halve seconde zodat de kaart strak in beeld staat, en doe dán pas de rest!
+            // 2. Wacht heel even tot de kaart goed is getekend, en voer dan de acties uit!
             setTimeout(() => {
                 // Zet de originele marker exact op Wons
                 if (windyPickerInstance) {
                     windyPickerInstance.open({ lat: 53.078, lon: 5.425 });
                 }
 
-                // Druk de Play-knop in voor het vooruitzicht
-                const playBtn = document.getElementById('playpause') || 
-                                document.querySelector('.play') || 
-                                document.querySelector('.play-pause-button');
-                if (playBtn) playBtn.click();
-            }, 500); 
+                // Zoek de play-knop en klik er automatisch op voor het vooruitzicht!
+                const playBtn = document.getElementById('playpause') || document.querySelector('.play-pause-button');
+                if (playBtn) {
+                    playBtn.click();
+                }
+            }, 800); 
         }
     } else {
-        // De slide is uit beeld verdwenen. 
-        // We resetten ons vinkje, zodat hij het de volgende keer dat de slide langskomt weer opnieuw doet!
-        windySetupDone = false;
+        // Als de slide weer uit beeld is, sluiten we de marker en resetten we het systeem
+        if (windySetupDone) {
+            windySetupDone = false;
+            if (windyPickerInstance) windyPickerInstance.close();
+            
+            // Zet de animatie op pauze als hij niet in beeld is
+            const playBtn = document.getElementById('playpause');
+            if (playBtn) playBtn.click(); 
+        }
     }
 }, 1000);
 
