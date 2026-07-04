@@ -251,12 +251,16 @@ function startSidebarMasterController() {
     const container = document.querySelector('.train-ticker-sub-container');
     if (!normalTrack || !container) return;
 
-    // Sloop eventuele flex-gaps uit je CSS die de boel uitrekken
+    // 1. ONSCHADBAAR MAKEN VAN DE CONTAINER (Genadeloos afknippen wat uitsteekt)
+    container.style.overflow = 'hidden'; 
+    container.style.padding = '0';
+    
     normalTrack.style.display = 'block'; 
-    normalTrack.style.gap = '0'; 
+    normalTrack.style.margin = '0'; 
+    normalTrack.style.padding = '0'; 
 
     normalTrack.innerHTML = mainPricesList.map(p => `
-        <div class="price-row" style="margin: 0 !important; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div class="price-row master-price-row" style="margin: 0 !important; padding: 0 5%; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05);">
             <span>${p.name}</span> <strong>${p.val}</strong>
         </div>
     `).join('');
@@ -265,11 +269,14 @@ function startSidebarMasterController() {
         const viewHeight = container.clientHeight;
         if (viewHeight === 0) return; 
 
-        // Nu weten we zeker dat 1/3e ook écht past, zonder extra CSS pixels
+        // 2. ABSOLUTE DICTATUUR OP DE VAKJES (Precies 1/3e, niks meer, niks minder)
         const exactRowHeight = viewHeight / 3;
-        const rows = normalTrack.querySelectorAll('.price-row');
+        const rows = normalTrack.querySelectorAll('.master-price-row');
+        
         rows.forEach(row => {
             row.style.height = exactRowHeight + 'px';
+            row.style.minHeight = exactRowHeight + 'px'; // Het mag niet krimpen
+            row.style.maxHeight = exactRowHeight + 'px'; // Het mag niet rekken
         });
 
         const trackHeight = normalTrack.scrollHeight;
@@ -1338,3 +1345,103 @@ function stopOmropSequences() {
     omropSequenceTimers.forEach(t => clearTimeout(t));
     omropSequenceTimers = [];
 }
+
+// ===============================================
+// 11. LIVE REGEN & ONWEER RADAR (WINDY API)
+// ===============================================
+function startWindyRadar() {
+    const mapContainer = document.getElementById('windy-map');
+    if (!mapContainer) return;
+
+    const options = {
+        key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', // Jouw API Key
+        lat: 53.078,                           // Gecentreerd op locatie
+        lon: 5.425,
+        zoom: 8,                               // Perfecte zoom voor Friesland/Noord-Nederland
+    };
+
+    // Initializeer de Windy API
+    windyInit(options, windyAPI => {
+        const { map, store } = windyAPI;
+        
+        // Zet de kaartweergave direct op Neerslag & Onweer
+        store.set('overlay', 'rain');
+        store.set('level', 'surface');
+    });
+}
+
+// Start de kaart pas na 4 seconden, zodat de rest van je TV-systeem geen vertraging oploopt bij het opstarten
+setTimeout(startWindyRadar, 4000);
+
+// ===============================================
+// 12. LIVE WEBCAM MAKKUM (DATA-BESPAREND)
+// ===============================================
+let makkumHls = null;
+let isWebcamPlaying = false;
+
+function manageWebcamSlide() {
+    const webcamSlide = document.getElementById('slide-makkum');
+    const videoEl = document.getElementById('makkum-video');
+    if (!webcamSlide || !videoEl) return;
+
+    // 1. OFFLINE CHECK: Verberg de slide als de hotspot weg is
+    if (!navigator.onLine) {
+        webcamSlide.classList.add('skip-slide');
+        // Als de tv net op deze slide stond terwijl internet wegviel, forceer de volgende slide!
+        if (webcamSlide.classList.contains('active')) window.next(); 
+        stopMakkumStream(videoEl);
+        return;
+    } else {
+        webcamSlide.classList.remove('skip-slide'); // Haal hem weer terug als er internet is
+    }
+
+    // 2. DATA CHECK: Speel alleen af als deze slide nú op tv is
+    if (webcamSlide.classList.contains('active')) {
+        if (!isWebcamPlaying) startMakkumStream(videoEl);
+    } else {
+        if (isWebcamPlaying) stopMakkumStream(videoEl);
+    }
+}
+
+function startMakkumStream(video) {
+    isWebcamPlaying = true;
+    
+    // Gebruik de 'schone' link zonder die Facebook rommel erachter
+    const streamUrl = 'https://webcam.camerabeveiligingfriesland.nl/memfs/d653c32e-924b-4340-86b2-1c20bcfdd7f1.m3u8';
+
+    // We gebruiken HLS.js om de stream op de Fire Stick werkend te krijgen
+    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+        makkumHls = new Hls({
+            capLevelToPlayerSize: true, // Slim trucje: Laadt geen 4K resolutie in als de speler kleiner is (Bespaart 4G!)
+            autoStartLoad: true
+        });
+        makkumHls.loadSource(streamUrl);
+        makkumHls.attachMedia(video);
+        makkumHls.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play().catch(e => console.log("Autoplay tijdelijk geblokkeerd"));
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Fallback voor Safari of browsers die het zelf snappen
+        video.src = streamUrl;
+        video.addEventListener('loadedmetadata', function() {
+            video.play().catch(e => console.log("Autoplay tijdelijk geblokkeerd"));
+        });
+    }
+}
+
+function stopMakkumStream(video) {
+    isWebcamPlaying = false;
+    
+    // HET BELANGRIJKSTE: Destroy de stream! 
+    // Dit zorgt dat de tv niet stiekem data blijft downloaden in de achtergrond.
+    if (makkumHls) {
+        makkumHls.destroy(); 
+        makkumHls = null;
+    }
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+}
+
+// Zet de bewaker aan: Check elke seconde de status
+setInterval(manageWebcamSlide, 1000);
