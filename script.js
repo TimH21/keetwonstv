@@ -1423,44 +1423,55 @@ setInterval(manageWebcamSlide, 1000);
 //    OVERGANGEN SLIDES
 //
 
-// Lijst met al onze epische overgangen
+// ===============================================
+// DE SLIDE ROTOR MET RANDOM OVERGANGEN
+// ===============================================
+let currentSlideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+
+// De lijst met onze 5 epische effecten
 const transitionEffects = [
-    'trans-diagonal-stripes', // Jouw idee met de donkergroene strepen
-    'trans-logo-stamp',       // Logo klapt in beeld en explodeert
-    'trans-tv-glitch',        // Digitale tv-storing
-    'trans-blinds',           // 5 verticale balken die omdraaien
-    'trans-slice'             // Scherm snijdt horizontaal door midden
+    'trans-diagonal-stripes', 
+    'trans-logo-stamp',       
+    'trans-tv-glitch',        
+    'trans-blinds',           
+    'trans-slice'             
 ];
 
-function nextSlide() {
-    const slides = document.querySelectorAll('.slide');
+function goToNextSlide() {
     const overlay = document.getElementById('transition-overlay');
-    
-    // 1. Kies een compleet random overgang uit de lijst
+    if (!overlay || slides.length === 0) return;
+
+    // 1. Pak een willekeurig effect
     const randomEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
     
-    // 2. Zet de animatie aan!
+    // 2. Start de visuele overgang
     overlay.className = `transition-overlay ${randomEffect}`;
     
-    // 3. Wacht exact een halve seconde (totdat het scherm volledig bedekt is door de overgang)
+    // 3. Verwissel de slides op het 'blinde' moment van de animatie (na 500ms)
     setTimeout(() => {
-        
-        // --- HIER WISSELEN WE DE SLIDES OP DE ACHTERGROND ---
         slides[currentSlideIndex].classList.remove('active');
-        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
         
-        // Sla slides over die offline zijn (zoals de Makkum webcam)
-        while(slides[currentSlideIndex].classList.contains('skip-slide')) {
+        // Ga naar de volgende slide (en sla overgeslagen slides zoals de webcam over als nodig)
+        do {
             currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-        }
+        } while (slides[currentSlideIndex].classList.contains('skip-slide'));
         
         slides[currentSlideIndex].classList.add('active');
-        // ---------------------------------------------------
+    }, 500); 
 
-    }, 500); // 500 milliseconden is het "blinde" punt van de animatie
-
-    // 4. Verwijder de animatie-class weer na 1.5 seconde, zodat hij klaar is voor de volgende keer
+    // 4. Verwijder het overgangseffect na 1.5s zodat het beeld weer vrij is
     setTimeout(() => {
         overlay.className = 'transition-overlay';
+        
+        // Lees hoe lang deze nieuwe slide in beeld moet blijven (standaard 35s, radar 40s)
+        const nextTime = parseInt(slides[currentSlideIndex].getAttribute('data-time')) || 35000;
+        
+        // Plan de vólgende wissel in!
+        setTimeout(goToNextSlide, nextTime);
     }, 1500);
 }
+
+// Start de allereerste slide-wissel nadat de pagina is geladen
+const initialTime = parseInt(slides[0].getAttribute('data-time')) || 35000;
+setTimeout(goToNextSlide, initialTime);
