@@ -2432,7 +2432,7 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   Weer kaart ding
+   Domme radar ofsa
    ========================================= */
 /* Verberg onnodige zijmenu's, zoekbalken en logo's */
 #windy #search,
@@ -2446,15 +2446,14 @@ body.fullscreen-mode .sidebar {
     pointer-events: none !important;
 }
 
-/* FIX DE TIJDLIJN: Exact boven de zwarte rand */
+/* FIX DE TIJDLIJN: Strak boven de zwarte ticker en klikbaar maken voor het script! */
 #windy #bottom {
     display: block !important;
     opacity: 1 !important;
     position: absolute !important;
-    bottom: 85px !important; /* Vaste pixels, duwt hem strak boven jouw ticker! */
+    bottom: 85px !important; 
     transform: scale(1.1); 
     transform-origin: bottom center;
-    pointer-events: none !important; 
     z-index: 9999 !important;
 }
 
@@ -2464,7 +2463,6 @@ body.fullscreen-mode .sidebar {
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
 }
 
-/* Strakker contrast voor het tv-scherm */
 #windy {
     filter: contrast(1.15) brightness(0.9);
 }
