@@ -2432,36 +2432,36 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   WINDY MAP TV-MODUS (VERBETERD DESIGN) 13:22
+   WINDY MAP TV-MODUS (VERBETERD DESIGN)
    ========================================= */
-/* Verberg onnodige zijmenu's, zoomknoppen en logo's */
-#windy .leaflet-control-container,
-#windy #plugin-rhpane,
-#windy #mobile-ovr-select,
+/* Verberg chirurgisch de zoekbalk, menu's, logo's en +/- knoppen */
+#windy #search,
 #windy #logo-wrapper,
-#windy #embed-zoom {
+#windy .leaflet-control-zoom,
+#windy #mobile-ovr-select,
+#windy #menu,
+#windy #plugin-rhpane {
     display: none !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
 
-/* Haal de tijdlijn TERUG zodat je het vooruitzicht ziet! */
+/* Zorg dat de TIJDLIJN en PLAY-knop wél zichtbaar blijven! */
 #windy #bottom {
-    display: flex !important;
+    display: block !important;
     opacity: 1 !important;
-    transform: scale(1.15); /* Maak de balk 15% groter voor de TV */
-    transform-origin: bottom center;
     bottom: 2vh !important;
-    pointer-events: none !important; /* Voorkomt muis-interacties */
+    transform: scale(1.15); /* Maakt de balk iets forser voor tv-kijken */
+    transform-origin: bottom center;
+    pointer-events: none !important; /* Voorkomt storingen op de tv */
 }
 
-/* Zorg dat de dagen en uren beter leesbaar zijn */
+/* Maak de teksten en de voorspelling iets beter leesbaar in het donker */
 #windy .timecode {
     font-weight: bold !important;
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
 }
 
-/* Maak de kaart net iets donkerder voor een strakker tv-contrast */
 #windy {
     filter: contrast(1.15) brightness(0.9);
 }
