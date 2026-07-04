@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 12. LIVE WEBCAM MAKKUM (DATA-BESPAREND)
+// 12. LIVE WEBCAM MAKKUM (DATA-BESPAREND)!
 // ===============================================
 let makkumHls = null;
 let isWebcamPlaying = false;
