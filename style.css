@@ -2430,3 +2430,20 @@ body.fullscreen-mode .sidebar {
     transform: translateY(-50%) rotate(-10deg); /* Lichte diagonale hoek */
     border-radius: 2px;
 }
+
+/* =========================================
+   WINDY MAP TV-MODUS (VERBERG KNOPPEN)
+   ========================================= */
+#windy-map .leaflet-control-container,
+#windy-map #bottom,
+#windy-map #plugin-rhpane,
+#windy-map #mobile-ovr-select,
+#windy-map #logo-wrapper {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+/* Maak de kaart net iets donkerder voor een strakker tv-contrast */
+#windy-map {
+    filter: contrast(1.1) brightness(0.85);
+}
