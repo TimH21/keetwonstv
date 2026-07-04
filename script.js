@@ -1347,56 +1347,64 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. live radar weer
+// 11. radar ding
 // ===============================================
 let windyMapInstance = null;
+let windyPickerInstance = null;
+let windyIsResized = false; // Voorkomt dat we de kaart oneindig blijven resetten
 
 function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
-    // DE WINNENDE OPTIES: Wel 'rain', géén geforceerd weermodel!
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
         zoom: 9,
-        overlay: 'rain' // Dit is verplicht hier, anders downloadt hij de module niet!
+        overlay: 'rain' // Dit is verplicht voor de buien
     };
 
     windyInit(options, windyAPI => {
-        const { map, picker, broadcast } = windyAPI;
+        const { map, picker } = windyAPI;
         windyMapInstance = map; 
-        
-        // Wacht tot de Windy motor écht 100% geladen is inclusief de buien
-        broadcast.once('redrawFinished', () => {
-            
-            // 1. Open de originele Windy data-marker exact op Wons
-            picker.open({ lat: 53.078, lon: 5.425 });
-
-            // 2. Geef de elementen een halve seconde de tijd en druk dan virtueel op 'Play'
-            setTimeout(() => {
-                // We zoeken naar verschillende namen die Windy gebruikt voor de play-knop
-                const playBtn = document.getElementById('playpause') || 
-                                document.querySelector('.play-pause-button') || 
-                                document.querySelector('[data-icon="play"]');
-                if (playBtn) {
-                    playBtn.click();
-                }
-            }, 500);
-
-        });
+        windyPickerInstance = picker; // Sla de marker op in het geheugen
     });
 }
 
-// Start de inlaad-procedure na 4 seconden om de rest van de tv niet te vertragen
+// Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// De Leaflet Fix (geeft de kaart de ruimte als hij uit de verborgen slide komt)
+// SLIMME CHECKER: Start de elementen pas als de slide ECHT in beeld is
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
-    if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
-        windyMapInstance.invalidateSize();
+    if (!radarSlide) return;
+
+    if (radarSlide.classList.contains('active')) {
+        // De slide is nu op TV! Als we dit nog niet gedaan hebben deze ronde:
+        if (!windyIsResized && windyMapInstance) {
+            
+            // 1. Herstel de afmetingen (tegen de grijze waas)
+            windyMapInstance.invalidateSize();
+            windyIsResized = true;
+
+            // 2. Open NU PAS de markering op Wons
+            if (windyPickerInstance) {
+                windyPickerInstance.open({ lat: 53.078, lon: 5.425 });
+            }
+
+            // 3. Geef het 1 seconde rust en druk dan virtueel de Play knop in
+            setTimeout(() => {
+                // Zoek de Windy Play knop en klik erop
+                const playBtn = document.querySelector('#bottom .play') || 
+                                document.querySelector('#playpause') || 
+                                document.querySelector('.play-pause');
+                if (playBtn) playBtn.click();
+            }, 1000);
+        }
+    } else {
+        // De slide is van TV verdwenen. Reset het geheugen voor het volgende rondje!
+        windyIsResized = false;
     }
 }, 1000);
 // ===============================================
