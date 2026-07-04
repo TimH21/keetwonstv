@@ -2432,18 +2432,36 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   WINDY MAP TV-MODUS (VERBERG KNOPPEN)
+   WINDY MAP TV-MODUS (VERBETERD DESIGN)
    ========================================= */
+/* Verberg onnodige zijmenu's, zoomknoppen en logo's */
 #windy .leaflet-control-container,
-#windy #bottom,
 #windy #plugin-rhpane,
 #windy #mobile-ovr-select,
-#windy #logo-wrapper {
+#windy #logo-wrapper,
+#windy #embed-zoom {
     display: none !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* Haal de tijdlijn TERUG zodat je het vooruitzicht ziet! */
+#windy #bottom {
+    display: flex !important;
+    opacity: 1 !important;
+    transform: scale(1.15); /* Maak de balk 15% groter voor de TV */
+    transform-origin: bottom center;
+    bottom: 2vh !important;
+    pointer-events: none !important; /* Voorkomt muis-interacties */
+}
+
+/* Zorg dat de dagen en uren beter leesbaar zijn */
+#windy .timecode {
+    font-weight: bold !important;
+    text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
+}
+
 /* Maak de kaart net iets donkerder voor een strakker tv-contrast */
 #windy {
-    filter: contrast(1.1) brightness(0.85);
+    filter: contrast(1.15) brightness(0.9);
 }
