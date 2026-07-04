@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. Weer radar ding
+// 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
 // ===============================================
 let windyMapInstance = null;
 let windyPickerInstance = null;
@@ -1409,6 +1409,7 @@ setInterval(() => {
         windySetupDone = false;
     }
 }, 1000);
+
 // ===============================================
 // 12. LIVE WEBCAM MAKKUM (DATA-BESPAREND)
 // ===============================================
