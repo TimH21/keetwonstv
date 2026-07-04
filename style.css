@@ -2432,9 +2432,9 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   Domme radar ofsa...
+   Map ding weer radar
    ========================================= */
-/* Verberg onnodige zijmenu's, zoekbalken en logo's */
+/* Verberg onnodige zijmenu's en logo's */
 #windy #search,
 #windy #logo-wrapper,
 #windy .leaflet-control-zoom,
@@ -2446,23 +2446,24 @@ body.fullscreen-mode .sidebar {
     pointer-events: none !important;
 }
 
-/* FIX DE TIJDLIJN: Strak boven de zwarte ticker en klikbaar maken voor het script! */
+/* FIX DE TIJDLIJN: Exact 100 pixels van de bodem, net boven jouw eigen ticker! */
 #windy #bottom {
     display: block !important;
     opacity: 1 !important;
     position: absolute !important;
-    bottom: 85px !important; 
-    transform: scale(1.1); 
+    bottom: 100px !important; /* <--- Veilige marge boven de zwarte rand */
+    transform: scale(1.15); 
     transform-origin: bottom center;
     z-index: 9999 !important;
 }
 
-/* Zorg dat de teksten in de tijdlijn scherp leesbaar zijn */
+/* Zorg dat de tijden goed leesbaar zijn */
 #windy .timecode {
     font-weight: bold !important;
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
 }
 
+/* Strak tv-contrast */
 #windy {
     filter: contrast(1.15) brightness(0.9);
 }
