@@ -1349,20 +1349,23 @@ function stopOmropSequences() {
 // ===============================================
 // 11. LIVE REGEN & ONWEER RADAR (WINDY API)
 // ===============================================
+let windyMapInstance = null; // We maken een geheugensteuntje aan voor de kaart
+
 function startWindyRadar() {
-    const mapContainer = document.getElementById('windy-map');
+    const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', // Jouw API Key
-        lat: 53.078,                           // Gecentreerd op locatie
+        lat: 53.078,                           // Wons
         lon: 5.425,
-        zoom: 8,                               // Perfecte zoom voor Friesland/Noord-Nederland
+        zoom: 8,                               
     };
 
     // Initializeer de Windy API
     windyInit(options, windyAPI => {
         const { map, store } = windyAPI;
+        windyMapInstance = map; // Sla de kaart op in ons geheugensteuntje!
         
         // Zet de kaartweergave direct op Neerslag & Onweer
         store.set('overlay', 'rain');
@@ -1370,8 +1373,18 @@ function startWindyRadar() {
     });
 }
 
-// Start de kaart pas na 4 seconden, zodat de rest van je TV-systeem geen vertraging oploopt bij het opstarten
+// Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
+
+// DE LEAFLET FIX: Geef de kaart elke seconde een schop als hij in beeld is
+setInterval(() => {
+    const radarSlide = document.getElementById('slide-radar');
+    // Controleer of de slide NU op tv is én of de kaart bestaat
+    if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
+        // Dit is het commando dat de grijze waas verhelpt:
+        windyMapInstance.invalidateSize();
+    }
+}, 1000);
 
 // ===============================================
 // 12. LIVE WEBCAM MAKKUM (DATA-BESPAREND)
