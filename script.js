@@ -1420,7 +1420,7 @@ function stopMakkumStream(video) {
 setInterval(manageWebcamSlide, 1000);
 
 // ===============================================
-// 2. ZELFSTANDIGE DATA SAVER (LAZY LOAD MODULE)
+// 2. ZELFSTANDIGE DATA SAVER ofsa
 // ===============================================
 document.addEventListener("DOMContentLoaded", () => {
     const allSlides = document.querySelectorAll('.slide');
