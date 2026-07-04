@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. LIVE REGEN en ONWEER VOORUITZICHT (WINDY API)
+// 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
 // ===============================================
 let windyMapInstance = null;
 
@@ -1359,41 +1359,34 @@ function startWindyRadar() {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
-        zoom: 10, // 🔍 Verder ingezoomd op Friesland!
+        zoom: 10, 
     };
 
     windyInit(options, windyAPI => {
-        const { map, store } = windyAPI;
+        const { map, store, picker } = windyAPI;
         windyMapInstance = map; 
         
-        // 1. Forceer het meest betrouwbare Europese weermodel (ECMWF)
-        store.set('product', 'ecmwf');
-        
-        // 2. Zet op Neerslag & Onweer (Vooruitzicht)
-        store.set('overlay', 'rain');
-        store.set('level', 'surface');
-
-        // 3. Rode markering toevoegen op Wons
-        const wonsIcon = L.divIcon({
-            className: 'custom-wons-marker',
-            html: '<i class="fa-solid fa-location-dot" style="color: #e31b23; font-size: 4vh; filter: drop-shadow(0px 4px 5px rgba(0,0,0,0.8));"></i>',
-            iconSize: [30, 30],
-            iconAnchor: [15, 30]
-        });
-        L.marker([53.078, 5.425], {icon: wonsIcon}).addTo(map);
-
-        // 4. Forceer het automatisch afspelen van het vooruitzicht!
+        // Wacht heel even (1.5s) tot de basiskaart 100% geladen is, 
+        // forceer dán pas de regen-laag. Dit voorkomt dat hij op Wind blijft steken!
         setTimeout(() => {
-            const playBtn = document.querySelector('.play-pause-button');
-            if(playBtn) playBtn.click();
-        }, 3000);
+            store.set('product', 'ecmwf'); // Meest betrouwbare weermodel
+            store.set('overlay', 'rain');  // Neerslag & Onweer
+            store.set('level', 'surface');
+
+            // Gebruik de ORIGINELE Windy data-marker op Wons!
+            picker.open({ lat: 53.078, lon: 5.425 });
+
+            // Forceer het automatisch afspelen van het vooruitzicht
+            const playBtn = document.querySelector('.play-pause-button') || document.querySelector('#playpause');
+            if (playBtn) playBtn.click();
+        }, 1500); 
     });
 }
 
 // Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// De Leaflet Fix (zodat hij niet grijs blijft)
+// De Leaflet Fix (zodat hij niet grijs blijft als de slide in beeld komt)
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
     if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
