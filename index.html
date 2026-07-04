@@ -133,41 +133,40 @@
 
           <!-- SLIDE: LIVE REGEN & WIND RADAR (40 SECONDEN) -->
 <div class="slide" id="slide-radar" data-title="Regen & Wind" data-time="40000">
-    <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #0a0a0a; overflow: hidden;">
+    <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #0a0a0a; overflow: hidden; display: flex; justify-content: center; align-items: center;">
         
-        <!-- LAAG 1: BUIENRADAR (Beeldschermvullend & Lazy Loaded) -->
-        <div class="radar-layer radar-regen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+        <!-- LAAG 1: BUIENRADAR (Strak gecentreerd, natuurlijk formaat, géén witte vlakken meer!) -->
+        <div class="radar-layer radar-regen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: flex; justify-content: center; align-items: center;">
             
             <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
                 <i class="fa-solid fa-cloud-showers-heavy"></i> LIVE BUIENRADAR
             </div>
             
-            <!-- Let op: data-src in plaats van src. Het script activeert deze pas als de slide in beeld is! -->
             <iframe id="buienradar-iframe"
-                data-src="https://gadgets.buienradar.nl/gadget/zoommap/?lat=53.08361&lng=5.42364&overname=2&zoom=10&naam=Wons&voor=1" 
-                scrolling="no" frameborder="0"
-                style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vh; border: none; pointer-events: none; transform: translate(-50%, -50%) scale(1.15); transform-origin: center center;">
+                data-src="https://gadgets.buienradar.nl/gadget/zoommap/?lat=53.083&lng=5.423&overname=2&zoom=10&naam=Wons&voor=1" 
+                scrolling="no" width="550" height="512" frameborder="no"
+                style="border: none; pointer-events: none; transform: scale(1.35); transform-origin: center center;">
             </iframe>
 
         </div>
 
-        <!-- LAAG 2: WINDRADAR (Windy - Ook Lazy Loaded) -->
-        <div class="radar-layer radar-wind" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0;">
+        <!-- LAAG 2: WINDRADAR (Windy - Met gefixte speld/marker op Wons!) -->
+        <div class="radar-layer radar-wind" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0; display: flex; justify-content: center; align-items: center;">
             
             <div class="header-badge" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh; background-color: #3b82f6; color: white;">
                 <i class="fa-solid fa-wind"></i> LIVE WINDRICHTING
             </div>
             
             <iframe id="windy-iframe"
-                data-src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=km/h&zoom=10&overlay=wind&product=ecmwf&level=surface&lat=53.08361&lon=5.42364&marker=true" 
+                data-src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=km/h&zoom=10&overlay=wind&product=ecmwf&level=surface&lat=53.08&lon=5.42&detailLat=53.08&detailLon=5.42&marker=true" 
                 frameborder="0" allow="geolocation"
-                style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vh; border: none; pointer-events: none; transform: translate(-50%, -50%) scale(1.1); transform-origin: center center; filter: contrast(1.15) brightness(0.9);">
+                style="width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.05); transform-origin: center center; filter: contrast(1.15) brightness(0.9);">
             </iframe>
 
         </div>
 
-        <!-- Zware donkere schaduwrand rondom de hele tv (vignette) -->
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; box-shadow: inset 0 0 150px rgba(0,0,0,1); pointer-events: none; z-index: 5;"></div>
+        <!-- Donkere rand (vignette) om het perfect te laten blenden -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; box-shadow: inset 0 0 120px rgba(0,0,0,1); pointer-events: none; z-index: 5;"></div>
     </div>
 </div>
 
