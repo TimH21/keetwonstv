@@ -2431,3 +2431,150 @@ body.fullscreen-mode .sidebar {
     border-radius: 2px;
 }
 
+/* =========================================
+   REGEN & WIND RADAR CROSSFADE (10s INTERVAL)
+   ========================================= */
+
+/* Zodra de radar-slide actief is, start de 40-seconden cyclus voor de wind-laag */
+.slide.active .radar-wind {
+    animation: crossfadeRadar 40s linear forwards;
+}
+
+/* 
+   Tijdlijn van de animatie (40 seconden in totaal):
+   0s - 9s   : Alleen Regen
+   10s - 19s : Alleen Wind
+   20s - 29s : Alleen Regen
+   30s - 39s : Alleen Wind
+*/
+@keyframes crossfadeRadar {
+    0%      { opacity: 0; }
+    22.5%   { opacity: 0; } /* Fade out (Regen is zichtbaar) */
+    25%     { opacity: 1; } /* Fade in (Wind is nu 100% zichtbaar) */
+    47.5%   { opacity: 1; } /* Houd wind vast */
+    50%     { opacity: 0; } /* Fade out (Terug naar Regen) */
+    72.5%   { opacity: 0; } /* Houd regen vast */
+    75%     { opacity: 1; } /* Fade in (Wind weer zichtbaar) */
+    97.5%   { opacity: 1; } /* Houd wind vast */
+    100%    { opacity: 0; } /* Einde cyclus, sluit netjes af op Regen */
+}
+
+/* =========================================
+   RANDOM OVERGANGEN & ANIMATIES
+   ========================================= */
+
+/* Basis instellingen voor de onzichtbare laag */
+.transition-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden; /* Standaard onzichtbaar */
+}
+
+/* Verberg het logo en de balken standaard */
+#transition-logo { opacity: 0; position: absolute; max-width: 40vw; max-height: 40vh; }
+.transition-overlay .stripe { display: none; }
+
+/* -----------------------------------------
+   EFFECT 1: De Diagonale Donkergroene Strepen
+   ----------------------------------------- */
+.trans-diagonal-stripes {
+    visibility: visible;
+    background: repeating-linear-gradient(45deg, #0a0a0a, #0a0a0a 100px, #047857 100px, #047857 200px);
+    background-size: 300% 300%;
+    animation: diagStripes 1s ease-in-out forwards;
+}
+.trans-diagonal-stripes #transition-logo {
+    animation: flashLogo 1s ease-in-out forwards;
+}
+
+@keyframes diagStripes {
+    0% { background-position: 100% 100%; opacity: 0; }
+    40% { opacity: 1; }
+    60% { opacity: 1; }
+    100% { background-position: 0% 0%; opacity: 0; }
+}
+@keyframes flashLogo {
+    0% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 20px #10b981); }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* -----------------------------------------
+   EFFECT 2: De Logo Stamp
+   ----------------------------------------- */
+.trans-logo-stamp {
+    visibility: visible;
+    background: #000;
+    animation: stampBg 1.2s ease-in-out forwards;
+}
+.trans-logo-stamp #transition-logo {
+    animation: stampLogo 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes stampBg {
+    0% { opacity: 0; } 30% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; }
+}
+@keyframes stampLogo {
+    0% { opacity: 0; transform: scale(5); }
+    30% { opacity: 1; transform: scale(1); }
+    70% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 30px #047857); }
+    100% { opacity: 0; transform: scale(0.1); }
+}
+
+/* -----------------------------------------
+   EFFECT 3: TV Glitch (Snel & Modern)
+   ----------------------------------------- */
+.trans-tv-glitch {
+    visibility: visible;
+    background: #10b981;
+    animation: glitchScreen 0.8s steps(10) forwards;
+}
+
+@keyframes glitchScreen {
+    0% { clip-path: inset(100% 0 0 0); opacity: 0; }
+    20% { clip-path: inset(20% 0 50% 0); opacity: 1; }
+    40% { clip-path: inset(80% 0 5% 0); }
+    50% { clip-path: inset(0 0 0 0); background: #000; }
+    60% { clip-path: inset(40% 0 20% 0); background: #047857; }
+    80% { clip-path: inset(10% 0 80% 0); opacity: 1; }
+    100% { clip-path: inset(0 0 100% 0); opacity: 0; }
+}
+
+/* -----------------------------------------
+   EFFECT 4: Jaloezieën (Verticale Balken)
+   ----------------------------------------- */
+.trans-blinds { visibility: visible; flex-direction: row; }
+.trans-blinds .stripe {
+    display: block; width: 20%; height: 100%; background: #047857;
+    animation: flipBlinds 1.2s ease-in-out forwards;
+    transform-origin: center; transform: scaleX(0);
+}
+.trans-blinds .stripe:nth-child(2) { animation-delay: 0.1s; background: #000; }
+.trans-blinds .stripe:nth-child(3) { animation-delay: 0.2s; background: #047857; }
+.trans-blinds .stripe:nth-child(4) { animation-delay: 0.3s; background: #000; }
+.trans-blinds .stripe:nth-child(5) { animation-delay: 0.4s; background: #047857; }
+
+@keyframes flipBlinds {
+    0% { transform: scaleX(0); }
+    40% { transform: scaleX(1); }
+    60% { transform: scaleX(1); }
+    100% { transform: scaleX(0); }
+}
+
+/* -----------------------------------------
+   EFFECT 5: Horizontale Slice
+   ----------------------------------------- */
+.trans-slice { visibility: visible; }
+.trans-slice::before, .trans-slice::after {
+    content: ''; position: absolute; left: 0; width: 100%; height: 50%; background: #000;
+}
+.trans-slice::before { top: 0; animation: sliceTop 1s ease-in-out forwards; border-bottom: 5px solid #10b981; }
+.trans-slice::after { bottom: 0; animation: sliceBottom 1s ease-in-out forwards; border-top: 5px solid #10b981; }
+
+@keyframes sliceTop { 0% { transform: translateY(-100%); } 40% { transform: translateY(0); } 60% { transform: translateY(0); } 100% { transform: translateY(-100%); } }
+@keyframes sliceBottom { 0% { transform: translateY(100%); } 40% { transform: translateY(0); } 60% { transform: translateY(0); } 100% { transform: translateY(100%); } }
