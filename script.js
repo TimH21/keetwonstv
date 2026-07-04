@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. Weer radar ding grrr
+// 11. live radar weer
 // ===============================================
 let windyMapInstance = null;
 
@@ -1355,40 +1355,41 @@ function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
-    // Start met een schone lei
+    // DE WINNENDE OPTIES: Wel 'rain', géén geforceerd weermodel!
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
-        zoom: 9 
+        zoom: 9,
+        overlay: 'rain' // Dit is verplicht hier, anders downloadt hij de module niet!
     };
 
     windyInit(options, windyAPI => {
-        const { map, store, picker, broadcast } = windyAPI;
+        const { map, picker, broadcast } = windyAPI;
         windyMapInstance = map; 
         
-        // DE GOUDEN FIX: Wacht tot Windy zelf aangeeft: "Ik ben 100% geladen"
+        // Wacht tot de Windy motor écht 100% geladen is inclusief de buien
         broadcast.once('redrawFinished', () => {
             
-            // 1. Pas dán forceren we de Neerslag & Onweer laag
-            store.set('overlay', 'rain');
-            store.set('level', 'surface');
+            // 1. Open de originele Windy data-marker exact op Wons
+            picker.open({ lat: 53.078, lon: 5.425 });
 
-            // 2. Wacht een fractie van een seconde tot de regenlaag zichtbaar is
+            // 2. Geef de elementen een halve seconde de tijd en druk dan virtueel op 'Play'
             setTimeout(() => {
-                // Open de originele Windy data-marker op Wons
-                picker.open({ lat: 53.078, lon: 5.425 });
-
-                // 3. Druk de 'Play' knop in om het vooruitzicht te starten
-                const playBtn = document.getElementById('playpause');
-                if (playBtn) playBtn.click();
+                // We zoeken naar verschillende namen die Windy gebruikt voor de play-knop
+                const playBtn = document.getElementById('playpause') || 
+                                document.querySelector('.play-pause-button') || 
+                                document.querySelector('[data-icon="play"]');
+                if (playBtn) {
+                    playBtn.click();
+                }
             }, 500);
 
         });
     });
 }
 
-// Start de inlaad-procedure na 4 seconden
+// Start de inlaad-procedure na 4 seconden om de rest van de tv niet te vertragen
 setTimeout(startWindyRadar, 4000);
 
 // De Leaflet Fix (geeft de kaart de ruimte als hij uit de verborgen slide komt)
