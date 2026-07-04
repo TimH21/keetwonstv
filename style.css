@@ -2432,32 +2432,34 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   Map ding weer radar
+   WINDY MAP TV-MODUS (VERBETERD DESIGN)
    ========================================= */
-/* Verberg onnodige zijmenu's en logo's */
+/* Verberg onnodige zijmenu's, zoekbalken, logo's én die rare 12-uur/24-uur tekst */
 #windy #search,
 #windy #logo-wrapper,
 #windy .leaflet-control-zoom,
 #windy #mobile-ovr-select,
 #windy #menu,
-#windy #plugin-rhpane {
+#windy #plugin-rhpane,
+#windy .accumulations,
+#windy .box-accumulations {
     display: none !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
 
-/* FIX DE TIJDLIJN: Exact 100 pixels van de bodem, net boven jouw eigen ticker! */
+/* FIX DE TIJDLIJN: Ruim boven de zwarte ticker! */
 #windy #bottom {
     display: block !important;
     opacity: 1 !important;
     position: absolute !important;
-    bottom: 100px !important; /* <--- Veilige marge boven de zwarte rand */
+    bottom: 125px !important; /* <--- Nog hoger getild, ver weg van je eigen ticker */
     transform: scale(1.15); 
     transform-origin: bottom center;
     z-index: 9999 !important;
 }
 
-/* Zorg dat de tijden goed leesbaar zijn */
+/* Zorg dat de tijden scherp leesbaar zijn */
 #windy .timecode {
     font-weight: bold !important;
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
