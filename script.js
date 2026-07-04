@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. Radar ding zooi
+// 11. Weer radar rommel
 // ===============================================
 let windyMapInstance = null;
 
@@ -1355,36 +1355,38 @@ function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
-    // FORCEER DIRECT DE GOEDE LAAG EN HET ECMWF MODEL IN DE OPTIES
+    // Gewoon de standaard veilige opties
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
-        zoom: 10, 
-        overlay: 'rain',       // <-- DIT FIXT HET: Start direct op Regen & Onweer
-        product: 'ecmwf',      // <-- Start direct op het betrouwbare Europese model
-        level: 'surface'
+        zoom: 9 // Ietsje uitgezoomd zodat je de buien vanaf zee aan ziet komen
     };
 
     windyInit(options, windyAPI => {
-        const { map, picker } = windyAPI;
+        const { map, store, picker } = windyAPI;
         windyMapInstance = map; 
         
-        // Omdat de kaart nu op 'rain' start, zal deze pop-up netjes het aantal mm neerslag tonen!
-        picker.open({ lat: 53.078, lon: 5.425 });
-
-        // Forceer het automatisch afspelen van de tijdlijn
+        // Wacht 1 seconde tot de motor draait, forceer dán de regenlaag
         setTimeout(() => {
-            const playBtn = document.querySelector('.play-pause-button') || document.querySelector('#playpause');
+            // 1. Zet de laag op Regen (Laat de API zelf het weermodel kiezen!)
+            store.set('overlay', 'rain');  
+            
+            // 2. Open de officiële marker op Wons
+            picker.open({ lat: 53.078, lon: 5.425 });
+
+            // 3. Druk de 'Play' knop in voor het vooruitzicht
+            const playBtn = document.getElementById('playpause') || document.querySelector('.play-pause-button');
             if (playBtn) playBtn.click();
-        }, 1500); 
+            
+        }, 1000); 
     });
 }
 
 // Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// De Leaflet Fix (zodat hij uit de slaapstand komt als de slide activeert)
+// De Leaflet Fix (haalt hem uit de slaapstand als hij in beeld komt)
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
     if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
