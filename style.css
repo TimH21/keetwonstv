@@ -2434,7 +2434,7 @@ body.fullscreen-mode .sidebar {
 /* =========================================
    WINDY MAP TV-MODUS (VERBETERD DESIGN)
    ========================================= */
-/* Verberg onnodige zijmenu's, zoekbalken, logo's én die rare 12-uur/24-uur tekst */
+/* Sloop alle onnodige knoppen, menu's, logo's én de range-selectoren (12u, 24u enz) eruit */
 #windy #search,
 #windy #logo-wrapper,
 #windy .leaflet-control-zoom,
@@ -2442,24 +2442,27 @@ body.fullscreen-mode .sidebar {
 #windy #menu,
 #windy #plugin-rhpane,
 #windy .accumulations,
-#windy .box-accumulations {
+#windy .box-accumulations,
+#windy [class*="calendar"],
+#windy [class*="range"],
+#windy .metric-select {
     display: none !important;
     opacity: 0 !important;
     pointer-events: none !important;
 }
 
-/* FIX DE TIJDLIJN: Ruim boven de zwarte ticker! */
+/* FIX DE TIJDLIJN: Perfect gepositioneerd strak boven je eigen balk */
 #windy #bottom {
     display: block !important;
     opacity: 1 !important;
     position: absolute !important;
-    bottom: 125px !important; /* <--- Nog hoger getild, ver weg van je eigen ticker */
-    transform: scale(1.15); 
+    bottom: 75px !important; /* <--- Stuk naar beneden gehaald zodat hij niet meer in het midden zweeft! */
+    transform: scale(1.1); 
     transform-origin: bottom center;
     z-index: 9999 !important;
 }
 
-/* Zorg dat de tijden scherp leesbaar zijn */
+/* Zorg dat de tijden goed leesbaar zijn */
 #windy .timecode {
     font-weight: bold !important;
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
