@@ -2432,7 +2432,7 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   Windy map zooi rommel
+   Weer kaart ding
    ========================================= */
 /* Verberg onnodige zijmenu's, zoekbalken en logo's */
 #windy #search,
@@ -2446,12 +2446,13 @@ body.fullscreen-mode .sidebar {
     pointer-events: none !important;
 }
 
-/* FIX DE TIJDLIJN: Til hem op bóven jouw eigen Keet-ticker! */
+/* FIX DE TIJDLIJN: Exact boven de zwarte rand */
 #windy #bottom {
     display: block !important;
     opacity: 1 !important;
-    bottom: 12vh !important; /* <--- TILT DE BALK OMHOOG UIT DE ZWARTE RAND */
-    transform: scale(1.15); 
+    position: absolute !important;
+    bottom: 85px !important; /* Vaste pixels, duwt hem strak boven jouw ticker! */
+    transform: scale(1.1); 
     transform-origin: bottom center;
     pointer-events: none !important; 
     z-index: 9999 !important;
