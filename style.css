@@ -2432,9 +2432,9 @@ body.fullscreen-mode .sidebar {
 }
 
 /* =========================================
-   Radar map ding
+   Windy map zooi rommel
    ========================================= */
-/* Verberg chirurgisch de zoekbalk, menu's, logo's en +/- knoppen */
+/* Verberg onnodige zijmenu's, zoekbalken en logo's */
 #windy #search,
 #windy #logo-wrapper,
 #windy .leaflet-control-zoom,
@@ -2446,22 +2446,24 @@ body.fullscreen-mode .sidebar {
     pointer-events: none !important;
 }
 
-/* Zorg dat de TIJDLIJN en PLAY-knop wél zichtbaar blijven! */
+/* FIX DE TIJDLIJN: Til hem op bóven jouw eigen Keet-ticker! */
 #windy #bottom {
     display: block !important;
     opacity: 1 !important;
-    bottom: 2vh !important;
-    transform: scale(1.15); /* Maakt de balk iets forser voor tv-kijken */
+    bottom: 12vh !important; /* <--- TILT DE BALK OMHOOG UIT DE ZWARTE RAND */
+    transform: scale(1.15); 
     transform-origin: bottom center;
-    pointer-events: none !important; /* Voorkomt storingen op de tv */
+    pointer-events: none !important; 
+    z-index: 9999 !important;
 }
 
-/* Maak de teksten en de voorspelling iets beter leesbaar in het donker */
+/* Zorg dat de teksten in de tijdlijn scherp leesbaar zijn */
 #windy .timecode {
     font-weight: bold !important;
     text-shadow: 0px 2px 4px rgba(0,0,0,0.8) !important;
 }
 
+/* Strakker contrast voor het tv-scherm */
 #windy {
     filter: contrast(1.15) brightness(0.9);
 }
