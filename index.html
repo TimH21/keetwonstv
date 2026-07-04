@@ -131,36 +131,35 @@
                 </div>
             </div>
 
-                            <!-- SLIDE: LIVE REGEN EN WIND RADAR (40 SECONDEN) -->
+           <!-- SLIDE: LIVE REGEN & WIND RADAR (40 SECONDEN) -->
             <div class="slide" id="slide-radar" data-title="Regen & Wind" data-time="40000">
                 <div class="slide-inner" style="width: 100%; height: 100%; padding: 0; position: relative; background: #0a0a0a; overflow: hidden;">
                     
-                    <!-- LAAG 1: REGENRADAR (RainViewer) -->
+                    <!-- LAAG 1: REGENRADAR (RainViewer - Nu geforceerd op de toekomst) -->
                     <div class="radar-layer radar-regen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
                         <div class="header-badge blue" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh;">
                             <i class="fa-solid fa-cloud-showers-heavy"></i> LIVE REGEN RADAR
                         </div>
+                        <!-- 'oF=1' = Forecast, 'oAP=1' = AutoPlay, 'c=1' = DarkMode -->
                         <iframe 
-                            src="https://www.rainviewer.com/map.html?loc=53.078,5.425,8&oAP=1&oF=1&layer=radar&sm=1&sn=1&theme=1" 
+                            src="https://www.rainviewer.com/map.html?loc=53.078,5.425,8&oAP=1&oF=1&layer=radar&sm=1&sn=1&theme=1&oFS=1" 
                             frameborder="0" allow="geolocation"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.02); transform-origin: top center; filter: contrast(1.1) brightness(0.95);">
                         </iframe>
                     </div>
-
-                    <!-- LAAG 2: WINDRADAR (Windy - wordt ingefaded via CSS) -->
+            
+                    <!-- LAAG 2: WINDRADAR (Windy - Live windstromen) -->
                     <div class="radar-layer radar-wind" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; opacity: 0;">
                         <div class="header-badge" style="position: absolute; top: 5vh; left: 4vw; z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-size: 2.5vh; background-color: #3b82f6; color: white;">
                             <i class="fa-solid fa-wind"></i> LIVE WINDRICHTING
                         </div>
-                        <!-- Windy Iframe, standaard ingesteld op de Wind-laag -->
                         <iframe 
-                            src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=9&overlay=wind&product=ecmwf&level=surface&lat=53.078&lon=5.425&detailLat=53.078&detailLon=5.425&marker=true" 
+                            src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=km/h&zoom=9&overlay=wind&product=ecmwf&level=surface&lat=53.078&lon=5.425&marker=true" 
                             frameborder="0" allow="geolocation"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.05); transform-origin: center center; filter: contrast(1.15) brightness(0.9);">
                         </iframe>
                     </div>
-
-                    <!-- Subtiele donkere schaduwrand voor een perfecte blending in je design -->
+            
                     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; box-shadow: inset 0 0 50px rgba(0,0,0,0.9); pointer-events: none; z-index: 5;"></div>
                 </div>
             </div>
