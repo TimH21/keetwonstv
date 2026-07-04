@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. Weer radar rommel
+// 11. Die domme weerradar moat it is dwan
 // ===============================================
 let windyMapInstance = null;
 
@@ -1355,45 +1355,49 @@ function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
-    // Gewoon de standaard veilige opties
+    // Start met een schone lei
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
-        zoom: 9 // Ietsje uitgezoomd zodat je de buien vanaf zee aan ziet komen
+        zoom: 9 
     };
 
     windyInit(options, windyAPI => {
-        const { map, store, picker } = windyAPI;
+        const { map, store, picker, broadcast } = windyAPI;
         windyMapInstance = map; 
         
-        // Wacht 1 seconde tot de motor draait, forceer dán de regenlaag
-        setTimeout(() => {
-            // 1. Zet de laag op Regen (Laat de API zelf het weermodel kiezen!)
-            store.set('overlay', 'rain');  
+        // DE GOUDEN FIX: Wacht tot Windy zelf aangeeft: "Ik ben 100% geladen"
+        broadcast.once('redrawFinished', () => {
             
-            // 2. Open de officiële marker op Wons
-            picker.open({ lat: 53.078, lon: 5.425 });
+            // 1. Pas dán forceren we de Neerslag & Onweer laag
+            store.set('overlay', 'rain');
+            store.set('level', 'surface');
 
-            // 3. Druk de 'Play' knop in voor het vooruitzicht
-            const playBtn = document.getElementById('playpause') || document.querySelector('.play-pause-button');
-            if (playBtn) playBtn.click();
-            
-        }, 1000); 
+            // 2. Wacht een fractie van een seconde tot de regenlaag zichtbaar is
+            setTimeout(() => {
+                // Open de originele Windy data-marker op Wons
+                picker.open({ lat: 53.078, lon: 5.425 });
+
+                // 3. Druk de 'Play' knop in om het vooruitzicht te starten
+                const playBtn = document.getElementById('playpause');
+                if (playBtn) playBtn.click();
+            }, 500);
+
+        });
     });
 }
 
 // Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// De Leaflet Fix (haalt hem uit de slaapstand als hij in beeld komt)
+// De Leaflet Fix (geeft de kaart de ruimte als hij uit de verborgen slide komt)
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
     if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
         windyMapInstance.invalidateSize();
     }
 }, 1000);
-
 // ===============================================
 // 12. LIVE WEBCAM MAKKUM (DATA-BESPAREND)
 // ===============================================
