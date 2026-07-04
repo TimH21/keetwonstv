@@ -1347,7 +1347,7 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. LIVE REGEN EN ONWEER VOORUITZICHT (WINDY API)
+// 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
 // ===============================================
 let windyMapInstance = null;
 
@@ -1355,28 +1355,26 @@ function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
+    // FORCEER DIRECT DE GOEDE LAAG EN HET ECMWF MODEL IN DE OPTIES
     const options = {
         key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
         lat: 53.078,                           
         lon: 5.425,
         zoom: 10, 
+        overlay: 'rain',       // <-- DIT FIXT HET: Start direct op Regen & Onweer
+        product: 'ecmwf',      // <-- Start direct op het betrouwbare Europese model
+        level: 'surface'
     };
 
     windyInit(options, windyAPI => {
-        const { map, store, picker } = windyAPI;
+        const { map, picker } = windyAPI;
         windyMapInstance = map; 
         
-        // Wacht heel even (1.5s) tot de basiskaart 100% geladen is, 
-        // forceer dán pas de regen-laag. Dit voorkomt dat hij op Wind blijft steken!
+        // Omdat de kaart nu op 'rain' start, zal deze pop-up netjes het aantal mm neerslag tonen!
+        picker.open({ lat: 53.078, lon: 5.425 });
+
+        // Forceer het automatisch afspelen van de tijdlijn
         setTimeout(() => {
-            store.set('product', 'ecmwf'); // Meest betrouwbare weermodel
-            store.set('overlay', 'rain');  // Neerslag & Onweer
-            store.set('level', 'surface');
-
-            // Gebruik de ORIGINELE Windy data-marker op Wons!
-            picker.open({ lat: 53.078, lon: 5.425 });
-
-            // Forceer het automatisch afspelen van het vooruitzicht
             const playBtn = document.querySelector('.play-pause-button') || document.querySelector('#playpause');
             if (playBtn) playBtn.click();
         }, 1500); 
@@ -1386,7 +1384,7 @@ function startWindyRadar() {
 // Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// De Leaflet Fix (zodat hij niet grijs blijft als de slide in beeld komt)
+// De Leaflet Fix (zodat hij uit de slaapstand komt als de slide activeert)
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
     if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
