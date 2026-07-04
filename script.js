@@ -1347,41 +1347,56 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. LIVE REGEN & ONWEER RADAR (WINDY API)
+// 11. LIVE REGEN & ONWEER VOORUITZICHT (WINDY API)
 // ===============================================
-let windyMapInstance = null; // We maken een geheugensteuntje aan voor de kaart
+let windyMapInstance = null;
 
 function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
     if (!mapContainer) return;
 
     const options = {
-        key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', // Jouw API Key
-        lat: 53.078,                           // Wons
+        key: 'IyvGFqKPOu9HNz42slFPC4pDYicy73xm', 
+        lat: 53.078,                           
         lon: 5.425,
-        zoom: 8,                               
+        zoom: 10, // 🔍 Verder ingezoomd op Friesland!
     };
 
-    // Initializeer de Windy API
     windyInit(options, windyAPI => {
         const { map, store } = windyAPI;
-        windyMapInstance = map; // Sla de kaart op in ons geheugensteuntje!
+        windyMapInstance = map; 
         
-        // Zet de kaartweergave direct op Neerslag & Onweer
+        // 1. Forceer het meest betrouwbare Europese weermodel (ECMWF)
+        store.set('product', 'ecmwf');
+        
+        // 2. Zet op Neerslag & Onweer (Vooruitzicht)
         store.set('overlay', 'rain');
         store.set('level', 'surface');
+
+        // 3. Rode markering toevoegen op Wons
+        const wonsIcon = L.divIcon({
+            className: 'custom-wons-marker',
+            html: '<i class="fa-solid fa-location-dot" style="color: #e31b23; font-size: 4vh; filter: drop-shadow(0px 4px 5px rgba(0,0,0,0.8));"></i>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+        });
+        L.marker([53.078, 5.425], {icon: wonsIcon}).addTo(map);
+
+        // 4. Forceer het automatisch afspelen van het vooruitzicht!
+        setTimeout(() => {
+            const playBtn = document.querySelector('.play-pause-button');
+            if(playBtn) playBtn.click();
+        }, 3000);
     });
 }
 
 // Start de inlaad-procedure na 4 seconden
 setTimeout(startWindyRadar, 4000);
 
-// DE LEAFLET FIX: Geef de kaart elke seconde een schop als hij in beeld is
+// De Leaflet Fix (zodat hij niet grijs blijft)
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
-    // Controleer of de slide NU op tv is én of de kaart bestaat
     if (radarSlide && radarSlide.classList.contains('active') && windyMapInstance) {
-        // Dit is het commando dat de grijze waas verhelpt:
         windyMapInstance.invalidateSize();
     }
 }, 1000);
