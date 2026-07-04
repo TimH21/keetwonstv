@@ -1418,3 +1418,49 @@ function stopMakkumStream(video) {
 
 // Zet de bewaker aan: Check elke seconde de status
 setInterval(manageWebcamSlide, 1000);
+
+//
+//    OVERGANGEN SLIDES
+//
+
+// Lijst met al onze epische overgangen
+const transitionEffects = [
+    'trans-diagonal-stripes', // Jouw idee met de donkergroene strepen
+    'trans-logo-stamp',       // Logo klapt in beeld en explodeert
+    'trans-tv-glitch',        // Digitale tv-storing
+    'trans-blinds',           // 5 verticale balken die omdraaien
+    'trans-slice'             // Scherm snijdt horizontaal door midden
+];
+
+function nextSlide() {
+    const slides = document.querySelectorAll('.slide');
+    const overlay = document.getElementById('transition-overlay');
+    
+    // 1. Kies een compleet random overgang uit de lijst
+    const randomEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
+    
+    // 2. Zet de animatie aan!
+    overlay.className = `transition-overlay ${randomEffect}`;
+    
+    // 3. Wacht exact een halve seconde (totdat het scherm volledig bedekt is door de overgang)
+    setTimeout(() => {
+        
+        // --- HIER WISSELEN WE DE SLIDES OP DE ACHTERGROND ---
+        slides[currentSlideIndex].classList.remove('active');
+        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        
+        // Sla slides over die offline zijn (zoals de Makkum webcam)
+        while(slides[currentSlideIndex].classList.contains('skip-slide')) {
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        }
+        
+        slides[currentSlideIndex].classList.add('active');
+        // ---------------------------------------------------
+
+    }, 500); // 500 milliseconden is het "blinde" punt van de animatie
+
+    // 4. Verwijder de animatie-class weer na 1.5 seconde, zodat hij klaar is voor de volgende keer
+    setTimeout(() => {
+        overlay.className = 'transition-overlay';
+    }, 1500);
+}
