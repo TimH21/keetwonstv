@@ -1347,11 +1347,11 @@ function stopOmropSequences() {
 }
 
 // ===============================================
-// 11. radar ding
+// 11. Weer map
 // ===============================================
 let windyMapInstance = null;
 let windyPickerInstance = null;
-let windyIsResized = false; // Voorkomt dat we de kaart oneindig blijven resetten
+let windySetupDone = false; // Houdt bij of we de marker en play-knop al geactiveerd hebben
 
 function startWindyRadar() {
     const mapContainer = document.getElementById('windy');
@@ -1362,49 +1362,51 @@ function startWindyRadar() {
         lat: 53.078,                           
         lon: 5.425,
         zoom: 9,
-        overlay: 'rain' // Dit is verplicht voor de buien
+        overlay: 'rain' // Verplicht om de buien in te laden
     };
 
     windyInit(options, windyAPI => {
-        const { map, picker } = windyAPI;
-        windyMapInstance = map; 
-        windyPickerInstance = picker; // Sla de marker op in het geheugen
+        windyMapInstance = windyAPI.map; 
+        windyPickerInstance = windyAPI.picker; 
     });
 }
 
-// Start de inlaad-procedure na 4 seconden
+// Start de basiskaart na 4 seconden op de achtergrond
 setTimeout(startWindyRadar, 4000);
 
-// SLIMME CHECKER: Start de elementen pas als de slide ECHT in beeld is
+// DE CONTROLEKAMER: Elke seconde kijken we of de slide in beeld is
 setInterval(() => {
     const radarSlide = document.getElementById('slide-radar');
     if (!radarSlide) return;
 
+    // Is de slide NU zichtbaar op de TV?
     if (radarSlide.classList.contains('active')) {
-        // De slide is nu op TV! Als we dit nog niet gedaan hebben deze ronde:
-        if (!windyIsResized && windyMapInstance) {
-            
-            // 1. Herstel de afmetingen (tegen de grijze waas)
+        
+        // Hebben we de marker en play-knop voor dit rondje al geactiveerd? Zo nee, doe het nu!
+        if (!windySetupDone && windyMapInstance) {
+            windySetupDone = true; // Zet een vinkje zodat we dit niet oneindig blijven herhalen
+
+            // 1. Forceer de juiste afmetingen (tegen de grijze waas)
             windyMapInstance.invalidateSize();
-            windyIsResized = true;
 
-            // 2. Open NU PAS de markering op Wons
-            if (windyPickerInstance) {
-                windyPickerInstance.open({ lat: 53.078, lon: 5.425 });
-            }
-
-            // 3. Geef het 1 seconde rust en druk dan virtueel de Play knop in
+            // 2. Wacht een halve seconde zodat de kaart strak in beeld staat, en doe dán pas de rest!
             setTimeout(() => {
-                // Zoek de Windy Play knop en klik erop
-                const playBtn = document.querySelector('#bottom .play') || 
-                                document.querySelector('#playpause') || 
-                                document.querySelector('.play-pause');
+                // Zet de originele marker exact op Wons
+                if (windyPickerInstance) {
+                    windyPickerInstance.open({ lat: 53.078, lon: 5.425 });
+                }
+
+                // Druk de Play-knop in voor het vooruitzicht
+                const playBtn = document.getElementById('playpause') || 
+                                document.querySelector('.play') || 
+                                document.querySelector('.play-pause-button');
                 if (playBtn) playBtn.click();
-            }, 1000);
+            }, 500); 
         }
     } else {
-        // De slide is van TV verdwenen. Reset het geheugen voor het volgende rondje!
-        windyIsResized = false;
+        // De slide is uit beeld verdwenen. 
+        // We resetten ons vinkje, zodat hij het de volgende keer dat de slide langskomt weer opnieuw doet!
+        windySetupDone = false;
     }
 }, 1000);
 // ===============================================
