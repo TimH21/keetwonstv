@@ -485,8 +485,10 @@ async function checkKnmiAlarm() {
                 const codeTxt = currentAlarmDetails.wrschklr.toLowerCase();
                 const alertText = currentAlarmDetails.lkop || currentAlarmDetails.alarmtxt || "Gevaarlijk weer op komst. Blijf alert.";
                 
-                // Zet de juiste kleur-class op de slide (knmi-geel, knmi-oranje, etc)
-                wrapper.className = `slide knmi-${codeTxt}`;
+                // Verwijder oude waarschuwingskleuren, maar laat 'slide' en 'active' met rust!
+                wrapper.classList.remove('knmi-geel', 'knmi-oranje', 'knmi-rood', 'skip-slide');
+                wrapper.classList.add(`knmi-${codeTxt}`);
+
                 if (titelEl) titelEl.textContent = `CODE ${codeTxt.toUpperCase()}`;
                 if (infoEl) infoEl.textContent = alertText;
 
@@ -1352,30 +1354,39 @@ function stopOmropSequences() {
 let makkumHls = null;
 let isWebcamPlaying = false;
 
-function manageWebcamSlide() {
+function manageNetworkSlides() {
+    const isOffline = !navigator.onLine;
+
+    // 1. BEHEER DE WEBCAM SLIDE
     const webcamSlide = document.getElementById('slide-makkum');
     const videoEl = document.getElementById('makkum-video');
-    if (!webcamSlide || !videoEl) return;
-
-    // 1. OFFLINE CHECK: Verberg de slide als de hotspot weg is
-    if (!navigator.onLine) {
-        webcamSlide.classList.add('skip-slide');
-        // Als de tv net op deze slide stond terwijl internet wegviel, forceer de volgende slide!
-        if (webcamSlide.classList.contains('active')) window.next(); 
-        stopMakkumStream(videoEl);
-        return;
-    } else {
-        webcamSlide.classList.remove('skip-slide'); // Haal hem weer terug als er internet is
+    if (webcamSlide) {
+        if (isOffline) {
+            webcamSlide.classList.add('skip-slide');
+            if (webcamSlide.classList.contains('active')) window.next(); 
+            if (isWebcamPlaying && videoEl) stopMakkumStream(videoEl);
+        } else {
+            webcamSlide.classList.remove('skip-slide'); 
+            if (webcamSlide.classList.contains('active') && !isWebcamPlaying && videoEl) {
+                startMakkumStream(videoEl);
+            } else if (!webcamSlide.classList.contains('active') && isWebcamPlaying && videoEl) {
+                stopMakkumStream(videoEl);
+            }
+        }
     }
 
-    // 2. DATA CHECK: Speel alleen af als deze slide nú op tv is
-    if (webcamSlide.classList.contains('active')) {
-        if (!isWebcamPlaying) startMakkumStream(videoEl);
-    } else {
-        if (isWebcamPlaying) stopMakkumStream(videoEl);
+    // 2. BEHEER DE RADAR SLIDE (Overslaan bij geen internet)
+    const radarSlide = document.getElementById('slide-radar');
+    if (radarSlide) {
+        if (isOffline) {
+            radarSlide.classList.add('skip-slide');
+            // Forceer de tv naar de volgende slide als hij net op de radar stond toen internet uitviel
+            if (radarSlide.classList.contains('active')) window.next();
+        } else {
+            radarSlide.classList.remove('skip-slide');
+        }
     }
 }
-
 function startMakkumStream(video) {
     isWebcamPlaying = true;
     
