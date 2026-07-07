@@ -142,34 +142,148 @@ window.next = function() {
     globalTimeOffset += dur;
     
     if (isPaused) pauseStartTime = Date.now();
-    syncScreens();
+// ===============================================
+// 1 & 2. DE SLIDE ROTOR MET RANDOM OVERGANGEN & BEDIENING
+// ===============================================
+if (window.keetTimer) clearTimeout(window.keetTimer);
+
+let currentSlideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+let isPaused = false;
+let currentNextTitleStr = "...";
+
+const transitionEffects = [
+    'trans-diagonal-stripes',
+    'trans-logo-stamp',
+    'trans-tv-glitch',
+    'trans-blinds',
+    'trans-slice'
+];
+
+function goToNextSlide() {
+    if (isPaused) return;
+
+    const overlay = document.getElementById('transition-overlay');
+    if (!overlay || slides.length === 0) return;
+
+    // 1. Start de transitie
+    const randomEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
+    overlay.className = `transition-overlay ${randomEffect}`;
+
+    setTimeout(() => {
+        // 2. Schakel de oude slide uit
+        if (slides[currentSlideIndex]) {
+            slides[currentSlideIndex].classList.remove('active');
+            if (slides[currentSlideIndex].id !== 'slide-omrop') {
+                stopOmropSequences();
+            }
+        }
+
+        // 3. Zoek de volgende slide (en skip de offline/verborgen slides)
+        do {
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        } while (slides[currentSlideIndex].classList.contains('skip-slide'));
+
+        const newSlide = slides[currentSlideIndex];
+        newSlide.classList.add('active');
+
+        // --- SPECIFIEKE KEET WÛNS LOGICA ---
+        const m = new Date();
+        const isTopOfHour = m.getMinutes() < 5;
+        let slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
+
+        if (newSlide.id === 'slide-knmi') {
+            document.body.classList.add('fullscreen-mode');
+        } else {
+            document.body.classList.remove('fullscreen-mode');
+        }
+
+        if (newSlide.id === 'slide-omrop') {
+            if (isTopOfHour) {
+                slideDuration = 65000; // Extra leestijd voor het journaal
+                newSlide.classList.add('journaal-active');
+                document.getElementById('omrop-mode-badge').textContent = "LIVESTREAM KEET-JOURNAAL";
+                renderOmropJournaal();
+            } else {
+                newSlide.classList.remove('journaal-active');
+                document.getElementById('omrop-mode-badge').textContent = "LIVE NIJSFEER";
+                startOmrop112Sequence();
+            }
+        }
+
+        // 4. Werk de footer en de voortgangsbalk bij
+        const nextIdx = (currentSlideIndex + 1) % slides.length;
+        currentNextTitleStr = slides[nextIdx].getAttribute('data-title') || "...";
+        const footerTitleEl = document.getElementById('footer-next-title');
+        if (footerTitleEl) footerTitleEl.textContent = currentNextTitleStr;
+
+        let bar = document.getElementById('global-progress-bar');
+        if (bar) {
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.transition = `width ${slideDuration}ms linear`;
+                bar.style.width = '100%';
+            }, 50);
+        }
+
+        // 5. Plan de volgende rotatie
+        window.keetTimer = setTimeout(goToNextSlide, slideDuration);
+
+    }, 500); // Wacht tot het scherm is bedekt door de transitie
+
+    // Ruim de transitie-laag op
+    setTimeout(() => {
+        overlay.className = 'transition-overlay';
+    }, 1500);
+}
+
+// BEDIENINGSKNOPPEN OVERSCHRIJVEN (Agressieve force)
+window.next = function() {
+    clearTimeout(window.keetTimer);
+    goToNextSlide();
 };
 
 window.togglePause = function() {
     const btn = document.getElementById('btn-pause');
     isPaused = !isPaused;
-    
+
+    let bar = document.getElementById('global-progress-bar');
+
     if (isPaused) {
-        pauseStartTime = Date.now();
-        clearTimeout(slideTimer);
-        btn.innerHTML = "Hervat Rotatie ▶️";
-        btn.style.background = "#2ecc71"; // Groen om weer aan te zetten
-        btn.style.color = "black";
+        clearTimeout(window.keetTimer);
+        if (btn) { btn.innerHTML = "Hervat Rotatie ▶️"; btn.style.background = "#2ecc71"; btn.style.color = "black"; }
         
-        let bar = document.getElementById('global-progress-bar');
+        const footerTitleEl = document.getElementById('footer-next-title');
+        if (footerTitleEl) footerTitleEl.textContent = "GEPAUZEERD";
+        
+        // Bevries de neon balk
         if (bar) {
             let currentWidth = window.getComputedStyle(bar).width;
             bar.style.transition = 'none';
-            bar.style.width = currentWidth; // Bevries de neon balk
+            bar.style.width = currentWidth;
         }
-        document.getElementById('footer-next-title').textContent = "GEPAUZEERD";
     } else {
-        btn.innerHTML = "Pauzeer Rotatie ⏸️";
-        btn.style.background = "#333";
-        btn.style.color = "white";
-        syncScreens(); // Start motor weer op
+        if (btn) { btn.innerHTML = "Pauzeer Rotatie ⏸️"; btn.style.background = "#333"; btn.style.color = "white"; }
+        goToNextSlide(); // Herstart direct
     }
 };
+
+// Start de motor 2 seconden nadat het scherm is opgestart
+setTimeout(goToNextSlide, 2000);
+
+// Tijd & Datum in de zijbalk houden we uiteraard draaiend!
+setInterval(() => {
+    const n = new Date();
+    const hours = String(n.getHours()).padStart(2, '0');
+    const minutes = String(n.getMinutes()).padStart(2, '0');
+    const timeEl = document.getElementById('time');
+    if (timeEl) timeEl.innerHTML = `${hours}<span class="blink-colon">:</span>${minutes}`;
+    const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
+    const dateEl = document.getElementById('date');
+    if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
+}, 1000);
+
 
 // ===============================================
 // 3. STATISCHE TICKER (NIEUWSZENDER ONDERIN)
@@ -1428,7 +1542,8 @@ function stopMakkumStream(video) {
 }
 
 // Zet de bewaker aan: Check elke seconde de status
-setInterval(manageWebcamSlide, 1000);
+setInterval(manageNetworkSlides, 1000);
+
 
 // ===============================================
 // 2. ZELFSTANDIGE DATA SAVER ofsa
