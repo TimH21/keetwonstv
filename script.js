@@ -431,50 +431,51 @@ async function checkKnmiAlarm() {
         const titelEl = document.getElementById('knmi-title');
         const infoEl = document.getElementById('knmi-info');
         const iconBox = document.getElementById('knmi-icons');
+        const bgBox = document.getElementById('knmi-bg-color'); // Koppel de achtergrond
 
         if (isEchtAlarm || isKleurAlarm) {
             isAlarmActive = true;
             currentAlarmDetails = weer; 
             if(!currentAlarmDetails.wrschklr || currentAlarmDetails.wrschklr === '') currentAlarmDetails.wrschklr = 'geel'; 
             
-            // --- KNMI SLIDE AANZETTEN (Smart Scanner) ---
             if (wrapper) {
-                wrapper.classList.remove('skip-slide'); // Haal hem uit de verberg-modus
+                wrapper.classList.remove('skip-slide'); 
                 const codeTxt = currentAlarmDetails.wrschklr.toLowerCase();
                 const alertText = currentAlarmDetails.lkop || currentAlarmDetails.alarmtxt || "Gevaarlijk weer op komst. Blijf alert.";
                 
-                // Verwijder oude waarschuwingskleuren, maar laat 'slide' en 'active' met rust!
-                wrapper.classList.remove('knmi-geel', 'knmi-oranje', 'knmi-rood', 'skip-slide');
-                wrapper.classList.add(`knmi-${codeTxt}`);
+                // FORCEER DE KLEUR VIA JAVASCRIPT!
+                if (bgBox) {
+                    if (codeTxt === 'rood') bgBox.style.backgroundColor = '#ef4444';
+                    else if (codeTxt === 'oranje') bgBox.style.backgroundColor = '#f97316';
+                    else bgBox.style.backgroundColor = '#facc15';
+                }
 
                 if (titelEl) titelEl.textContent = `CODE ${codeTxt.toUpperCase()}`;
                 if (infoEl) infoEl.textContent = alertText;
 
-                // De Woord-Scanner voor de iconen!
+                // Woord-Scanner voor de iconen
                 const textToAnalyze = alertText.toLowerCase();
                 let activeIcons = [];
 
-                if (textToAnalyze.includes("onweer") || textToAnalyze.includes("bliksem")) activeIcons.push('<i class="fa-solid fa-bolt" style="color:#f1c40f;"></i>');
-                if (textToAnalyze.includes("regen") || textToAnalyze.includes("neerslag")) activeIcons.push('<i class="fa-solid fa-cloud-showers-heavy" style="color:#3498db;"></i>');
-                if (textToAnalyze.includes("hagel")) activeIcons.push('<i class="fa-solid fa-cloud-meatball" style="color:#ecf0f1;"></i>');
-                if (textToAnalyze.includes("wind") || textToAnalyze.includes("storm") || textToAnalyze.includes("stoten")) activeIcons.push('<i class="fa-solid fa-wind" style="color:#bdc3c7;"></i>');
-                if (textToAnalyze.includes("sneeuw") || textToAnalyze.includes("winter")) activeIcons.push('<i class="fa-regular fa-snowflake" style="color:#fff;"></i>');
-                if (textToAnalyze.includes("glad") || textToAnalyze.includes("ijzel")) activeIcons.push('<i class="fa-solid fa-icicles" style="color:#81ecec;"></i>');
-                if (textToAnalyze.includes("mist")) activeIcons.push('<i class="fa-solid fa-smog" style="color:#95a5a6;"></i>');
-                if (textToAnalyze.includes("hitte") || textToAnalyze.includes("warmte")) activeIcons.push('<i class="fa-solid fa-temperature-arrow-up" style="color:#e74c3c;"></i>');
+                if (textToAnalyze.includes("onweer") || textToAnalyze.includes("bliksem")) activeIcons.push('<i class="fa-solid fa-bolt"></i>');
+                if (textToAnalyze.includes("regen") || textToAnalyze.includes("neerslag")) activeIcons.push('<i class="fa-solid fa-cloud-showers-heavy"></i>');
+                if (textToAnalyze.includes("hagel")) activeIcons.push('<i class="fa-solid fa-cloud-meatball"></i>');
+                if (textToAnalyze.includes("wind") || textToAnalyze.includes("storm") || textToAnalyze.includes("stoten")) activeIcons.push('<i class="fa-solid fa-wind"></i>');
+                if (textToAnalyze.includes("sneeuw") || textToAnalyze.includes("winter")) activeIcons.push('<i class="fa-regular fa-snowflake"></i>');
+                if (textToAnalyze.includes("glad") || textToAnalyze.includes("ijzel")) activeIcons.push('<i class="fa-solid fa-icicles"></i>');
+                if (textToAnalyze.includes("mist")) activeIcons.push('<i class="fa-solid fa-smog"></i>');
+                if (textToAnalyze.includes("hitte") || textToAnalyze.includes("warmte")) activeIcons.push('<i class="fa-solid fa-temperature-arrow-up"></i>');
 
-                if (activeIcons.length === 0) activeIcons.push('<i class="fa-solid fa-triangle-exclamation" style="color:#fff;"></i>');
-                
-                if (iconBox) iconBox.innerHTML = activeIcons.join('');
+                if (activeIcons.length === 0) activeIcons.push('<i class="fa-solid fa-triangle-exclamation"></i>');
+                if (iconBox) iconBox.innerHTML = activeIcons.join(' ');
             }
         } else {
             isAlarmActive = false;
             currentAlarmDetails = null;
-            // --- KNMI SLIDE VERBERGEN ALS HET VEILIG IS ---
             if (wrapper) wrapper.classList.add('skip-slide');
         }
         
-        updateFooterAlarmDisplay(); // Update de Ticker balk onderin
+        updateFooterAlarmDisplay(); 
     } catch (error) { 
         console.error("KNMI Fout:", error); 
     }
