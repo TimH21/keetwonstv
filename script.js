@@ -130,6 +130,17 @@ window.togglePause = function() {
 
 setTimeout(goToNextSlide, 2000);
 
+setInterval(() => {
+    const n = new Date();
+    const hours = String(n.getHours()).padStart(2, '0');
+    const minutes = String(n.getMinutes()).padStart(2, '0');
+    const timeEl = document.getElementById('time');
+    if (timeEl) timeEl.innerHTML = `${hours}<span class="blink-colon">:</span>${minutes}`;
+    const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
+    const dateEl = document.getElementById('date');
+    if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
+}, 1000);
+
 // ===============================================
 // 3. STATISCHE TICKER (NIEUWSZENDER ONDERIN)
 // ===============================================
