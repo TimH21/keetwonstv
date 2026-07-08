@@ -3,106 +3,91 @@
 // =======================================================
 
 // ===============================================
-// 1 & 2. DE SLIDE ROTOR MET BOTERZACHTE FADE & BEDIENING
+// 1 & 2. DE SLIDE ROTOR (INSTANT WISSEL) & BEDIENING
 // ===============================================
 if (window.keetTimer) clearTimeout(window.keetTimer);
 
 let currentSlideIndex = 0;
 const slides = document.querySelectorAll('.slide');
 let isPaused = false;
-let isTransitioning = false; 
 let currentNextTitleStr = "...";
 
-// FIX 1: Verwijder de hardgecodeerde 'active' class (van o.a. de prijzenlijst) om dubbele schermen te voorkomen!
+// Verwijder dubbele actieve slides (zoals de prijzenlijst) bij opstarten
 slides.forEach(s => s.classList.remove('active'));
 if(slides[0]) slides[0].classList.add('active');
 
 function goToNextSlide() {
-    if (isPaused || isTransitioning) return; 
-    
-    const overlay = document.getElementById('transition-overlay');
-    if (!overlay || slides.length === 0) return;
+    if (isPaused) return; 
 
-    isTransitioning = true; 
+    // Oude slide direct uitzetten
+    const oldSlide = slides[currentSlideIndex];
+    if (oldSlide) {
+        oldSlide.classList.remove('active');
+        if (oldSlide.id !== 'slide-omrop') stopOmropSequences();
+        
+        const oldIframes = oldSlide.querySelectorAll('iframe[data-src]');
+        oldIframes.forEach(ifr => ifr.removeAttribute('src'));
+    }
 
-    // FIX 2: Bagger-animaties eruit, we gebruiken uitsluitend de vloeiende 'Fade to Black'
-    overlay.className = 'transition-overlay blackout';
+    // Zoek de volgende slide
+    let escapeHatch = 0;
+    do {
+        currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+        escapeHatch++;
+        if(escapeHatch > slides.length) break; 
+    } while (slides[currentSlideIndex].classList.contains('skip-slide'));
 
-    setTimeout(() => {
-        const oldSlide = slides[currentSlideIndex];
-        if (oldSlide) {
-            oldSlide.classList.remove('active');
-            if (oldSlide.id !== 'slide-omrop') stopOmropSequences();
-            
-            const oldIframes = oldSlide.querySelectorAll('iframe[data-src]');
-            oldIframes.forEach(ifr => ifr.removeAttribute('src'));
-        }
+    const newSlide = slides[currentSlideIndex];
+    let slideDuration = 20000;
 
-        let escapeHatch = 0;
-        do {
-            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
-            escapeHatch++;
-            if(escapeHatch > slides.length) break; 
-        } while (slides[currentSlideIndex].classList.contains('skip-slide'));
+    if (newSlide) {
+        // Nieuwe slide direct aanzetten
+        newSlide.classList.add('active');
 
-        const newSlide = slides[currentSlideIndex];
-        let slideDuration = 20000;
+        const newIframes = newSlide.querySelectorAll('iframe[data-src]');
+        newIframes.forEach(ifr => ifr.src = ifr.getAttribute('data-src'));
 
-        if (newSlide) {
-            newSlide.classList.add('active');
+        const m = new Date();
+        const isTopOfHour = m.getMinutes() < 5;
+        slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
 
-            const newIframes = newSlide.querySelectorAll('iframe[data-src]');
-            newIframes.forEach(ifr => ifr.src = ifr.getAttribute('data-src'));
+        if (newSlide.id === 'slide-knmi') document.body.classList.add('fullscreen-mode');
+        else document.body.classList.remove('fullscreen-mode');
 
-            const m = new Date();
-            const isTopOfHour = m.getMinutes() < 5;
-            slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
-
-            if (newSlide.id === 'slide-knmi') document.body.classList.add('fullscreen-mode');
-            else document.body.classList.remove('fullscreen-mode');
-
-            if (newSlide.id === 'slide-omrop') {
-                const badge = document.getElementById('omrop-mode-badge');
-                if (isTopOfHour) {
-                    slideDuration = 65000;
-                    newSlide.classList.add('journaal-active');
-                    if (badge) badge.textContent = "LIVESTREAM KEET-JOURNAAL";
-                    renderOmropJournaal();
-                } else {
-                    newSlide.classList.remove('journaal-active');
-                    if (badge) badge.textContent = "LIVE NIJSFEER";
-                    startOmrop112Sequence();
-                }
+        if (newSlide.id === 'slide-omrop') {
+            const badge = document.getElementById('omrop-mode-badge');
+            if (isTopOfHour) {
+                slideDuration = 65000;
+                newSlide.classList.add('journaal-active');
+                if (badge) badge.textContent = "LIVESTREAM KEET-JOURNAAL";
+                renderOmropJournaal();
+            } else {
+                newSlide.classList.remove('journaal-active');
+                if (badge) badge.textContent = "LIVE NIJSFEER";
+                startOmrop112Sequence();
             }
         }
+    }
 
-        const nextIdx = (currentSlideIndex + 1) % slides.length;
-        currentNextTitleStr = slides[nextIdx].getAttribute('data-title') || "...";
-        const footerTitleEl = document.getElementById('footer-next-title');
-        if (footerTitleEl) footerTitleEl.textContent = currentNextTitleStr;
+    const nextIdx = (currentSlideIndex + 1) % slides.length;
+    currentNextTitleStr = slides[nextIdx].getAttribute('data-title') || "...";
+    const footerTitleEl = document.getElementById('footer-next-title');
+    if (footerTitleEl) footerTitleEl.textContent = currentNextTitleStr;
 
-        let bar = document.getElementById('global-progress-bar');
-        if (bar) {
-            bar.style.transition = 'none';
-            bar.style.width = '0%';
-            setTimeout(() => {
-                bar.style.transition = `width ${slideDuration}ms linear`;
-                bar.style.width = '100%';
-            }, 50);
-        }
+    let bar = document.getElementById('global-progress-bar');
+    if (bar) {
+        bar.style.transition = 'none';
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.transition = `width ${slideDuration}ms linear`;
+            bar.style.width = '100%';
+        }, 50);
+    }
 
-        window.keetTimer = setTimeout(goToNextSlide, slideDuration);
-    }, 600); // Wacht precies 600ms (tot het scherm 100% zwart is) met overschakelen
-
-    // Fade weer langzaam op naar de nieuwe slide
-    setTimeout(() => {
-        if(overlay) overlay.className = 'transition-overlay';
-        setTimeout(() => { isTransitioning = false; }, 600); 
-    }, 1000);
+    window.keetTimer = setTimeout(goToNextSlide, slideDuration);
 }
 
 window.next = function() {
-    if (isTransitioning) return;
     clearTimeout(window.keetTimer);
     goToNextSlide();
 };
@@ -130,7 +115,8 @@ window.togglePause = function() {
 
 setTimeout(goToNextSlide, 2000);
 
-setInterval(() => {
+// DE KLOK FIX (Direct een push geven zodat hij niet op --:-- blijft hangen)
+function updateClock() {
     const n = new Date();
     const hours = String(n.getHours()).padStart(2, '0');
     const minutes = String(n.getMinutes()).padStart(2, '0');
@@ -139,7 +125,9 @@ setInterval(() => {
     const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
     const dateEl = document.getElementById('date');
     if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
-}, 1000);
+}
+updateClock(); // Voer 1x direct uit
+setInterval(updateClock, 1000); // En blijf daarna elke seconde tikken
 
 // ===============================================
 // 3. STATISCHE TICKER (NIEUWSZENDER ONDERIN)
