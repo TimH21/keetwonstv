@@ -164,22 +164,26 @@
 
 
             
-            <div class="slide" id="slide-knmi" data-title="Prijzenlijst" data-time="45000">
-                <div class="knmi-bg"></div>
-                <div class="knmi-container" id="knmi-wrapper">
-                    
-                    <div class="knmi-header-box">
-                        <div class="knmi-logo-txt">KNMI</div>
-                        <div class="knmi-icon-box" id="knmi-icons">
-                            <i class="fa-solid fa-sun"></i>
-                        </div>
-                    </div>
-                    
-                    <h1 id="knmi-title">GEEN WAARSCHUWINGEN</h1>
-                    <p id="knmi-info">Op dit moment is er geen actueel weeralarm voor de provincie Friesland.</p>
-                    
+            <div class="slide" id="slide-knmi" data-title="Prijzenlijst" data-time="60000">
+    <div class="slide-inner centered-layout" style="width: 100%; height: 100%; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        
+        <div id="knmi-bg-color" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background-color: #f97316;"></div>
+        
+        <div style="z-index: 2; color: white; max-width: 85%;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 4vh;">
+                <div style="font-size: 5vh; font-weight: 900; letter-spacing: 5px; background: white; color: black; padding: 1vh 2vw; border-radius: 10px;">KNMI</div>
+                <div id="knmi-icons" style="font-size: 6vh; display: flex; gap: 15px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
             </div>
+            
+            <h1 id="knmi-title" style="font-size: 8vh; margin-bottom: 2vh; font-weight: 900; text-shadow: 0 5px 15px rgba(0,0,0,0.6);">GEEN WAARSCHUWINGEN</h1>
+            <p id="knmi-info" style="font-size: 3.5vh; line-height: 1.4; text-shadow: 0 3px 10px rgba(0,0,0,0.6);">Op dit moment is er geen actueel weeralarm voor de provincie Friesland.</p>
+        </div>
+        
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; box-shadow: inset 0 0 100px rgba(0,0,0,0.9); pointer-events: none; z-index: 3;"></div>
+    </div>
+</div>
 
             <!-- Nieuwe Vaste Menukaart met geüpdatete prijzen -->
             <div class="slide active" id="slide-menu-main" data-title="Prijzenlijst" data-time="45000">
