@@ -431,7 +431,7 @@ async function checkKnmiAlarm() {
         const titelEl = document.getElementById('knmi-title');
         const infoEl = document.getElementById('knmi-info');
         const iconBox = document.getElementById('knmi-icons');
-        const bgBox = document.getElementById('knmi-bg-color'); // Koppel de achtergrond
+        const bgBox = document.getElementById('knmi-bg-color'); // Koppel de nieuwe achtergrond!
 
         if (isEchtAlarm || isKleurAlarm) {
             isAlarmActive = true;
@@ -443,7 +443,7 @@ async function checkKnmiAlarm() {
                 const codeTxt = currentAlarmDetails.wrschklr.toLowerCase();
                 const alertText = currentAlarmDetails.lkop || currentAlarmDetails.alarmtxt || "Gevaarlijk weer op komst. Blijf alert.";
                 
-                // FORCEER DE KLEUR VIA JAVASCRIPT!
+                // FORCEER DE KLEUR KEIHARD VIA JAVASCRIPT!
                 if (bgBox) {
                     if (codeTxt === 'rood') bgBox.style.backgroundColor = '#ef4444';
                     else if (codeTxt === 'oranje') bgBox.style.backgroundColor = '#f97316';
@@ -457,16 +457,16 @@ async function checkKnmiAlarm() {
                 const textToAnalyze = alertText.toLowerCase();
                 let activeIcons = [];
 
-                if (textToAnalyze.includes("onweer") || textToAnalyze.includes("bliksem")) activeIcons.push('<i class="fa-solid fa-bolt"></i>');
-                if (textToAnalyze.includes("regen") || textToAnalyze.includes("neerslag")) activeIcons.push('<i class="fa-solid fa-cloud-showers-heavy"></i>');
-                if (textToAnalyze.includes("hagel")) activeIcons.push('<i class="fa-solid fa-cloud-meatball"></i>');
-                if (textToAnalyze.includes("wind") || textToAnalyze.includes("storm") || textToAnalyze.includes("stoten")) activeIcons.push('<i class="fa-solid fa-wind"></i>');
-                if (textToAnalyze.includes("sneeuw") || textToAnalyze.includes("winter")) activeIcons.push('<i class="fa-regular fa-snowflake"></i>');
-                if (textToAnalyze.includes("glad") || textToAnalyze.includes("ijzel")) activeIcons.push('<i class="fa-solid fa-icicles"></i>');
-                if (textToAnalyze.includes("mist")) activeIcons.push('<i class="fa-solid fa-smog"></i>');
-                if (textToAnalyze.includes("hitte") || textToAnalyze.includes("warmte")) activeIcons.push('<i class="fa-solid fa-temperature-arrow-up"></i>');
+                if (textToAnalyze.includes("onweer") || textToAnalyze.includes("bliksem")) activeIcons.push('<i class="fa-solid fa-bolt" style="color:#f1c40f;"></i>');
+                if (textToAnalyze.includes("regen") || textToAnalyze.includes("neerslag")) activeIcons.push('<i class="fa-solid fa-cloud-showers-heavy" style="color:#fff;"></i>');
+                if (textToAnalyze.includes("hagel")) activeIcons.push('<i class="fa-solid fa-cloud-meatball" style="color:#ecf0f1;"></i>');
+                if (textToAnalyze.includes("wind") || textToAnalyze.includes("storm") || textToAnalyze.includes("stoten")) activeIcons.push('<i class="fa-solid fa-wind" style="color:#bdc3c7;"></i>');
+                if (textToAnalyze.includes("sneeuw") || textToAnalyze.includes("winter")) activeIcons.push('<i class="fa-regular fa-snowflake" style="color:#fff;"></i>');
+                if (textToAnalyze.includes("glad") || textToAnalyze.includes("ijzel")) activeIcons.push('<i class="fa-solid fa-icicles" style="color:#81ecec;"></i>');
+                if (textToAnalyze.includes("mist")) activeIcons.push('<i class="fa-solid fa-smog" style="color:#95a5a6;"></i>');
+                if (textToAnalyze.includes("hitte") || textToAnalyze.includes("warmte")) activeIcons.push('<i class="fa-solid fa-temperature-arrow-up" style="color:#e74c3c;"></i>');
 
-                if (activeIcons.length === 0) activeIcons.push('<i class="fa-solid fa-triangle-exclamation"></i>');
+                if (activeIcons.length === 0) activeIcons.push('<i class="fa-solid fa-triangle-exclamation" style="color:#fff;"></i>');
                 if (iconBox) iconBox.innerHTML = activeIcons.join(' ');
             }
         } else {
