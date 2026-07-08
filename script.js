@@ -41,35 +41,43 @@ function goToNextSlide() {
         }
 
         // Zoek de volgende (en skip slides die offline zijn)
+        let escapeHatch = 0; // Veiligheid tegen vastlopen als alles offline is
         do {
             currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            escapeHatch++;
+            if(escapeHatch > slides.length) break; 
         } while (slides[currentSlideIndex].classList.contains('skip-slide'));
 
         const newSlide = slides[currentSlideIndex];
-        newSlide.classList.add('active');
+        let slideDuration = 20000;
 
-        // DATA SAVER: Nieuwe iframes direct laden met hun data-src!
-        const newIframes = newSlide.querySelectorAll('iframe[data-src]');
-        newIframes.forEach(ifr => ifr.src = ifr.getAttribute('data-src'));
+        if (newSlide) {
+            newSlide.classList.add('active');
 
-        // --- SPECIFIEKE KEET WÛNS LOGICA ---
-        const m = new Date();
-        const isTopOfHour = m.getMinutes() < 5;
-        let slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
+            // DATA SAVER: Nieuwe iframes direct laden met hun data-src!
+            const newIframes = newSlide.querySelectorAll('iframe[data-src]');
+            newIframes.forEach(ifr => ifr.src = ifr.getAttribute('data-src'));
 
-        if (newSlide.id === 'slide-knmi') document.body.classList.add('fullscreen-mode');
-        else document.body.classList.remove('fullscreen-mode');
+            // --- SPECIFIEKE KEET WÛNS LOGICA ---
+            const m = new Date();
+            const isTopOfHour = m.getMinutes() < 5;
+            slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
 
-        if (newSlide.id === 'slide-omrop') {
-            if (isTopOfHour) {
-                slideDuration = 65000;
-                newSlide.classList.add('journaal-active');
-                document.getElementById('omrop-mode-badge').textContent = "LIVESTREAM KEET-JOURNAAL";
-                renderOmropJournaal();
-            } else {
-                newSlide.classList.remove('journaal-active');
-                document.getElementById('omrop-mode-badge').textContent = "LIVE NIJSFEER";
-                startOmrop112Sequence();
+            if (newSlide.id === 'slide-knmi') document.body.classList.add('fullscreen-mode');
+            else document.body.classList.remove('fullscreen-mode');
+
+            if (newSlide.id === 'slide-omrop') {
+                const badge = document.getElementById('omrop-mode-badge'); // VEILIGHEIDSCHECK
+                if (isTopOfHour) {
+                    slideDuration = 65000;
+                    newSlide.classList.add('journaal-active');
+                    if (badge) badge.textContent = "LIVESTREAM KEET-JOURNAAL";
+                    renderOmropJournaal();
+                } else {
+                    newSlide.classList.remove('journaal-active');
+                    if (badge) badge.textContent = "LIVE NIJSFEER";
+                    startOmrop112Sequence();
+                }
             }
         }
 
@@ -89,11 +97,12 @@ function goToNextSlide() {
             }, 50);
         }
 
+        // Plan de volgende slide succesvol in
         window.keetTimer = setTimeout(goToNextSlide, slideDuration);
     }, 500);
 
     setTimeout(() => {
-        overlay.className = 'transition-overlay';
+        if(overlay) overlay.className = 'transition-overlay';
         isTransitioning = false; // Animatie klaar, haal het slot er weer af!
     }, 1500);
 }
