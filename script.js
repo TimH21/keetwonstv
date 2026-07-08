@@ -3,146 +3,6 @@
 // =======================================================
 
 // ===============================================
-// 1. ATOMIC CLOCK SLIDE SYSTEEM (MET HANDMATIGE BEDIENING)
-// ===============================================
-let slideTimer;
-const DEFAULT_TIME = 20000;
-let globalTimeOffset = 0; 
-let pauseStartTime = 0;   
-let isPaused = false;            // DEZE WAS WEG!
-let currentNextTitleStr = "..."; // DEZE WAS OOK WEG!
-
-function syncScreens() {
-    const allActiveSlides = Array.from(document.querySelectorAll('.slide:not(.skip-slide)'));
-    if (allActiveSlides.length === 0) return;
-
-    let totalCycleMs = 0;
-    const timings = [];
-    allActiveSlides.forEach(slide => {
-        const dur = parseInt(slide.getAttribute('data-time')) || DEFAULT_TIME;
-        timings.push({ el: slide, duration: dur });
-        totalCycleMs += dur;
-    });
-
-    let now = Date.now();
-    
-    // Als we gepauzeerd zijn, loopt de tijd voor de diashow niet verder
-    if (isPaused) {
-        globalTimeOffset -= (now - pauseStartTime);
-        pauseStartTime = now;
-    }
-
-    let elapsedInCycle = (now + globalTimeOffset) % totalCycleMs;
-    if (elapsedInCycle < 0) elapsedInCycle += totalCycleMs;
-
-    let currentSlideIdx = 0;
-    for (let i = 0; i < timings.length; i++) {
-        if (elapsedInCycle < timings[i].duration) {
-            currentSlideIdx = i;
-            break;
-        }
-        elapsedInCycle -= timings[i].duration;
-    }
-
-    const currentSlide = timings[currentSlideIdx].el;
-    const timeRemaining = timings[currentSlideIdx].duration - elapsedInCycle;
-
-    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
-    currentSlide.classList.add('active');
-    // ACTIVEER FULLSCREEN EN JOURNAAL MODUS VOOR KNMI & OMROP
-    const m = new Date();
-    const isTopOfHour = m.getMinutes() < 5; // Eerste 5 minuten van het uur
-
-    // Dynamische tijdsverlenging voor het elk-uur-journaal instellen in de loop
-    timings.forEach(t => {
-        if (t.el.id === 'slide-omrop' && isTopOfHour) {
-            t.duration = 65000; // Geef het journaal een dikke minuut leestijd!
-        }
-    });
-
-    if (currentSlide.id === 'slide-knmi') {
-        document.body.classList.add('fullscreen-mode');
-    } else {
-        document.body.classList.remove('fullscreen-mode');
-    }
-
-    // Specifieke Omrop Logica triggeren bij activatie
-    if (currentSlide.id === 'slide-omrop') {
-        const slideEl = document.getElementById('slide-omrop');
-        if (isTopOfHour) {
-            slideEl.classList.add('journaal-active');
-            document.getElementById('omrop-mode-badge').textContent = "LIVESTREAM KEET-JOURNAAL";
-            renderOmropJournaal();
-        } else {
-            slideEl.classList.remove('journaal-active');
-            document.getElementById('omrop-mode-badge').textContent = "LIVE NIJSFEER";
-            startOmrop112Sequence();
-        }
-    } else {
-        stopOmropSequences(); // Rust op de achtergrond als de slide weg is
-    }
-
-    const nextIdx = (currentSlideIdx + 1) % timings.length;
-    const nextTitle = timings[nextIdx].el.getAttribute('data-title') || "...";
-    const footerTitleEl = document.getElementById('footer-next-title');
-    
-    if (footerTitleEl) {
-        if (isPaused) footerTitleEl.textContent = "GEPAUZEERD";
-        else footerTitleEl.textContent = nextTitle;
-    }
-
-    let bar = document.getElementById('global-progress-bar');
-    if (bar) {
-        bar.style.transition = 'none';
-        let startPercentage = (elapsedInCycle / timings[currentSlideIdx].duration) * 100;
-        bar.style.width = startPercentage + '%';
-        
-        if (!isPaused) {
-            setTimeout(() => {
-                bar.style.transition = `width ${timeRemaining}ms linear`;
-                bar.style.width = '100%';
-            }, 50);
-        }
-    }
-
-    clearTimeout(slideTimer);
-    if (!isPaused) {
-        slideTimer = setTimeout(syncScreens, timeRemaining);
-    }
-}
-setTimeout(syncScreens, 200);
-
-// ===============================================
-// 2. BEDIENINGSKNOPPEN & TIJD EN DATUM
-// ===============================================
-
-setInterval(() => {
-    const n = new Date();
-    const hours = String(n.getHours()).padStart(2, '0');
-    const minutes = String(n.getMinutes()).padStart(2, '0');
-    
-    const timeEl = document.getElementById('time');
-    if (timeEl) timeEl.innerHTML = `${hours}<span class="blink-colon">:</span>${minutes}`;
-    
-    const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
-    const dateEl = document.getElementById('date');
-    if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
-}, 1000);
-
-// BEDIENINGSKNOPPEN (AGRESSIEVE FORCE NEXT)
-window.next = function() {
-    const allActiveSlides = Array.from(document.querySelectorAll('.slide:not(.skip-slide)'));
-    const currentActive = document.querySelector('.slide.active');
-    if(!currentActive || allActiveSlides.length === 0) return;
-    
-    // Pak de duur van de dia waar we nu op zitten
-    let dur = parseInt(currentActive.getAttribute('data-time')) || DEFAULT_TIME;
-    
-    // Geef de wereldwijde tijdlijn een zet van precies één dia-lengte
-    globalTimeOffset += dur;
-    
-    if (isPaused) pauseStartTime = Date.now();
-// ===============================================
 // 1 & 2. DE SLIDE ROTOR MET RANDOM OVERGANGEN & BEDIENING
 // ===============================================
 if (window.keetTimer) clearTimeout(window.keetTimer);
@@ -150,36 +10,37 @@ if (window.keetTimer) clearTimeout(window.keetTimer);
 let currentSlideIndex = 0;
 const slides = document.querySelectorAll('.slide');
 let isPaused = false;
+let isTransitioning = false; // HET VEILIGHEIDSSLOT TEGEN VASTLOPEN!
 let currentNextTitleStr = "...";
 
 const transitionEffects = [
-    'trans-diagonal-stripes',
-    'trans-logo-stamp',
-    'trans-tv-glitch',
-    'trans-blinds',
-    'trans-slice'
+    'trans-diagonal-stripes', 'trans-logo-stamp', 'trans-tv-glitch', 'trans-blinds', 'trans-slice'
 ];
 
 function goToNextSlide() {
-    if (isPaused) return;
-
+    // Stop als we gepauzeerd zijn of AL aan het draaien zijn
+    if (isPaused || isTransitioning) return; 
+    
     const overlay = document.getElementById('transition-overlay');
     if (!overlay || slides.length === 0) return;
 
-    // 1. Start de transitie
+    isTransitioning = true; // Zet het slot erop!
+
     const randomEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
     overlay.className = `transition-overlay ${randomEffect}`;
 
     setTimeout(() => {
-        // 2. Schakel de oude slide uit
-        if (slides[currentSlideIndex]) {
-            slides[currentSlideIndex].classList.remove('active');
-            if (slides[currentSlideIndex].id !== 'slide-omrop') {
-                stopOmropSequences();
-            }
+        const oldSlide = slides[currentSlideIndex];
+        if (oldSlide) {
+            oldSlide.classList.remove('active');
+            if (oldSlide.id !== 'slide-omrop') stopOmropSequences();
+            
+            // DATA SAVER: Oude iframes direct leeggooien
+            const oldIframes = oldSlide.querySelectorAll('iframe[data-src]');
+            oldIframes.forEach(ifr => ifr.removeAttribute('src'));
         }
 
-        // 3. Zoek de volgende slide (en skip de offline/verborgen slides)
+        // Zoek de volgende (en skip slides die offline zijn)
         do {
             currentSlideIndex = (currentSlideIndex + 1) % slides.length;
         } while (slides[currentSlideIndex].classList.contains('skip-slide'));
@@ -187,20 +48,21 @@ function goToNextSlide() {
         const newSlide = slides[currentSlideIndex];
         newSlide.classList.add('active');
 
+        // DATA SAVER: Nieuwe iframes direct laden met hun data-src!
+        const newIframes = newSlide.querySelectorAll('iframe[data-src]');
+        newIframes.forEach(ifr => ifr.src = ifr.getAttribute('data-src'));
+
         // --- SPECIFIEKE KEET WÛNS LOGICA ---
         const m = new Date();
         const isTopOfHour = m.getMinutes() < 5;
         let slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
 
-        if (newSlide.id === 'slide-knmi') {
-            document.body.classList.add('fullscreen-mode');
-        } else {
-            document.body.classList.remove('fullscreen-mode');
-        }
+        if (newSlide.id === 'slide-knmi') document.body.classList.add('fullscreen-mode');
+        else document.body.classList.remove('fullscreen-mode');
 
         if (newSlide.id === 'slide-omrop') {
             if (isTopOfHour) {
-                slideDuration = 65000; // Extra leestijd voor het journaal
+                slideDuration = 65000;
                 newSlide.classList.add('journaal-active');
                 document.getElementById('omrop-mode-badge').textContent = "LIVESTREAM KEET-JOURNAAL";
                 renderOmropJournaal();
@@ -211,7 +73,7 @@ function goToNextSlide() {
             }
         }
 
-        // 4. Werk de footer en de voortgangsbalk bij
+        // Footer update
         const nextIdx = (currentSlideIndex + 1) % slides.length;
         currentNextTitleStr = slides[nextIdx].getAttribute('data-title') || "...";
         const footerTitleEl = document.getElementById('footer-next-title');
@@ -227,19 +89,17 @@ function goToNextSlide() {
             }, 50);
         }
 
-        // 5. Plan de volgende rotatie
         window.keetTimer = setTimeout(goToNextSlide, slideDuration);
+    }, 500);
 
-    }, 500); // Wacht tot het scherm is bedekt door de transitie
-
-    // Ruim de transitie-laag op
     setTimeout(() => {
         overlay.className = 'transition-overlay';
+        isTransitioning = false; // Animatie klaar, haal het slot er weer af!
     }, 1500);
 }
 
-// BEDIENINGSKNOPPEN OVERSCHRIJVEN (Agressieve force)
 window.next = function() {
+    if (isTransitioning) return; // Voorkom dubbelklik-crashes
     clearTimeout(window.keetTimer);
     goToNextSlide();
 };
@@ -247,17 +107,13 @@ window.next = function() {
 window.togglePause = function() {
     const btn = document.getElementById('btn-pause');
     isPaused = !isPaused;
-
     let bar = document.getElementById('global-progress-bar');
 
     if (isPaused) {
         clearTimeout(window.keetTimer);
         if (btn) { btn.innerHTML = "Hervat Rotatie ▶️"; btn.style.background = "#2ecc71"; btn.style.color = "black"; }
-        
         const footerTitleEl = document.getElementById('footer-next-title');
         if (footerTitleEl) footerTitleEl.textContent = "GEPAUZEERD";
-        
-        // Bevries de neon balk
         if (bar) {
             let currentWidth = window.getComputedStyle(bar).width;
             bar.style.transition = 'none';
@@ -265,14 +121,12 @@ window.togglePause = function() {
         }
     } else {
         if (btn) { btn.innerHTML = "Pauzeer Rotatie ⏸️"; btn.style.background = "#333"; btn.style.color = "white"; }
-        goToNextSlide(); // Herstart direct
+        goToNextSlide();
     }
 };
 
-// Start de motor 2 seconden nadat het scherm is opgestart
 setTimeout(goToNextSlide, 2000);
 
-// Tijd & Datum in de zijbalk houden we uiteraard draaiend!
 setInterval(() => {
     const n = new Date();
     const hours = String(n.getHours()).padStart(2, '0');
@@ -283,7 +137,6 @@ setInterval(() => {
     const dateEl = document.getElementById('date');
     if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
 }, 1000);
-
 
 // ===============================================
 // 3. STATISCHE TICKER (NIEUWSZENDER ONDERIN)
@@ -1471,7 +1324,7 @@ let isWebcamPlaying = false;
 function manageNetworkSlides() {
     const isOffline = !navigator.onLine;
 
-    // 1. BEHEER DE WEBCAM SLIDE
+    // 1. BEHEER WEBCAM
     const webcamSlide = document.getElementById('slide-makkum');
     const videoEl = document.getElementById('makkum-video');
     if (webcamSlide) {
@@ -1489,18 +1342,21 @@ function manageNetworkSlides() {
         }
     }
 
-    // 2. BEHEER DE RADAR SLIDE (Overslaan bij geen internet)
+    // 2. BEHEER RADAR (Overslaan bij geen internet)
     const radarSlide = document.getElementById('slide-radar');
     if (radarSlide) {
         if (isOffline) {
             radarSlide.classList.add('skip-slide');
-            // Forceer de tv naar de volgende slide als hij net op de radar stond toen internet uitviel
+            // Forceer de tv naar de volgende slide als hij net op de radar stond
             if (radarSlide.classList.contains('active')) window.next();
         } else {
             radarSlide.classList.remove('skip-slide');
         }
     }
 }
+// 2000 ms is veiliger voor de processor dan 1000ms
+setInterval(manageNetworkSlides, 2000);
+
 function startMakkumStream(video) {
     isWebcamPlaying = true;
     
