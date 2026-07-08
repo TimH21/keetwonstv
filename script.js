@@ -3,31 +3,30 @@
 // =======================================================
 
 // ===============================================
-// 1 & 2. DE SLIDE ROTOR MET RANDOM OVERGANGEN & BEDIENING
+// 1 & 2. DE SLIDE ROTOR MET BOTERZACHTE FADE & BEDIENING
 // ===============================================
 if (window.keetTimer) clearTimeout(window.keetTimer);
 
 let currentSlideIndex = 0;
 const slides = document.querySelectorAll('.slide');
 let isPaused = false;
-let isTransitioning = false; // HET VEILIGHEIDSSLOT TEGEN VASTLOPEN!
+let isTransitioning = false; 
 let currentNextTitleStr = "...";
 
-const transitionEffects = [
-    'trans-diagonal-stripes', 'trans-logo-stamp', 'trans-tv-glitch', 'trans-blinds', 'trans-slice'
-];
+// FIX 1: Verwijder de hardgecodeerde 'active' class (van o.a. de prijzenlijst) om dubbele schermen te voorkomen!
+slides.forEach(s => s.classList.remove('active'));
+if(slides[0]) slides[0].classList.add('active');
 
 function goToNextSlide() {
-    // Stop als we gepauzeerd zijn of AL aan het draaien zijn
     if (isPaused || isTransitioning) return; 
     
     const overlay = document.getElementById('transition-overlay');
     if (!overlay || slides.length === 0) return;
 
-    isTransitioning = true; // Zet het slot erop!
+    isTransitioning = true; 
 
-    const randomEffect = transitionEffects[Math.floor(Math.random() * transitionEffects.length)];
-    overlay.className = `transition-overlay ${randomEffect}`;
+    // FIX 2: Bagger-animaties eruit, we gebruiken uitsluitend de vloeiende 'Fade to Black'
+    overlay.className = 'transition-overlay blackout';
 
     setTimeout(() => {
         const oldSlide = slides[currentSlideIndex];
@@ -35,13 +34,11 @@ function goToNextSlide() {
             oldSlide.classList.remove('active');
             if (oldSlide.id !== 'slide-omrop') stopOmropSequences();
             
-            // DATA SAVER: Oude iframes direct leeggooien
             const oldIframes = oldSlide.querySelectorAll('iframe[data-src]');
             oldIframes.forEach(ifr => ifr.removeAttribute('src'));
         }
 
-        // Zoek de volgende (en skip slides die offline zijn)
-        let escapeHatch = 0; // Veiligheid tegen vastlopen als alles offline is
+        let escapeHatch = 0;
         do {
             currentSlideIndex = (currentSlideIndex + 1) % slides.length;
             escapeHatch++;
@@ -54,11 +51,9 @@ function goToNextSlide() {
         if (newSlide) {
             newSlide.classList.add('active');
 
-            // DATA SAVER: Nieuwe iframes direct laden met hun data-src!
             const newIframes = newSlide.querySelectorAll('iframe[data-src]');
             newIframes.forEach(ifr => ifr.src = ifr.getAttribute('data-src'));
 
-            // --- SPECIFIEKE KEET WÛNS LOGICA ---
             const m = new Date();
             const isTopOfHour = m.getMinutes() < 5;
             slideDuration = parseInt(newSlide.getAttribute('data-time')) || 20000;
@@ -67,7 +62,7 @@ function goToNextSlide() {
             else document.body.classList.remove('fullscreen-mode');
 
             if (newSlide.id === 'slide-omrop') {
-                const badge = document.getElementById('omrop-mode-badge'); // VEILIGHEIDSCHECK
+                const badge = document.getElementById('omrop-mode-badge');
                 if (isTopOfHour) {
                     slideDuration = 65000;
                     newSlide.classList.add('journaal-active');
@@ -81,7 +76,6 @@ function goToNextSlide() {
             }
         }
 
-        // Footer update
         const nextIdx = (currentSlideIndex + 1) % slides.length;
         currentNextTitleStr = slides[nextIdx].getAttribute('data-title') || "...";
         const footerTitleEl = document.getElementById('footer-next-title');
@@ -97,18 +91,18 @@ function goToNextSlide() {
             }, 50);
         }
 
-        // Plan de volgende slide succesvol in
         window.keetTimer = setTimeout(goToNextSlide, slideDuration);
-    }, 500);
+    }, 600); // Wacht precies 600ms (tot het scherm 100% zwart is) met overschakelen
 
+    // Fade weer langzaam op naar de nieuwe slide
     setTimeout(() => {
         if(overlay) overlay.className = 'transition-overlay';
-        isTransitioning = false; // Animatie klaar, haal het slot er weer af!
-    }, 1500);
+        setTimeout(() => { isTransitioning = false; }, 600); 
+    }, 1000);
 }
 
 window.next = function() {
-    if (isTransitioning) return; // Voorkom dubbelklik-crashes
+    if (isTransitioning) return;
     clearTimeout(window.keetTimer);
     goToNextSlide();
 };
@@ -135,17 +129,6 @@ window.togglePause = function() {
 };
 
 setTimeout(goToNextSlide, 2000);
-
-setInterval(() => {
-    const n = new Date();
-    const hours = String(n.getHours()).padStart(2, '0');
-    const minutes = String(n.getMinutes()).padStart(2, '0');
-    const timeEl = document.getElementById('time');
-    if (timeEl) timeEl.innerHTML = `${hours}<span class="blink-colon">:</span>${minutes}`;
-    const dStr = n.toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long'});
-    const dateEl = document.getElementById('date');
-    if (dateEl) dateEl.textContent = dStr.charAt(0).toUpperCase() + dStr.slice(1);
-}, 1000);
 
 // ===============================================
 // 3. STATISCHE TICKER (NIEUWSZENDER ONDERIN)
